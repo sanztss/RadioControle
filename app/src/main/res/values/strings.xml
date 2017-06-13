@@ -1,0 +1,49 @@
+<resources>
+    <string name="app_name">Rádio Controle</string>
+    <string name="action_canais">Canais</string>
+    <string name="action_dormir">Dormir</string>
+    <string name="action_canal">Canal</string>
+    <string name="drawer_open">Abrir</string>
+    <string name="drawer_close">Fechar</string>
+
+    <string name="nav_item_home">Início</string>
+    <string name="nav_item_noticias">Notícias</string>
+    <string name="nav_item_mural">Mural</string>
+    <string name="nav_item_programas">Programas</string>
+    <string name="nav_item_perfil">Perfil</string>
+    <string name="nav_item_podcasts">Podcasts</string>
+    <string name="nav_item_promocoes">Promoções</string>
+    <string name="nav_item_sobre">Sobre o aplicativo</string>
+
+    <string name="nav_item_icon_home">Início</string>
+    <string name="nav_item_icon_noticias">Amigos</string>
+    <string name="nav_item_icon_mural">Mural</string>
+
+
+    <!-- navigation drawer item labels  -->
+    <string-array name="nav_drawer_labels">
+        <item>@string/nav_item_home</item>
+        <item>@string/nav_item_noticias</item>
+        <item>@string/nav_item_icon_mural</item>
+        <item>@string/nav_item_programas</item>
+        <item>@string/nav_item_perfil</item>
+        <item>@string/nav_item_podcasts</item>
+        <item>@string/nav_item_promocoes</item>
+        <item>@string/nav_item_sobre</item>
+    </string-array>
+
+    <integer-array name="nav_drawer_icons">
+        <item>@drawable/ic_home_gray</item>
+        <item>@drawable/ic_newspaper_gray</item>
+        <item>@drawable/ic_comments_gray</item>
+        <item>@drawable/ic_calendar_clock_gray</item>
+        <item>@drawable/ic_account_gray</item>
+        <item>@drawable/ic_radio_tower_gray</item>
+        <item>@drawable/ic_trophy_gray</item>
+        <item>@drawable/ic_information_gray</item>
+    </integer-array>
+
+    <string name="title_mural">Mural</string>
+    <string name="title_noticias">Notícias</string>
+    <string name="title_home">Início</string>
+</resources>
