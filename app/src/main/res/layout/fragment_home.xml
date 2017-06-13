@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:clipToPadding="false"
     tools:context="accessweb.com.br.radiocontrole.activity.HomeFragment"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
@@ -14,7 +15,8 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:clipToPadding="false">
 
             <ImageView
                 android:id="@+id/anuncio"
@@ -52,7 +54,8 @@
                 android:layout_below="@id/relativeLogo"
                 android:layout_marginTop="0dp"
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:clipToPadding="false">
 
                 <!--<LinearLayout
                     android:id="@+id/maisVotadas"
@@ -428,10 +431,19 @@
                     </RelativeLayout>
 
                 </LinearLayout>
-
+                <android.support.design.widget.FloatingActionButton
+                    android:onClick="playPause"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elevation="4dp"
+                    android:layout_alignParentTop="true"
+                    android:layout_alignParentRight="true"
+                    android:src="@drawable/ic_play_white"
+                    app:backgroundTint="@color/colorPrimary"
+                    android:layout_marginTop="-50dp"/>
             </RelativeLayout>
 
-            <android.support.design.widget.FloatingActionButton
+            <!--<android.support.design.widget.FloatingActionButton
                 android:onClick="playPause"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -441,7 +453,7 @@
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
                 android:src="@drawable/ic_play_white"
-                app:backgroundTint="@color/colorPrimary"/>
+                app:backgroundTint="@color/colorPrimary"/>-->
 
         </RelativeLayout>
 

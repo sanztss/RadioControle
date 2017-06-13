@@ -17,6 +17,8 @@ import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.AnimationUtils;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private FragmentDrawer drawerFragment;
     private Context mContext;
     private SlidingUpPanelLayout painel;
+    private TextView txtRotativo;
 
 
     @Override
@@ -74,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         ///     SlidingUpPanelLayout     ///
         ////////////////////////////////////
         painel = (SlidingUpPanelLayout) findViewById(R.id.sliding_layout);
+        painel.getChildAt(1).setOnClickListener(null);
         painel.addPanelSlideListener(new SlidingUpPanelLayout.PanelSlideListener() {
             @Override
             public void onPanelSlide(View panel, float slideOffset) {
@@ -91,6 +95,12 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             painel.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
             }
         });
+
+        //////////////////////////////
+        ///     Texto Rotativo     ///
+        //////////////////////////////
+        txtRotativo = (TextView) this.findViewById(R.id.txtRotativo);
+        txtRotativo.setSelected(true);
     }
 
 
@@ -110,10 +120,19 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        pToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                painel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+            }
+        });
+
         pToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
 
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+
+                Log.v("back", "" + item.getItemId());
                 if(item.getItemId() == R.id.action_canais){
                     Toast.makeText(getApplicationContext(), "Abrir lista de canais!", Toast.LENGTH_SHORT).show();
                 }else if (item.getItemId() == R.id.action_dormir){
