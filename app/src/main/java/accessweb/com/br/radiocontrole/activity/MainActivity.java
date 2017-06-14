@@ -10,10 +10,12 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -45,7 +47,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private Context mContext;
     private SlidingUpPanelLayout painel;
     private TextView txtRotativo;
-
+    private RecyclerView mRecyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,9 +136,12 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
                 Log.v("back", "" + item.getItemId());
                 if(item.getItemId() == R.id.action_canais){
-                    Toast.makeText(getApplicationContext(), "Abrir lista de canais!", Toast.LENGTH_SHORT).show();
+                    final ModalListFragment dialogListCanais = new ModalListFragment("Selecione o canal desejado:", "canais");
+                    dialogListCanais.show(getSupportFragmentManager(), "test");
+
                 }else if (item.getItemId() == R.id.action_dormir){
-                    Toast.makeText(getApplicationContext(), "Abrir lista de tempo!", Toast.LENGTH_SHORT).show();
+                    final ModalListFragment dialogListDormir = new ModalListFragment("Selecione o tempo para desligar automaticamente:", "dormir");
+                    dialogListDormir.show(getSupportFragmentManager(), "test");
                 }
 
                 return false;

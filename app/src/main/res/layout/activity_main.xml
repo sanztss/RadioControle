@@ -322,7 +322,7 @@
             android:layout_height="69dp"
             android:gravity="center_horizontal"
             android:src="@drawable/anuncio"
-            android:scaleType="fitStart"
+            android:scaleType="fitXY"
             android:layout_alignParentBottom="true"/>
 
     </RelativeLayout>
