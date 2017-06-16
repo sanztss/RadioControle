@@ -1,41 +1,23 @@
 package accessweb.com.br.radiocontrole.activity;
 
+import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.animation.AnimationUtils;
-import android.view.animation.TranslateAnimation;
-import android.widget.AdapterView;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
-import android.text.style.RelativeSizeSpan;
-import android.view.ViewGroup.LayoutParams;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import accessweb.com.br.radiocontrole.R;
-import accessweb.com.br.radiocontrole.adapter.ChannelAdapter;
-import accessweb.com.br.radiocontrole.model.ChannelItem;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
 
@@ -47,7 +29,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private Context mContext;
     private SlidingUpPanelLayout painel;
     private TextView txtRotativo;
-    private RecyclerView mRecyclerView;
+    private Activity mActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         setContentView(R.layout.activity_main);
 
         mContext = getApplicationContext();
+        mActivity = MainActivity.this;
 
         ///////////////////////
         ///     Toolbar     ///
@@ -62,8 +45,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
-
-
 
 
         //////////////////////////////
@@ -103,8 +84,15 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         //////////////////////////////
         txtRotativo = (TextView) this.findViewById(R.id.txtRotativo);
         txtRotativo.setSelected(true);
-    }
 
+        /////////////////////////////////
+        ///     Notícias Fragment     ///
+        /////////////////////////////////
+
+
+
+
+    }
 
     ////////////////////////////
     ///     Menu Toolbar     ///
@@ -280,11 +268,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 title = getString(R.string.title_home);
                 break;
             case 1:
-                fragment = new FriendsFragment();
+                fragment = new NoticiasFragment();
                 title = getString(R.string.title_noticias);
                 break;
             case 2:
-                fragment = new MessagesFragment();
+                fragment = new MuralFragment();
                 title = getString(R.string.title_mural);
                 break;
             default:
@@ -302,6 +290,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         }
     }
 
+    /////////////////////////////////////
+    ///     Métodos Home Fragment     ///
+    /////////////////////////////////////
     public void abrirPainel(View view) {
         Log.v("view", "Player toolbar");
         painel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
@@ -310,4 +301,10 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     public void playPauseButton(View view) {
         Log.v("view", "Botão play/pause");
     }
+
+    /////////////////////////////////////////
+    ///     Métodos Notícias Fragment     ///
+    /////////////////////////////////////////
+
+
 }
