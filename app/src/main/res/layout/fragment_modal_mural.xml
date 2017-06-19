@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:local="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/muralToolbar"
+        android:layout_alignParentTop="true"
+        android:elevation="4dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        local:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
+    <RelativeLayout
+        android:layout_below="@+id/muralToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp">
+
+        <TextView
+            android:id="@+id/txtTituloModal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="32sp"
+            android:text="Compartilhe conosco que está pensando ou acontecendo?"
+            android:textColor="#000"
+            android:textStyle="bold"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/txtSubtituloModal"
+            android:layout_below="@+id/txtTituloModal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="16sp"
+            android:text="*Sua postagem passará primeiro pela moderação."
+            android:textColor="#727272"
+            android:layout_marginTop="10dp"/>
+        
+        <EditText
+            android:id="@+id/edtTextoPublicacao"
+            android:layout_below="@+id/txtSubtituloModal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="top|left"
+            android:inputType="textMultiLine"
+            android:lines="8"
+            android:maxLines="10"
+            android:minLines="6"
+            android:scrollbars="vertical"
+            android:layout_marginTop="20dp"
+            android:backgroundTint="@color/colorPrimary"/>
+
+        <Button
+            android:layout_below="@+id/edtTextoPublicacao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="ENVIAR"
+            android:textColorHint="#fff"
+            android:backgroundTint="@color/colorPrimary"
+            android:elevation="4dp"
+            android:layout_marginTop="10dp"
+            android:layout_alignParentRight="true"/>
+
+    </RelativeLayout>
+
+</RelativeLayout>

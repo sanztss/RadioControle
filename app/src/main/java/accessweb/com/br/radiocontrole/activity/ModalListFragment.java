@@ -113,6 +113,14 @@ public class ModalListFragment extends DialogFragment {
             icons.add(R.drawable.ic_clock_gray);
             icons.add(R.drawable.ic_clock_gray);
             icons.add(R.drawable.ic_clock_gray);
+        } else if (modalTipo.equals("mural")) {
+            titles.add("Texto");
+            titles.add("Imagem");
+            titles.add("Áudio");
+
+            icons.add(R.drawable.ic_format_text_gray);
+            icons.add(R.drawable.ic_file_image_gray);
+            icons.add(R.drawable.ic_music_gray);
         }
 
 
@@ -196,6 +204,9 @@ public class ModalListFragment extends DialogFragment {
             public void onClick(View view, int position) {
                 Log.v("aaaa","" + view);
                 getDialog().dismiss();
+                MuralModalFragment dialog = new MuralModalFragment("Postagem de texto", "texto");
+                dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+                dialog.show(getActivity().getFragmentManager(), "dialog");
             }
 
             @Override

@@ -18,151 +18,201 @@
         android:orientation="vertical">
 
         <RelativeLayout
+            android:id="@+id/templateTexto"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
-            <ImageView
-                android:id="@+id/imgFotoUsuarioPost"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/fotoUsuario1"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:src="@drawable/hearmenow"/>
+                android:layout_alignParentTop="true" />
 
             <TextView
-                android:id="@+id/txtNomeUsuarioPost"
-                android:layout_below="@id/txtTempoNoticia"
+                android:id="@+id/nomeUsuario1"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
+                android:lines="1"
                 android:textColor="#262626"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:text="Fulando de tal"
-                android:gravity="center_vertical"
-                android:lines="1"/>
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/txtTempoPost"
-                android:layout_below="@id/txtNomeUsuarioPost"
+                android:id="@+id/tempoPublicacao1"
+                android:layout_below="@id/nomeUsuario1"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:layout_marginLeft="50dp"
                 android:layout_alignParentRight="true"
+                android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
                 android:textColor="#7f7f7f"
-                android:textSize="13sp"
-                android:text="há 3 horas atrás"
-                android:gravity="center_vertical"/>
+                android:textSize="13sp" />
 
             <TextView
-                android:id="@+id/txtConteudoPost"
-                android:layout_below="@id/imgFotoUsuarioPost"
-                android:layout_width="wrap_content"
+                android:id="@+id/textoPublicacao1"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColor="#262626"
-                android:textSize="15sp"
+                android:layout_below="@id/fotoUsuario1"
                 android:layout_marginTop="5dp"
-                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis rhoncus volutpat justo gravida malesuada. Pellentesque pulvinar, ante placerat commodo mattis, ipsum enim pulvinar orci, non accumsan urna neque vitae tellus."/>
+                android:textColor="#262626"
+                android:textSize="15sp" />
 
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/templateImagem"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
-            <ImageView
-                android:id="@+id/imgFotoUsuarioPost2"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/fotoUsuario2"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:src="@drawable/hearmenow"/>
+                android:layout_alignParentTop="true"/>
 
             <TextView
-                android:id="@+id/txtNomeUsuarioPost2"
-                android:layout_below="@id/txtTempoNoticia"
+                android:id="@+id/nomeUsuario2"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
+                android:lines="1"
                 android:textColor="#262626"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:text="Fulando de tal"
-                android:gravity="center_vertical"
-                android:lines="1"/>
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/txtTempoPost2"
-                android:layout_below="@id/txtNomeUsuarioPost2"
+                android:id="@+id/tempoPublicacao2"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:layout_marginLeft="50dp"
                 android:layout_alignParentRight="true"
+                android:layout_below="@id/nomeUsuario2"
+                android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
                 android:textColor="#7f7f7f"
-                android:textSize="13sp"
-                android:text="há 3 horas atrás"
-                android:gravity="center_vertical"/>
+                android:textSize="13sp" />
 
             <TextView
-                android:id="@+id/txtConteudoPost2"
-                android:layout_below="@id/imgFotoUsuarioPost2"
+                android:id="@+id/textoPublicacao2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textColor="#262626"
-                android:textSize="15sp"
+                android:layout_below="@id/fotoUsuario2"
                 android:layout_marginTop="5dp"
-                android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis rhoncus volutpat justo gravida malesuada. Pellentesque pulvinar, ante placerat commodo mattis, ipsum enim pulvinar orci, non accumsan urna neque vitae tellus."/>
+                android:textColor="#262626"
+                android:textSize="15sp" />
 
             <ImageView
-                android:id="@+id/imgFotoPost"
-                android:layout_below="@+id/txtConteudoPost2"
+                android:id="@+id/imagemPublicacao"
+                android:layout_below="@id/textoPublicacao2"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:src="@drawable/restaurant"/>
+                android:layout_height="match_parent"
+                android:maxHeight="250dp"
+                android:layout_marginTop="5dp"
+                android:background="@color/colorPrimary"
+                android:adjustViewBounds="true"
+                android:scaleType="center"/>
         </RelativeLayout>
 
         <RelativeLayout
+            android:id="@+id/templateAudio"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:visibility="gone">
 
-            <ImageView
-                android:id="@+id/imgFotoUsuarioPost3"
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/fotoUsuario3"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
-                android:src="@drawable/hearmenow"/>
+                android:layout_alignParentTop="true"/>
 
             <TextView
-                android:id="@+id/txtNomeUsuarioPost3"
-                android:layout_below="@id/txtTempoNoticia"
+                android:id="@+id/nomeUsuario3"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"
                 android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
+                android:lines="1"
                 android:textColor="#262626"
                 android:textSize="16sp"
-                android:textStyle="bold"
-                android:text="Fulando de tal"
-                android:gravity="center_vertical"
-                android:lines="1"/>
+                android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/txtTempoPost3"
-                android:layout_below="@id/txtNomeUsuarioPost3"
+                android:id="@+id/audioPublicacao"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true" />
+
+            <TextView
+                android:id="@+id/tempoPublicacao3"
                 android:layout_width="match_parent"
                 android:layout_height="20dp"
-                android:layout_marginLeft="50dp"
                 android:layout_alignParentRight="true"
+                android:layout_below="@id/nomeUsuario3"
+                android:layout_marginLeft="50dp"
+                android:gravity="center_vertical"
                 android:textColor="#7f7f7f"
-                android:textSize="13sp"
-                android:text="há 3 horas atrás"
-                android:gravity="center_vertical"/>
+                android:textSize="13sp" />
+
+            <RelativeLayout
+                android:id="@+id/video_control"
+                android:layout_width="match_parent"
+                android:layout_height="45dp"
+                android:layout_below="@+id/fotoUsuario3"
+                android:layout_marginTop="5dp"
+                android:background="@color/colorPrimary">
+
+                <ImageButton
+                    android:id="@+id/imgBtnPlayPause"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="5dp"
+                    android:background="@null"
+                    android:padding="0dp"
+                    android:scaleType="fitXY"
+                    android:src="@drawable/ic_play_white" />
+
+                <SeekBar
+                    android:id="@+id/sbAudio"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="45dp"
+                    android:layout_marginRight="45dp"
+                    android:max="100"
+                    android:maxHeight="10dp"
+                    android:minHeight="10dp"
+                    android:progress="0"
+                    android:progressDrawable="@drawable/seekbar_style"
+                    android:splitTrack="false"
+                    android:thumb="@drawable/custom_thumb" />
+
+                <TextView
+                    android:id="@+id/txtTempoAudio"
+                    android:layout_width="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerVertical="true"
+                    android:layout_margin="5dp"
+                    android:gravity="left"
+                    android:text="00:00"
+                    android:textColor="@android:color/white" />
+
+            </RelativeLayout>
 
 
         </RelativeLayout>

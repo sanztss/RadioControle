@@ -85,13 +85,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         txtRotativo = (TextView) this.findViewById(R.id.txtRotativo);
         txtRotativo.setSelected(true);
 
-        /////////////////////////////////
-        ///     Notícias Fragment     ///
-        /////////////////////////////////
-
-
-
-
     }
 
     ////////////////////////////
@@ -300,6 +293,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     public void playPauseButton(View view) {
         Log.v("view", "Botão play/pause");
+    }
+
+    public void postMural(View view) {
+        final ModalListFragment dialogListCanais = new ModalListFragment("Selecione o formato do post:", "mural");
+        dialogListCanais.show(getSupportFragmentManager(), "test");
     }
 
     /////////////////////////////////////////
