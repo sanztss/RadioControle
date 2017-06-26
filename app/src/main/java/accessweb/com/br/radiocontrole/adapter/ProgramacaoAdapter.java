@@ -3,22 +3,35 @@ package accessweb.com.br.radiocontrole.adapter;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.support.design.widget.Snackbar;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
+import android.text.style.RelativeSizeSpan;
 import android.util.Log;
+import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.activity.SegundaFragment;
 import accessweb.com.br.radiocontrole.model.Programa;
 import accessweb.com.br.radiocontrole.util.AlarmReceiver;
 import de.hdodenhof.circleimageview.CircleImageView;
@@ -65,9 +78,94 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
         holder.nomeLocutorPrograma.setText(current.getNomeLocutorPrograma());
 
         holder.btnNotificar.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 Log.v("Click", "Botão notificar.");
-                setUpAlarm(10 * 1000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+
+                final String[] selectedItem = {null};
+
+                RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(1.0f);
+                SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder("Com quantos minutos antes quer ser notificado?");
+                spannableStringBuilder.setSpan(
+                        relativeSizeSpan,
+                        0,
+                        1,
+                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                );
+                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                        DrawerLayout.LayoutParams.MATCH_PARENT, DrawerLayout.LayoutParams.WRAP_CONTENT
+                );
+                LinearLayout LLayout = new LinearLayout(context);
+                LLayout.setOrientation(LinearLayout.VERTICAL);
+                params.setMargins(15,15,15,15);
+                LLayout.setLayoutParams(params);
+                LLayout.setPadding(15,15,15,15);
+                TextView tv_title = new TextView(context);
+                tv_title.setLayoutParams(params);
+                tv_title.setTextColor(Color.parseColor("#0074c8"));
+                tv_title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
+                tv_title.setGravity(Gravity.CENTER_HORIZONTAL);
+                tv_title.setText(spannableStringBuilder);
+                LLayout.addView(tv_title);
+
+                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+
+                builder.setCustomTitle(LLayout);
+
+                final String[] minutos = new String[]{
+                        "5 Minutos",
+                        "15 Minutos",
+                        "30 Minutos",
+                        "60 Minutos",
+                };
+
+                builder.setSingleChoiceItems(
+                        minutos,
+                        -1,
+                        new DialogInterface.OnClickListener()
+                        {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                selectedItem[0] = Arrays.asList(minutos).get(i);
+                            }
+                        });
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+                        Log.v("hahaha", "" + selectedItem[0]);
+                        if (selectedItem[0] != null){
+                            switch (selectedItem[0]){
+                                case "5 Minutos":
+                                    setUpAlarm(5 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                    break;
+                                case "15 Minutos":
+                                    setUpAlarm(15 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                    break;
+                                case "30 Minutos":
+                                    setUpAlarm(30 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                    break;
+                                case "60 Minutos":
+                                    setUpAlarm(60 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                });
+
+                builder.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialogInterface, int i) {
+
+                    }
+                });
+
+                AlertDialog dialog = builder.create();
+
+                dialog.show();
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(context.getResources().getColor(R.color.colorPrimary));
+                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(context.getResources().getColor(R.color.colorPrimary));
             }
         });
 

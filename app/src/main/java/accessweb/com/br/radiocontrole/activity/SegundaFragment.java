@@ -51,21 +51,6 @@ public class SegundaFragment extends Fragment{
         adapter = new ProgramacaoAdapter(getContext(), getData());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        /*recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getContext(), recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override public void onItemClick(View view, int position) {
-                        int itemPosition = recyclerView.getChildLayoutPosition(view);
-                        Programa item = getData().get(itemPosition);
-                        Log.v("aaa", "" + itemPosition);
-                    }
-
-                    @Override public void onLongItemClick(View view, int position) {
-
-                    }
-                })
-        );*/
-
         return rootView;
     }
 
