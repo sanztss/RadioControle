@@ -90,20 +90,19 @@ public class NoticiaService extends Service {
                     cachedList = new ArrayList<Noticia>(mItems);
                     Log.d(TAG, "Initialized  cached list");
                     sendCachedList();
-                }
-                else if ( mItems != null ) {
+                } else if ( mItems != null ) {
                     // Prepend mItems to cachedList if they don't exists
                     // I know this n^2 complexity there has to be better
                     // way to merge these two list for now this will suffice.
                     boolean itemsUpdated = false;
                     for ( int k = mItems.size() -1 ; k >= 0 ; k--) {
-                        Noticia item =mItems.get(k);
+                        Noticia item = mItems.get(k);
                         boolean itemExists = false;
                         for (Noticia i: cachedList) {
-                            if (i.isEqualTo(item)) {
+                            /*if (i.isEqualTo(item)) {
                                 itemExists = true;
                                 break;
-                            }
+                            }*/
                         }
                         if (!itemExists) {
                             itemsUpdated = true;
@@ -114,8 +113,7 @@ public class NoticiaService extends Service {
                     if (itemsUpdated) {
                         Log.d(TAG, "Finished updating cached list");
                         sendCachedList();
-                    }
-                    else {
+                    } else {
                         Log.d(TAG,"No updates to cache no need to send an update");
                     }
                 }

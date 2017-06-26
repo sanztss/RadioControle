@@ -2,6 +2,10 @@ package accessweb.com.br.radiocontrole.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -13,11 +17,19 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.io.IOException;
+
 import accessweb.com.br.radiocontrole.R;
+import wseemann.media.FFmpegMediaMetadataRetriever;
+
+import static accessweb.com.br.radiocontrole.R.id.playPauseToolbar;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
 
@@ -30,6 +42,17 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private SlidingUpPanelLayout painel;
     private TextView txtRotativo;
     private Activity mActivity;
+    private ImageButton imgBtnPlayPause;
+    private ImageButton playPauseToolbar;
+    private HomeFragment homeFragment;
+    private Boolean audioTocando = false;
+    private MediaPlayer mediaPlayer;
+    private ImageView albumCoverToolbar;
+    private ImageView imgCapaAlbum;
+    private TextView nomeMusica;
+    private TextView txtNomeMusica;
+    private TextView nomeArtista;
+    private TextView txtNomeCantor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         ///     Toolbar     ///
         ///////////////////////
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar.setTitle("Início");
         setSupportActionBar(mToolbar);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -84,6 +108,19 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         //////////////////////////////
         txtRotativo = (TextView) this.findViewById(R.id.txtRotativo);
         txtRotativo.setSelected(true);
+
+        //////////////////////
+        ///     Player     ///
+        //////////////////////
+
+        imgBtnPlayPause = (ImageButton) findViewById(R.id.imgBtnPlayPause);
+        playPauseToolbar =(ImageButton) findViewById(R.id.playPauseToolbar);
+        albumCoverToolbar = (ImageView) findViewById(R.id.albumCoverToolbar);
+        imgCapaAlbum = (ImageView) findViewById(R.id.albumCoverToolbar);
+        nomeMusica = (TextView) findViewById(R.id.nomeMusica);
+        txtNomeMusica = (TextView) findViewById(R.id.txtNomeMusica);
+        nomeArtista = (TextView) findViewById(R.id.nomeArtista);
+        txtNomeCantor = (TextView) findViewById(R.id.txtNomeCantor);
 
     }
 
@@ -255,18 +292,27 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private void displayView(int position) {
         Fragment fragment = null;
         String title = getString(R.string.app_name);
+        String tag = null;
         switch (position) {
             case 0:
                 fragment = new HomeFragment();
-                title = getString(R.string.title_home);
+                title = "Início";
+                tag = "inicio";
                 break;
             case 1:
                 fragment = new NoticiasFragment();
-                title = getString(R.string.title_noticias);
+                title = "Notícias";
+                tag = "noticias";
                 break;
             case 2:
                 fragment = new MuralFragment();
-                title = getString(R.string.title_mural);
+                title = "Mural";
+                tag = "mural";
+                break;
+            case 3:
+                fragment = new ProgramacaoFragment();
+                title = "Programação";
+                tag = "programacao";
                 break;
             default:
                 break;
@@ -275,12 +321,16 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         if (fragment != null) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.replace(R.id.container_body, fragment);
+            fragmentTransaction.replace(R.id.container_body, fragment, tag);
             fragmentTransaction.commit();
-
-            // set the toolbar title
-            getSupportActionBar().setTitle(title);
+            fragmentManager.executePendingTransactions();
+            if (position == 0 && audioTocando) {
+                changeIcon("pause");
+            }
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            toolbar.setTitle(title);
         }
+
     }
 
     /////////////////////////////////////
@@ -291,14 +341,106 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         painel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
     }
 
-    public void playPauseButton(View view) {
-        Log.v("view", "Botão play/pause");
+    public void playPauseStreaming(View view) {
+        Log.v("aaa", ""+ view.getId());
+        if (!audioTocando) {
+            changeIcon("pause");
+        } else {
+            changeIcon("play");
+        }
+
     }
 
-    public void postMural(View view) {
-        final ModalListFragment dialogListCanais = new ModalListFragment("Selecione o formato do post:", "mural");
-        dialogListCanais.show(getSupportFragmentManager(), "test");
+    private void changeIcon(String acao) {
+        homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("inicio");
+        Log.v("aaa", ""+ homeFragment);
+        if (acao.equals("play")){
+            audioTocando = false;
+            mediaPlayer.stop();
+            albumCoverToolbar.setImageResource(R.drawable.album_cover);
+            imgCapaAlbum.setImageResource(R.drawable.album_cover);
+            nomeMusica.setText("Pausado");
+            txtNomeMusica.setText("Pausado");
+            nomeArtista.setText("");
+            txtNomeCantor.setText("");
+            imgBtnPlayPause.setImageResource(R.drawable.ic_play_white);
+            playPauseToolbar.setImageResource(R.drawable.ic_play_gray);
+            if (homeFragment != null)
+                homeFragment.changeIcon(acao);
+        }else if (acao.equals("pause")) {
+            audioTocando = true;
+
+            //String url = "http://files.freemusicarchive.org/music%2FccCommunity%2FThe_Kyoto_Connection%2FWake_Up%2FThe_Kyoto_Connection_-_09_-_Hachiko_The_Faithtful_Dog.mp3";
+            String url = "http://stream.hostpg.com.br:8170";
+            FFmpegMediaMetadataRetriever mmr = new FFmpegMediaMetadataRetriever();
+            try {
+                mmr.setDataSource(url);
+            }catch (Exception e){
+
+            }
+
+            byte [] artwork = mmr.getEmbeddedPicture();
+
+            String artist = mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_ARTIST);
+            String album = mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_ALBUM);
+            String title = mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_TITLE);
+            mmr.release();
+            if (artwork != null){
+                Bitmap bitmap = BitmapFactory.decodeByteArray(artwork, 0, artwork.length);
+                albumCoverToolbar.setImageBitmap(bitmap);
+                imgCapaAlbum.setImageBitmap(bitmap);
+            } else {
+                albumCoverToolbar.setImageResource(R.drawable.album_cover);
+                imgCapaAlbum.setImageResource(R.drawable.album_cover);
+            }
+
+            if (artist != null){
+                nomeMusica.setText(title);
+                txtNomeMusica.setText(title);
+                nomeArtista.setText(artist);
+                txtNomeCantor.setText(artist);
+            } else {
+                nomeMusica.setText("Desconhecido");
+                txtNomeMusica.setText("Desconhecido");
+                nomeArtista.setText("Desconhecido");
+                txtNomeCantor.setText("Desconhecido");
+            }
+
+
+
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer.setOnErrorListener(new MediaPlayer.OnErrorListener() {
+                @Override
+                public boolean onError(MediaPlayer mp, int what, int extra) {
+                    return false;
+                }
+            });
+            mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    mediaPlayer.start();
+                }
+            });
+            try {
+                mediaPlayer.setDataSource(url);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            mediaPlayer.prepareAsync();
+
+            imgBtnPlayPause.setImageResource(R.drawable.ic_pause_white);
+            playPauseToolbar.setImageResource(R.drawable.ic_pause_gray);
+            if (homeFragment != null)
+                homeFragment.changeIcon(acao);
+        }
     }
+
+    public void abrirUrlIntent(View view) {
+        Log.v("intent", "" + view.getTag());
+        //view.get
+    }
+
 
     /////////////////////////////////////////
     ///     Métodos Notícias Fragment     ///

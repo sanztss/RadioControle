@@ -39,6 +39,7 @@ public class Noticia implements Serializable {
         return tempoNoticia;
     }
 
+/*
     public boolean isEqualTo(Noticia n) {
         if (n.getTituloNoticia().equals(tituloNoticia) &&
                 n.getResumoNoticia().equals(resumoNoticia) &&
@@ -48,6 +49,7 @@ public class Noticia implements Serializable {
         else
             return false;
     }
+*/
 
     public void setTempoNoticia(String tempoNoticia) {
         this.tempoNoticia = tempoNoticia;

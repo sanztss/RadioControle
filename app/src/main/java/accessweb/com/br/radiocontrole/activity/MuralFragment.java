@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +30,7 @@ public class MuralFragment extends Fragment {
     private RecyclerView recyclerView;
     private MuralListAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
+    private FloatingActionButton btnAdicionarPostagem;
     private static ArrayList<String> fotoUsuario = new ArrayList<String>();
     private static ArrayList<String> nomeUsuario = new ArrayList<String>();
     private static ArrayList<String> modeloPublicacao = new ArrayList<String>();
@@ -87,6 +89,7 @@ public class MuralFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_mural, container, false);
 
+        btnAdicionarPostagem = (FloatingActionButton) rootView.findViewById(R.id.btnAdicionarPostagem);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
 
         /*adapter = new NoticiasListAdapter(getActivity(), getData());
@@ -131,14 +134,21 @@ public class MuralFragment extends Fragment {
             Log.v("aaaa", "" + e);
         }*/
         // Inflate the layout for this fragment
+
+        btnAdicionarPostagem.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                final ModalListFragment dialogListCanais = new ModalListFragment("Selecione o tipo da postagem:", "mural");
+                dialogListCanais.show(getActivity().getSupportFragmentManager(), "dialog");
+            }
+        });
         return rootView;
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
-        toolbar.setTitle("Mural");
+        /*Toolbar toolbar = (Toolbar) getActivity().findViewById(R.id.toolbar);
+        toolbar.setTitle("Mural");*/
     }
 
     @Override

@@ -83,12 +83,18 @@ public class NoticiasListAdapter extends RecyclerView.Adapter<NoticiasListAdapte
 
     @Override
     public int getItemCount() {
-        return data.size();
+        return  this.data == null ? 0 : this.data.size();
     }
 
-    public void clearData() {
-        int size = this.data.size();
-        this.data.clear();
+    public void clear() {
+        if (this.data != null){
+            this.data.clear();
+            notifyDataSetChanged();
+        }
+    }
+    public void addAll(List<Noticia> list) {
+        this.data.addAll(list);
+        notifyDataSetChanged();
     }
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tempoNoticia;

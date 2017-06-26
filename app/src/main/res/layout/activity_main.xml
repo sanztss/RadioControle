@@ -74,11 +74,12 @@
                     android:background="#fff">
 
                     <ImageView
+                        android:id="@+id/albumCoverToolbar"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_alignParentLeft="true"
                         android:layout_centerVertical="true"
-                        android:src="@drawable/hearmenow"/>
+                        android:src="@drawable/album_cover"/>
 
                     <TextView
                         android:id="@+id/nomeMusica"
@@ -87,7 +88,7 @@
                         android:layout_alignParentTop="true"
                         android:layout_marginLeft="56dp"
                         android:layout_marginRight="56dp"
-                        android:text="Hear Me Now"
+                        android:text="Pausado"
                         android:textColor="#262626"
                         android:textSize="15sp"/>
 
@@ -98,18 +99,20 @@
                         android:layout_height="20dp"
                         android:layout_marginLeft="56dp"
                         android:layout_marginRight="56dp"
-                        android:text="Alok"
+                        android:text=""
                         android:textColor="#7f7f7f"
                         android:textSize="13sp"/>
 
-                    <ImageView
+                    <ImageButton
                         android:id="@+id/playPauseToolbar"
-                        android:onClick="playPauseButton"
+                        android:onClick="playPauseStreaming"
                         android:layout_width="40dp"
                         android:layout_height="40dp"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:src="@drawable/ic_play_gray"/>
+                        android:src="@drawable/ic_play_gray"
+                        android:scaleType="fitXY"
+                        android:background="@color/textColorPrimary"/>
 
                 </RelativeLayout>
 
@@ -197,7 +200,7 @@
                         android:layout_centerHorizontal="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nome da música"
+                        android:text="Pausado"
                         android:textStyle="bold"
                         android:textColor="#fff"
                         android:textSize="16sp"
@@ -209,7 +212,7 @@
                         android:layout_centerHorizontal="true"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Nome do cantor"
+                        android:text=""
                         android:textColor="#fff"
                         android:textSize="15sp"/>
 
@@ -305,6 +308,7 @@
 
         <ImageButton
             android:id="@+id/imgBtnPlayPause"
+            android:onClick="playPauseStreaming"
             android:layout_width="75dp"
             android:layout_height="75dp"
             android:src="@drawable/ic_play_white"

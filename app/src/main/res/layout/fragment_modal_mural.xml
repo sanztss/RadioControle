@@ -19,60 +19,145 @@
         android:background="?attr/colorPrimary"
         local:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         local:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-    <RelativeLayout
+    <ScrollView
         android:layout_below="@+id/muralToolbar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp">
+        android:layout_marginBottom="70dp">
 
-        <TextView
-            android:id="@+id/txtTituloModal"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="32sp"
-            android:text="Compartilhe conosco que está pensando ou acontecendo?"
-            android:textColor="#000"
-            android:textStyle="bold"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="16dp"/>
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginBottom="70dp">
 
-        <TextView
-            android:id="@+id/txtSubtituloModal"
-            android:layout_below="@+id/txtTituloModal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="16sp"
-            android:text="*Sua postagem passará primeiro pela moderação."
-            android:textColor="#727272"
-            android:layout_marginTop="10dp"/>
-        
-        <EditText
-            android:id="@+id/edtTextoPublicacao"
-            android:layout_below="@+id/txtSubtituloModal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="top|left"
-            android:inputType="textMultiLine"
-            android:lines="8"
-            android:maxLines="10"
-            android:minLines="6"
-            android:scrollbars="vertical"
-            android:layout_marginTop="20dp"
-            android:backgroundTint="@color/colorPrimary"/>
+            <TextView
+                android:id="@+id/txtTituloModal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="28sp"
+                android:text="Compartilhe conosco o que está pensando ou acontecendo?"
+                android:textColor="#000"
+                android:textStyle="bold"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="16dp"/>
 
-        <Button
-            android:layout_below="@+id/edtTextoPublicacao"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="ENVIAR"
-            android:textColorHint="#fff"
-            android:backgroundTint="@color/colorPrimary"
-            android:elevation="4dp"
-            android:layout_marginTop="10dp"
-            android:layout_alignParentRight="true"/>
+            <TextView
+                android:id="@+id/txtSubtituloModal"
+                android:layout_below="@+id/txtTituloModal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:text="*Sua postagem passará primeiro pela moderação."
+                android:textColor="#727272"
+                android:layout_marginTop="10dp"/>
 
-    </RelativeLayout>
+            <EditText
+                android:id="@+id/textoPublicacao"
+                android:layout_below="@+id/txtSubtituloModal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:gravity="top|left"
+                android:inputType="textMultiLine"
+                android:lines="6"
+                android:maxLines="6"
+                android:minLines="6"
+                android:scrollbars="vertical"
+                android:layout_marginTop="20dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:visibility="gone"/>
+
+
+
+            <RelativeLayout
+                android:id="@+id/templateFormImagem"
+                android:layout_below="@+id/textoPublicacao"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <Button
+                    android:id="@+id/btnAdicionarFoto"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginTop="5dp"
+                    android:hint="ADICIONAR FOTO"
+                    android:textColorHint="#5c5c5c"
+                    android:backgroundTint="#fff"
+                    android:elevation="4dp"
+                    android:drawablePadding="10dp"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:drawableLeft="@drawable/ic_camera_gray"/>
+
+                <ImageView
+                    android:layout_below="@+id/btnAdicionarFoto"
+                    android:id="@+id/imgFoto"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_alignParentLeft="true"/>
+
+                <TextView
+                    android:id="@+id/nomeFoto"
+                    android:layout_width="match_parent"
+                    android:layout_height="18dp"
+                    android:layout_marginLeft="55dp"
+                    android:textSize="14sp"
+                    android:layout_alignParentBottom="true"/>
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/templateFormAudio"
+                android:layout_below="@+id/txtSubtituloModal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <Chronometer
+                    android:id="@+id/tempoAudio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="30dp"
+                    android:textSize="40sp"
+                    android:text="00:00:00"
+                    android:textColor="@color/colorPrimary"/>
+
+                <android.support.design.widget.FloatingActionButton
+                    android:id="@+id/gravarAudio"
+                    android:layout_below="@+id/tempoAudio"
+                    android:tag="record"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:elevation="4dp"
+                    android:layout_centerHorizontal="true"
+                    android:src="@drawable/ic_microphone_white"
+                    app:backgroundTint="#e8070d"
+                    app:useCompatPadding="true"/>
+
+            </RelativeLayout>
+
+
+        </RelativeLayout>
+
+    </ScrollView>
+
+
+    <Button
+        android:id="@+id/btnEnviarPostagem"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:hint="ENVIAR"
+        android:textColorHint="#fff"
+        android:backgroundTint="@color/colorPrimary"
+        android:elevation="4dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginRight="16dp"/>
 
 </RelativeLayout>

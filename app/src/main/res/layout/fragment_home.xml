@@ -1,17 +1,19 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fragment_home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:clipChildren="false"
-    tools:context="accessweb.com.br.radiocontrole.activity.HomeFragment"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    tools:context="accessweb.com.br.radiocontrole.activity.HomeFragment">
 
     <ScrollView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:clipChildren="false"
         android:layout_alignParentTop="true"
-        android:clipChildren="false">
+        android:layout_alignParentStart="true">
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -58,66 +60,6 @@
                 android:layout_height="wrap_content"
                 android:clipChildren="false">
 
-                <!--<LinearLayout
-                    android:id="@+id/maisVotadas"
-                    android:layout_marginTop="0dp"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="fill_parent"
-                        android:layout_height="40dp"
-                        android:paddingLeft="16dp"
-                        android:background="#e2e2e2"
-                        android:textColor="#959595"
-                        android:text="Músicas mais votadas"
-                        android:textSize="16sp"
-                        android:gravity="center_vertical"/>
-
-                    <RelativeLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="40dp"
-                            android:layout_height="40dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_music_circle_gray"/>
-
-                        <TextView
-                            android:id="@+id/nomeMusica"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="56dp"
-                            android:text="Hear Me Now"
-                            android:textColor="#262626"
-                            android:textSize="16sp"/>
-
-                        <TextView
-                            android:id="@+id/nomeArtista"
-                            android:layout_below="@+id/nomeMusica"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="56dp"
-                            android:text="Alok"
-                            android:textColor="#7f7f7f"
-                            android:textSize="13sp"/>
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#cccccc"
-                        android:layout_marginLeft="72dp"/>
-
-                </LinearLayout>-->
-
                 <LinearLayout
                     android:id="@+id/contato"
                     android:layout_marginTop="0dp"
@@ -129,133 +71,29 @@
                         android:layout_width="fill_parent"
                         android:layout_height="40dp"
                         android:paddingLeft="16dp"
-                        android:background="#e2e2e2"
-                        android:textColor="#959595"
-                        android:text="Contato"
+                        android:textColor="@color/colorPrimary"
+                        android:text="Redes Sociais"
                         android:textSize="17sp"
+                        android:textStyle="bold"
                         android:gravity="center_vertical"/>
 
-                    <RelativeLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_map_marker_gray"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:id="@+id/rua"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="41dp"
-                            android:text="Rua Amauri Lange Silvério, 450 Pilarzinho - Curitiba / PR"
-                            android:textColor="#262626"
-                            android:textSize="15sp"/>
-
-                    </RelativeLayout>
-
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#cccccc"
-                        android:layout_marginLeft="59dp"/>
+                        android:layout_height="2dp"
+                        android:background="#dbdbdb"/>
 
-                    <RelativeLayout
+                    <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/gridViewSocial"
+                        android:numColumns="auto_fit"
+                        android:gravity="center"
+                        android:columnWidth="50dp"
+                        android:stretchMode="columnWidth"
                         android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="fill_parent"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
+                        android:layout_marginTop="10dp"/>
 
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_phone_gray"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:id="@+id/telefone1"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="41dp"
-                            android:text="(41) 3331-6300"
-                            android:textColor="#262626"
-                            android:textSize="15sp"/>
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#cccccc"
-                        android:layout_marginLeft="59dp"/>
-
-                    <RelativeLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_web_gray"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:id="@+id/site"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="41dp"
-                            android:text="curitiba.jovempanfm.uol.com.br"
-                            android:textColor="#262626"
-                            android:textSize="15sp"/>
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#cccccc"
-                        android:layout_marginLeft="59dp"/>
-
-                    <RelativeLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_email_gray"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:id="@+id/email"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="41dp"
-                            android:text="contato@jovempan.com.br"
-                            android:textColor="#262626"
-                            android:textSize="15sp"/>
-
-                    </RelativeLayout>
 
                 </LinearLayout>
 
@@ -267,183 +105,36 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
+
                     <TextView
                         android:layout_width="fill_parent"
                         android:layout_height="40dp"
                         android:paddingLeft="16dp"
-                        android:background="#e2e2e2"
-                        android:textColor="#959595"
-                        android:text="Redes Sociais"
+                        android:textColor="@color/colorPrimary"
+                        android:text="Contato"
                         android:textSize="17sp"
+                        android:textStyle="bold"
                         android:gravity="center_vertical"/>
 
-                    <RelativeLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_facebook_gray"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:id="@+id/facebook"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="41dp"
-                            android:text="facebook.com/jovempan"
-                            android:textColor="#262626"
-                            android:textSize="15sp"/>
-
-                    </RelativeLayout>
-
                     <View
                         android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#cccccc"
-                        android:layout_marginLeft="59dp"/>
+                        android:layout_height="2dp"
+                        android:background="#dbdbdb"/>
 
-                    <RelativeLayout
+                    <GridView xmlns:android="http://schemas.android.com/apk/res/android"
+                        android:id="@+id/gridViewContato"
+                        android:numColumns="auto_fit"
+                        android:gravity="center"
+                        android:columnWidth="50dp"
+                        android:stretchMode="columnWidth"
                         android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="fill_parent"
                         android:paddingLeft="16dp"
                         android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_twitter_gray"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:id="@+id/twitter"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="41dp"
-                            android:text="twitter.com/radiojovempan"
-                            android:textColor="#262626"
-                            android:textSize="15sp"/>
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#cccccc"
-                        android:layout_marginLeft="59dp"/>
-
-                    <RelativeLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_youtube_play_gray"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:id="@+id/youtube"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="41dp"
-                            android:text="youtube.com/user/portaljovempan"
-                            android:textColor="#262626"
-                            android:textSize="15sp"/>
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#cccccc"
-                        android:layout_marginLeft="59dp"/>
-
-                    <RelativeLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_instagram_gray"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:id="@+id/instagran"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="41dp"
-                            android:text="instagram.com/radiojovempan/"
-                            android:textColor="#262626"
-                            android:textSize="15sp"/>
-
-                    </RelativeLayout>
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="#cccccc"
-                        android:layout_marginLeft="59dp"/>
-
-                    <RelativeLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingLeft="16dp"
-                        android:paddingRight="16dp"
-                        android:paddingTop="10dp"
-                        android:paddingBottom="10dp">
-
-                        <ImageView
-                            android:layout_width="25dp"
-                            android:layout_height="25dp"
-                            android:layout_alignParentLeft="true"
-                            android:src="@drawable/ic_google_plus_gray"
-                            android:layout_centerInParent="true"/>
-
-                        <TextView
-                            android:id="@+id/googlePlus"
-                            android:layout_width="fill_parent"
-                            android:layout_height="match_parent"
-                            android:layout_marginLeft="41dp"
-                            android:text="plus.google.com/100662291740097839613"
-                            android:textColor="#262626"
-                            android:textSize="15sp"/>
-
-                    </RelativeLayout>
+                        android:layout_marginTop="10dp"
+                        android:layout_marginBottom="10dp"/>
 
                 </LinearLayout>
-
-                <android.support.design.widget.FloatingActionButton
-                    android:onClick="playPause"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:elevation="4dp"
-                    android:layout_alignParentTop="true"
-                    android:layout_alignParentRight="true"
-                    android:src="@drawable/ic_play_white"
-                    app:backgroundTint="@color/colorPrimary"
-                    android:layout_marginTop="-50dp"
-                    app:useCompatPadding="true"/>
 
             </RelativeLayout>
 
@@ -458,6 +149,20 @@
                 android:layout_alignParentRight="true"
                 android:src="@drawable/ic_play_white"
                 app:backgroundTint="@color/colorPrimary"/>-->
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/btnHomePlayPause"
+                android:onClick="playPauseStreaming"
+                android:tag="play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:elevation="4dp"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:src="@drawable/ic_play_white"
+                app:backgroundTint="@color/colorPrimary"
+                android:layout_marginTop="272dp"
+                app:useCompatPadding="true"/>
 
         </RelativeLayout>
 

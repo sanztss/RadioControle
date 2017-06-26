@@ -36,6 +36,7 @@ import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.ModalListAdapter;
+import accessweb.com.br.radiocontrole.model.Mural;
 import accessweb.com.br.radiocontrole.model.NavDrawerItem;
 
 public class ModalListFragment extends DialogFragment {
@@ -203,10 +204,25 @@ public class ModalListFragment extends DialogFragment {
             @Override
             public void onClick(View view, int position) {
                 Log.v("aaaa","" + view);
+                int itemPosition = recyclerView.getChildLayoutPosition(view);
+                String abrirTelaTitulo = titles.get(itemPosition);
                 getDialog().dismiss();
-                MuralModalFragment dialog = new MuralModalFragment("Postagem de texto", "texto");
-                dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
-                dialog.show(getActivity().getFragmentManager(), "dialog");
+                if (modalTipo.equals("mural")){
+                    Log.v("aaaaaaa", abrirTelaTitulo);
+                    if (abrirTelaTitulo.equals("Texto")) {
+                        MuralModalFragment dialog = new MuralModalFragment("Postagem de texto", "texto");
+                        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+                        dialog.show(getActivity().getFragmentManager(), "dialog");
+                    } else if (abrirTelaTitulo.equals("Imagem")) {
+                        MuralModalFragment dialog = new MuralModalFragment("Postagem de imagem", "imagem");
+                        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+                        dialog.show(getActivity().getFragmentManager(), "dialog");
+                    } else if (abrirTelaTitulo.equals("Áudio")) {
+                        MuralModalFragment dialog = new MuralModalFragment("Postagem de áudio", "audio");
+                        dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+                        dialog.show(getActivity().getFragmentManager(), "dialog");
+                    }
+                }
             }
 
             @Override
