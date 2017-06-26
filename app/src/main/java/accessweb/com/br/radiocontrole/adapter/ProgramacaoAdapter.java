@@ -26,15 +26,23 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.activity.SegundaFragment;
 import accessweb.com.br.radiocontrole.model.Programa;
 import accessweb.com.br.radiocontrole.util.AlarmReceiver;
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static java.text.DateFormat.Field.TIME_ZONE;
 
 /**
  * Created by Des. Android on 26/06/2017.
@@ -65,7 +73,7 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
     }
 
     @Override
-    public void onBindViewHolder(MyViewHolder holder, int position) {
+    public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Programa current = data.get(position);
 
         holder.horaInicioPrograma.setText(current.getHoraInicioPrograma());
@@ -132,20 +140,26 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        Log.v("hahaha", "" + selectedItem[0]);
+                        Date rightNow = Calendar.getInstance().getTime();
+                        Log.v("aaaa", "" + rightNow);
+
                         if (selectedItem[0] != null){
                             switch (selectedItem[0]){
                                 case "5 Minutos":
                                     setUpAlarm(5 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                    holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
                                     break;
                                 case "15 Minutos":
                                     setUpAlarm(15 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                    holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
                                     break;
                                 case "30 Minutos":
                                     setUpAlarm(30 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                    holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
                                     break;
                                 case "60 Minutos":
                                     setUpAlarm(60 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                    holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
                                     break;
                                 default:
                                     break;
