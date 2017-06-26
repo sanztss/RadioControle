@@ -1,6 +1,7 @@
 package accessweb.com.br.radiocontrole.util;
 
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -10,6 +11,7 @@ import android.support.v4.app.NotificationCompat;
 import android.widget.Toast;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.activity.MainActivity;
 
 /**
  * Created by Des. Android on 26/06/2017.
@@ -37,6 +39,12 @@ public class AlarmReceiver extends BroadcastReceiver {
                 .setContentText(message)
                 .setSound(soundUri)// message for notification
                 .setAutoCancel(true); // clear notification after click
+
+        PendingIntent contentIntent = PendingIntent.getActivity(context, 0, new Intent(context, MainActivity.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
+
+        mBuilder.setContentIntent(contentIntent);
+
         NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         mNotificationManager.notify(0, mBuilder.build());
     }
