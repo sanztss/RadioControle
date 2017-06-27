@@ -2,11 +2,13 @@ package accessweb.com.br.radiocontrole.activity;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -22,14 +24,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.facebook.FacebookSdk;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.io.IOException;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.util.ActivityResultBus;
+import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 import wseemann.media.FFmpegMediaMetadataRetriever;
 
 import static accessweb.com.br.radiocontrole.R.id.playPauseToolbar;
+import static android.os.Build.VERSION_CODES.M;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
 
@@ -57,6 +63,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
 
         mContext = getApplicationContext();
@@ -123,6 +130,14 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         txtNomeCantor = (TextView) findViewById(R.id.txtNomeCantor);
 
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        ActivityResultBus.getInstance().postQueue(
+                new ActivityResultEvent(requestCode, resultCode, data));
+    }
+
 
     ////////////////////////////
     ///     Menu Toolbar     ///
@@ -313,6 +328,14 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 fragment = new ProgramacaoFragment();
                 title = "Programação";
                 tag = "programacao";
+                break;
+            case 4:
+                fragment = new PerfilFragment();
+                title = "Perfil";
+                tag = "perfil";
+                /*SuaContaFragment dialog = new SuaContaFragment("Sua Conta");
+                dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+                dialog.show(this.getSupportFragmentManager(), "dialog");*/
                 break;
             default:
                 break;
