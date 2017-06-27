@@ -46,4 +46,7 @@
     <string name="title_mural">Mural</string>
     <string name="title_noticias">Notícias</string>
     <string name="title_home">Início</string>
+
+    <string name="facebook_app_id">840705319432205</string>
+    <string name="fb_login_protocol_scheme">fb840705319432205</string>
 </resources>

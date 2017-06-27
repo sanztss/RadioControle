@@ -62,13 +62,56 @@ public class ProgramacaoFragment extends Fragment {
 
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
-        adapter.addFragment(new SegundaFragment(), "SEG");
-        adapter.addFragment(new TercaFragment(), "TER");
-        adapter.addFragment(new QuartaFragment(), "QUA");
-        adapter.addFragment(new QuintaFragment(), "QUI");
-        adapter.addFragment(new SextaFragment(), "SEX");
-        adapter.addFragment(new SabadoFragment(), "SAB");
-        adapter.addFragment(new DomingoFragment(), "DOM");
+
+        // SEGUNDA
+        ProgramacaoDiaFragment segunda = new ProgramacaoDiaFragment();
+        Bundle argsSegunda = new Bundle();
+        argsSegunda.putString("dia", "segunda");
+        segunda.setArguments(argsSegunda);
+        adapter.addFragment(segunda, "SEG");
+
+        // TERÇA
+        ProgramacaoDiaFragment terca = new ProgramacaoDiaFragment();
+        Bundle argsTerca = new Bundle();
+        argsTerca.putString("dia", "terca");
+        terca.setArguments(argsTerca);
+        adapter.addFragment(terca, "TER");
+
+        // QUARTA
+        ProgramacaoDiaFragment quarta = new ProgramacaoDiaFragment();
+        Bundle argsQuarta = new Bundle();
+        argsQuarta.putString("dia", "quarta");
+        quarta.setArguments(argsQuarta);
+        adapter.addFragment(quarta, "QUA");
+
+        // QUINTA
+        ProgramacaoDiaFragment quinta = new ProgramacaoDiaFragment();
+        Bundle argsQuinta = new Bundle();
+        argsQuinta.putString("dia", "quinta");
+        quinta.setArguments(argsQuinta);
+        adapter.addFragment(quinta, "QUI");
+
+        // SEXTA
+        ProgramacaoDiaFragment sexta = new ProgramacaoDiaFragment();
+        Bundle argsSexta = new Bundle();
+        argsSexta.putString("dia", "sexta");
+        sexta.setArguments(argsSexta);
+        adapter.addFragment(sexta, "SEX");
+
+        // SABADO
+        ProgramacaoDiaFragment sabado = new ProgramacaoDiaFragment();
+        Bundle argsSabado = new Bundle();
+        argsSabado.putString("dia", "sabado");
+        sabado.setArguments(argsSabado);
+        adapter.addFragment(sabado, "SAB");
+
+        // DOMINGO
+        ProgramacaoDiaFragment domingo = new ProgramacaoDiaFragment();
+        Bundle argsDomingo = new Bundle();
+        argsDomingo.putString("dia", "domingo");
+        domingo.setArguments(argsDomingo);
+        adapter.addFragment(domingo, "DOM");
+
         viewPager.setAdapter(adapter);
     }
 

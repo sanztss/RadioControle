@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
-import android.support.design.widget.Snackbar;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
@@ -26,23 +25,16 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import accessweb.com.br.radiocontrole.R;
-import accessweb.com.br.radiocontrole.activity.SegundaFragment;
 import accessweb.com.br.radiocontrole.model.Programa;
 import accessweb.com.br.radiocontrole.util.AlarmReceiver;
 import de.hdodenhof.circleimageview.CircleImageView;
-
-import static java.text.DateFormat.Field.TIME_ZONE;
 
 /**
  * Created by Des. Android on 26/06/2017.
