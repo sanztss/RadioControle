@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
@@ -16,6 +17,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.PermissionChecker;
 import android.util.Log;
@@ -23,6 +25,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+
+import com.facebook.login.LoginManager;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.io.IOException;
@@ -30,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
+import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.Manifest.permission.CAMERA;
@@ -45,6 +52,9 @@ public class PerfilFragment extends Fragment {
     private Button btnEditarPerfil;
     private Button btnAlterarFoto;
     private Button btnSair;
+    private CircleImageView fotoUsuario;
+    private TextView nomeUsuario;
+    private TextView emailUsuario;
 
     private ArrayList<String> permissions = new ArrayList<>();
     private ArrayList<String> permissionsToRequest;
@@ -83,18 +93,38 @@ public class PerfilFragment extends Fragment {
             int permission2 = PermissionChecker.checkSelfPermission(getActivity(), WRITE_EXTERNAL_STORAGE);
 
             if (permission1 == PermissionChecker.PERMISSION_GRANTED) {
-                Log.w("aaa", "aaaa1");
+
             } else {
-                Log.w("aaa", "aaaa2");
+
             }
 
             if (permission2 == PermissionChecker.PERMISSION_GRANTED) {
-                Log.w("bbb", "bbbb1");
+
             } else {
-                Log.w("bbb", "bbbb2");
+
             }
 
         }
+
+
+        fotoUsuario = (CircleImageView) rootView.findViewById(R.id.fotoUsuario);
+        nomeUsuario = (TextView) rootView.findViewById(R.id.nomeUsuario);
+        emailUsuario = (TextView) rootView.findViewById(R.id.emailUsuario);
+
+        SharedPreferences sharedPrefs  = getActivity().getSharedPreferences("UserData", 0);
+
+
+
+        Picasso.with(getContext())
+                .load(sharedPrefs.getString("userUrlFoto",""))
+                .placeholder(R.drawable.user)
+                .error(R.drawable.user)
+                .into(fotoUsuario);
+
+        System.out.println(sharedPrefs.getString("userUrlFoto",""));
+
+        nomeUsuario.setText(sharedPrefs.getString("userNome",""));
+        emailUsuario.setText(sharedPrefs.getString("userEmail",""));
 
         btnEditarPerfil = (Button) rootView.findViewById(R.id.btnEditarPerfil);
         btnAlterarFoto = (Button) rootView.findViewById(R.id.btnAlterarFoto);
@@ -103,6 +133,9 @@ public class PerfilFragment extends Fragment {
         btnEditarPerfil.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Btn btnEditarPerfil");
+                EditarPerfilDialogFragment dialog = new EditarPerfilDialogFragment();
+                dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+                dialog.show(getActivity().getSupportFragmentManager(), "dialog");
             }
         });
 
@@ -116,6 +149,18 @@ public class PerfilFragment extends Fragment {
         btnSair.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Btn btnSair");
+
+                LoginManager.getInstance().logOut();
+
+                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("UserData", 0);
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                editor.putString("userId", "");
+                editor.putString("userEmail", "");
+                editor.putString("userNome", "");
+                editor.putString("userUrlFoto", "");
+                editor.commit();
+
+                ((MainActivity)getActivity()).fecharPerfil();
             }
         });
         return rootView;

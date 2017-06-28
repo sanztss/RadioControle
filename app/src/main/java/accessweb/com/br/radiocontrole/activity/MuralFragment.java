@@ -1,16 +1,12 @@
 package accessweb.com.br.radiocontrole.activity;
 
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -137,7 +133,7 @@ public class MuralFragment extends Fragment {
 
         btnAdicionarPostagem.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                final ModalListFragment dialogListCanais = new ModalListFragment("Selecione o tipo da postagem:", "mural");
+                final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o tipo da postagem:", "mural");
                 dialogListCanais.show(getActivity().getSupportFragmentManager(), "dialog");
             }
         });

@@ -5,7 +5,6 @@ package accessweb.com.br.radiocontrole.activity;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -14,7 +13,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
@@ -25,23 +23,19 @@ import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.ModalListAdapter;
-import accessweb.com.br.radiocontrole.model.Mural;
 import accessweb.com.br.radiocontrole.model.NavDrawerItem;
 
-public class ModalListFragment extends DialogFragment {
+public class EscolherDialogFragment extends DialogFragment {
 
-    private static String TAG = ModalListFragment.class.getSimpleName();
+    private static String TAG = EscolherDialogFragment.class.getSimpleName();
 
     private RecyclerView recyclerView;
     private ActionBarDrawerToggle mDrawerToggle;
@@ -55,7 +49,7 @@ public class ModalListFragment extends DialogFragment {
     private String modalTipo;
     //private NavDrawerItem[] itens;
 
-    public ModalListFragment(String title, String modal) {
+    public EscolherDialogFragment(String title, String modal) {
         modalTitle =  title;
         modalTipo = modal;
     }
@@ -210,15 +204,15 @@ public class ModalListFragment extends DialogFragment {
                 if (modalTipo.equals("mural")){
                     Log.v("aaaaaaa", abrirTelaTitulo);
                     if (abrirTelaTitulo.equals("Texto")) {
-                        MuralModalFragment dialog = new MuralModalFragment("Postagem de texto", "texto");
+                        MuralDialogFragment dialog = new MuralDialogFragment("Postagem de texto", "texto");
                         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
                         dialog.show(getActivity().getFragmentManager(), "dialog");
                     } else if (abrirTelaTitulo.equals("Imagem")) {
-                        MuralModalFragment dialog = new MuralModalFragment("Postagem de imagem", "imagem");
+                        MuralDialogFragment dialog = new MuralDialogFragment("Postagem de imagem", "imagem");
                         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
                         dialog.show(getActivity().getFragmentManager(), "dialog");
                     } else if (abrirTelaTitulo.equals("Áudio")) {
-                        MuralModalFragment dialog = new MuralModalFragment("Postagem de áudio", "audio");
+                        MuralDialogFragment dialog = new MuralDialogFragment("Postagem de áudio", "audio");
                         dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
                         dialog.show(getActivity().getFragmentManager(), "dialog");
                     }

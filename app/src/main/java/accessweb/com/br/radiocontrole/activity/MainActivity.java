@@ -3,6 +3,7 @@ package accessweb.com.br.radiocontrole.activity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -22,7 +23,6 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
@@ -33,9 +33,6 @@ import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 import wseemann.media.FFmpegMediaMetadataRetriever;
-
-import static accessweb.com.br.radiocontrole.R.id.playPauseToolbar;
-import static android.os.Build.VERSION_CODES.M;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
 
@@ -169,11 +166,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
                 Log.v("back", "" + item.getItemId());
                 if(item.getItemId() == R.id.action_canais){
-                    final ModalListFragment dialogListCanais = new ModalListFragment("Selecione o canal desejado:", "canais");
+                    final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o canal desejado:", "canais");
                     dialogListCanais.show(getSupportFragmentManager(), "test");
 
                 }else if (item.getItemId() == R.id.action_dormir){
-                    final ModalListFragment dialogListDormir = new ModalListFragment("Selecione o tempo para desligar automaticamente:", "dormir");
+                    final EscolherDialogFragment dialogListDormir = new EscolherDialogFragment("Selecione o tempo para desligar automaticamente:", "dormir");
                     dialogListDormir.show(getSupportFragmentManager(), "test");
                 }
 
@@ -330,12 +327,22 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 tag = "programacao";
                 break;
             case 4:
-                fragment = new PerfilFragment();
-                title = "Perfil";
-                tag = "perfil";
-                /*SuaContaFragment dialog = new SuaContaFragment("Sua Conta");
-                dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
-                dialog.show(this.getSupportFragmentManager(), "dialog");*/
+                SharedPreferences sharedPrefs  = getSharedPreferences("UserData", 0);
+                System.out.println("sashauisha" + sharedPrefs.getString("userNome",""));
+                if (!sharedPrefs.contains("userId") || sharedPrefs.getString("userId","").equals("")){
+                    System.out.println("Usuário deslogado!!!");
+                    SuaContaDialogFragment dialog = new SuaContaDialogFragment();
+                    dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+                    FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                    //dialog.show(this.getSupportFragmentManager(), "dialog");
+                    ft.add(dialog,"fragment_dialog");
+                    ft.commit();
+                }else {
+                    System.out.println("Usuário logado!!!");
+                    fragment = new PerfilFragment();
+                    title = "Perfil";
+                    tag = "perfil";
+                }
                 break;
             default:
                 break;
@@ -464,10 +471,31 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         //view.get
     }
 
+    public void fecharPerfil() {
+        Fragment fragment = null;
+        fragment = new HomeFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container_body, fragment, "inicio");
+        fragmentTransaction.commit();
+        fragmentManager.executePendingTransactions();
+        if (audioTocando) {
+            changeIcon("pause");
+        }
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Início");
+    }
 
-    /////////////////////////////////////////
-    ///     Métodos Notícias Fragment     ///
-    /////////////////////////////////////////
-
+    public void abrirPerfil() {
+        Fragment fragment = null;
+        fragment = new PerfilFragment();
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+        fragmentTransaction.replace(R.id.container_body, fragment, "inicio");
+        fragmentTransaction.commit();
+        fragmentManager.executePendingTransactions();
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Perfil");
+    }
 
 }

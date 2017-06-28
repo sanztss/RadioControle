@@ -7,8 +7,11 @@ import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -74,6 +77,11 @@ public class EntrarFragment extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Btn Entrar");
+                Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
+                if (prev != null) {
+                    DialogFragment df = (DialogFragment) prev;
+                    df.dismiss();
+                }
             }
         });
 
@@ -122,6 +130,19 @@ public class EntrarFragment extends Fragment {
                             profile_pic_url = new JSONObject(profile_pic_data.getString("data"));
                             Log.v("Url foto facebook: ", profile_pic_url.getString("url"));
 
+                            SharedPreferences sharedPrefs = getActivity().getSharedPreferences("UserData", 0);
+                            SharedPreferences.Editor editor = sharedPrefs.edit();
+                            editor.putString("userId", resposta.get("id").toString());
+                            editor.putString("userEmail", resposta.get("email").toString());
+                            editor.putString("userNome", resposta.get("name").toString());
+                            editor.putString("userUrlFoto", profile_pic_url.getString("url"));
+                            editor.commit();
+                            Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
+                            if (prev != null) {
+                                DialogFragment df = (DialogFragment) prev;
+                                ((MainActivity)getActivity()).abrirPerfil();
+                                df.dismiss();
+                            }
                         } catch(Exception e){
                             e.printStackTrace();
                         }
@@ -129,7 +150,7 @@ public class EntrarFragment extends Fragment {
 
                 });
         Bundle permission_param = new Bundle();
-        permission_param.putString("fields", "id,name,email,picture.width(120).height(120)");
+        permission_param.putString("fields", "id,name,email,picture.width(300).height(300)");
         data_request.setParameters(permission_param);
         data_request.executeAsync();
 

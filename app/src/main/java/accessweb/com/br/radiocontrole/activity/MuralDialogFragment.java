@@ -51,11 +51,10 @@ import accessweb.com.br.radiocontrole.R;
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
-import static android.R.attr.permission;
 
-public class MuralModalFragment extends DialogFragment {
+public class MuralDialogFragment extends DialogFragment {
 
-    private static String TAG = ModalListFragment.class.getSimpleName();
+    private static String TAG = EscolherDialogFragment.class.getSimpleName();
 
     private String modalTitle;
     private String modalTipo;
@@ -88,7 +87,7 @@ public class MuralModalFragment extends DialogFragment {
     private ArrayList<String> permissions = new ArrayList<>();
     private final static int ALL_PERMISSIONS_RESULT = 107;
 
-    public MuralModalFragment(String title, String modal) {
+    public MuralDialogFragment(String title, String modal) {
         modalTitle =  title;
         modalTipo = modal;
     }

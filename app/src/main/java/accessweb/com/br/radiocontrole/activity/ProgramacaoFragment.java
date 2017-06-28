@@ -21,7 +21,7 @@ import accessweb.com.br.radiocontrole.R;
 
 public class ProgramacaoFragment extends Fragment {
 
-	private static String TAG = ModalListFragment.class.getSimpleName();
+	private static String TAG = EscolherDialogFragment.class.getSimpleName();
     private TabLayout tabLayout;
     private ViewPager viewPager;
 
