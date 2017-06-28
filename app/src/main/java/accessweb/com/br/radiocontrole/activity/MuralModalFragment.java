@@ -131,8 +131,6 @@ public class MuralModalFragment extends DialogFragment {
             textoPublicacao.setVisibility(View.VISIBLE);
             templateFormImagem.setVisibility(View.VISIBLE);
             if (android.os.Build.VERSION.SDK_INT > 23) {
-
-
                 if (permissionsToRequest.size() > 0)
                     getActivity().requestPermissions(permissionsToRequest.toArray(new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
             }else {
