@@ -13,6 +13,7 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private Toolbar mToolbar;
     private Toolbar pToolbar;
     private FragmentDrawer drawerFragment;
+    private DrawerLayout drawerLayout;
     private Context mContext;
     private SlidingUpPanelLayout painel;
     private TextView txtRotativo;
@@ -78,8 +80,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         //////////////////////////////
         ///     FragmentDrawer     ///
         //////////////////////////////
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawerFragment = (FragmentDrawer)getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
-        drawerFragment.setUp(R.id.fragment_navigation_drawer, (DrawerLayout) findViewById(R.id.drawer_layout), mToolbar);
+        drawerFragment.setUp(R.id.fragment_navigation_drawer, drawerLayout, mToolbar);
         drawerFragment.setDrawerListener(this);
         displayView(0);
 
@@ -126,6 +129,19 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         nomeArtista = (TextView) findViewById(R.id.nomeArtista);
         txtNomeCantor = (TextView) findViewById(R.id.txtNomeCantor);
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        if(isDrawerOpen()) {
+            drawerLayout.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    public boolean isDrawerOpen() {
+        return drawerLayout != null && drawerLayout.isDrawerOpen(GravityCompat.START);
     }
 
     @Override
@@ -343,6 +359,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                     title = "Perfil";
                     tag = "perfil";
                 }
+                break;
+            case 5:
+                fragment = new PodcastsFragment();
+                title = "Podcasts";
+                tag = "podcasts";
                 break;
             default:
                 break;

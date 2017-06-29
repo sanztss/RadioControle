@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="2dp"
+    android:layout_margin="6dp"
+    card_view:cardElevation="4dp"
+    card_view:contentPadding="10dp"
+    card_view:cardMaxElevation="6dp"
+    card_view:cardBackgroundColor="#fff">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/dataPublicacaoPodcast"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="Publicado no dia 29/06/2017"
+            android:textColor="#7f7f7f"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/linkPodcast"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:textColor="#7f7f7f"
+            android:textSize="13sp" />
+
+        <TextView
+            android:id="@+id/tituloPodcast"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Podcast 01"
+            android:textColor="#262626"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+
+        <RelativeLayout
+            android:id="@+id/podcast_control"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/colorPrimary">
+
+            <ImageButton
+                android:id="@+id/btnPlayPausePodcast"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:background="@null"
+                android:padding="0dp"
+                android:scaleType="fitXY"
+                android:src="@drawable/ic_play_white" />
+
+            <ProgressBar
+                android:id="@+id/loadingIcon"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:indeterminate="true"
+                android:visibility="gone"/>
+
+            <SeekBar
+                android:id="@+id/progressBarPodcast"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="45dp"
+                android:layout_marginRight="45dp"
+                android:max="100"
+                android:maxHeight="10dp"
+                android:minHeight="10dp"
+                android:progress="0"
+                android:progressDrawable="@drawable/seekbar_style"
+                android:splitTrack="false"
+                android:thumb="@drawable/custom_thumb" />
+
+            <TextView
+                android:id="@+id/tempoAudioPodcast"
+                android:layout_width="40dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_margin="5dp"
+                android:gravity="left"
+                android:text="00:00"
+                android:textColor="@android:color/white" />
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</android.support.v7.widget.CardView>
