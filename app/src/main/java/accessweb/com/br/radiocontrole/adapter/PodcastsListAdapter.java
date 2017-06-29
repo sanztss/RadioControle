@@ -69,6 +69,7 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
                 // SE NENHUM PODCAST ESTIVER TOCANDO
                 if (!isPlaying){
                     try {
+
                         // SE FOR A PRIMEIRA VEZ QUE APERTA PLAY -> CRIA-SE UM NOVO PODCAST
                         if (firstTime){
 

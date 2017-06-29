@@ -33,7 +33,6 @@ public class PodcastsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private PodcastsListAdapter adapter;
-    private SwipeRefreshLayout mSwipeRefreshLayout;
     List<Podcast> podecasts;
 
     public PodcastsFragment() {
@@ -84,15 +83,6 @@ public class PodcastsFragment extends Fragment {
                 })
         );*/
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
-        mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                updatePodcasts();
-            }
-        });
-
         return rootView;
     }
 
@@ -104,10 +94,6 @@ public class PodcastsFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-    }
-
-    protected void updatePodcasts(){
-        mSwipeRefreshLayout.setRefreshing(false);
     }
 }
 
