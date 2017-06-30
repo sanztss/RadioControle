@@ -32,6 +32,7 @@ import java.io.IOException;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EscolherDialogFragment;
+import accessweb.com.br.radiocontrole.dialog.SobreDialogFragment;
 import accessweb.com.br.radiocontrole.dialog.SuaContaDialogFragment;
 import accessweb.com.br.radiocontrole.fragment.FragmentDrawer;
 import accessweb.com.br.radiocontrole.fragment.HomeFragment;
@@ -379,6 +380,13 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 fragment = new PromocoesFragment();
                 title = "Promoções";
                 tag = "promocoes";
+                break;
+            case 7:
+                SobreDialogFragment dialog = new SobreDialogFragment();
+                dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+                FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.add(dialog,"fragment_dialog");
+                ft.commit();
                 break;
             default:
                 break;
