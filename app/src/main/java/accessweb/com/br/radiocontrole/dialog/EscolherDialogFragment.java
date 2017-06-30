@@ -1,4 +1,4 @@
-package accessweb.com.br.radiocontrole.activity;
+package accessweb.com.br.radiocontrole.dialog;
 
 
 

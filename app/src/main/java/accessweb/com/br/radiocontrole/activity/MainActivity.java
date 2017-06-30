@@ -31,6 +31,16 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.io.IOException;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.dialog.EscolherDialogFragment;
+import accessweb.com.br.radiocontrole.dialog.SuaContaDialogFragment;
+import accessweb.com.br.radiocontrole.fragment.FragmentDrawer;
+import accessweb.com.br.radiocontrole.fragment.HomeFragment;
+import accessweb.com.br.radiocontrole.fragment.MuralFragment;
+import accessweb.com.br.radiocontrole.fragment.NoticiasFragment;
+import accessweb.com.br.radiocontrole.fragment.PerfilFragment;
+import accessweb.com.br.radiocontrole.fragment.PodcastsFragment;
+import accessweb.com.br.radiocontrole.fragment.ProgramacaoFragment;
+import accessweb.com.br.radiocontrole.fragment.PromocoesFragment;
 import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 import wseemann.media.FFmpegMediaMetadataRetriever;
@@ -364,6 +374,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 fragment = new PodcastsFragment();
                 title = "Podcasts";
                 tag = "podcasts";
+                break;
+            case 6:
+                fragment = new PromocoesFragment();
+                title = "Promoções";
+                tag = "promocoes";
                 break;
             default:
                 break;

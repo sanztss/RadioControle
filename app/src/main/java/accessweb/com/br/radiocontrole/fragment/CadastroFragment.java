@@ -1,4 +1,4 @@
-package accessweb.com.br.radiocontrole.activity;
+package accessweb.com.br.radiocontrole.fragment;
 
 import accessweb.com.br.radiocontrole.R;
 import android.os.Bundle;

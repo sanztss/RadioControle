@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:clipChildren="false"
-    tools:context="accessweb.com.br.radiocontrole.activity.HomeFragment">
+    tools:context="accessweb.com.br.radiocontrole.fragment.HomeFragment">
 
     <ScrollView
         android:layout_width="fill_parent"

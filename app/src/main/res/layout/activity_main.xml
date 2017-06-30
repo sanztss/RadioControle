@@ -121,7 +121,7 @@
 
         <fragment
             android:id="@+id/fragment_navigation_drawer"
-            android:name="accessweb.com.br.radiocontrole.activity.FragmentDrawer"
+            android:name="accessweb.com.br.radiocontrole.fragment.FragmentDrawer"
             android:layout_width="@dimen/nav_drawer_width"
             android:layout_height="match_parent"
             android:layout_gravity="start"

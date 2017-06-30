@@ -1,4 +1,4 @@
-package accessweb.com.br.radiocontrole.activity;
+package accessweb.com.br.radiocontrole.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.dialog.EscolherDialogFragment;
 
 /**
  * Created by Des. Android on 29/06/2017.
@@ -64,8 +65,16 @@ public class PromocoesFragment extends Fragment {
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
 
-        adapter.addFragment(new PromocoesStatusFragment(), "Vigentes");
-        adapter.addFragment(new PromocoesStatusFragment(), "Encerradas");
+        PromocoesStatusFragment vigentes = new PromocoesStatusFragment();
+        Bundle argsVigentes = new Bundle();
+        argsVigentes.putString("status", "vigentes");
+        vigentes.setArguments(argsVigentes);
+        adapter.addFragment(vigentes, "Vigentes");
+        PromocoesStatusFragment encerradas = new PromocoesStatusFragment();
+        Bundle argsEncerradas = new Bundle();
+        argsEncerradas.putString("status", "encerradas");
+        encerradas.setArguments(argsEncerradas);
+        adapter.addFragment(encerradas, "Encerradas");
 
         viewPager.setAdapter(adapter);
     }

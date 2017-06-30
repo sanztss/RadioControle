@@ -1,10 +1,13 @@
 package accessweb.com.br.radiocontrole.model;
 
+import java.io.Serializable;
+import java.util.List;
+
 /**
  * Created by Des. Android on 29/06/2017.
  */
 
-public class Promocao {
+public class Promocao implements Serializable {
     private String imagemPromocao;
     private String tituloPromocao;
     private String dataEncerramentoPromocao;
@@ -12,12 +15,14 @@ public class Promocao {
     private String linkRegulamentoPromocao;
     private String linkAudioPromocao;
     private String linkVideoPromocao;
-    private Premio premio;
+    private Boolean participando;
+    private Boolean vigente;
+    private static List<Premio> premio;
 
     public Promocao() {
     }
 
-    public Promocao(String imagemPromocao, String tituloPromocao, String dataEncerramentoPromocao, String dataSorteioPromocao, String linkRegulamentoPromocao, String linkAudioPromocao, String linkVideoPromocao, Premio premio) {
+    public Promocao(String imagemPromocao, String tituloPromocao, String dataEncerramentoPromocao, String dataSorteioPromocao, String linkRegulamentoPromocao, String linkAudioPromocao, String linkVideoPromocao, Boolean participando, Boolean vigente, List<Premio> premio) {
         this.imagemPromocao = imagemPromocao;
         this.tituloPromocao = tituloPromocao;
         this.dataEncerramentoPromocao = dataEncerramentoPromocao;
@@ -25,6 +30,8 @@ public class Promocao {
         this.linkRegulamentoPromocao = linkRegulamentoPromocao;
         this.linkAudioPromocao = linkAudioPromocao;
         this.linkVideoPromocao = linkVideoPromocao;
+        this.participando = participando;
+        this.vigente = vigente;
         this.premio = premio;
     }
 
@@ -84,11 +91,27 @@ public class Promocao {
         this.linkVideoPromocao = linkVideoPromocao;
     }
 
-    public Premio getPremio() {
+    public Boolean getParticipando() {
+        return participando;
+    }
+
+    public void setParticipando(Boolean participando) {
+        this.participando = participando;
+    }
+
+    public Boolean getVigente() {
+        return vigente;
+    }
+
+    public void setVigente(Boolean vigente) {
+        this.vigente = vigente;
+    }
+
+    public List<Premio> getPremio() {
         return premio;
     }
 
-    public void setPremio(Premio premio) {
+    public void setPremio(List<Premio> premio) {
         this.premio = premio;
     }
 }

@@ -1,6 +1,8 @@
-package accessweb.com.br.radiocontrole.activity;
+package accessweb.com.br.radiocontrole.dialog;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.fragment.CadastroFragment;
+import accessweb.com.br.radiocontrole.fragment.EntrarFragment;
 
 import android.app.Activity;
 import android.app.Dialog;

@@ -1,8 +1,7 @@
-package accessweb.com.br.radiocontrole.activity;
+package accessweb.com.br.radiocontrole.fragment;
 
 import accessweb.com.br.radiocontrole.R;
-import accessweb.com.br.radiocontrole.adapter.ProgramacaoAdapter;
-import accessweb.com.br.radiocontrole.model.Programa;
+import accessweb.com.br.radiocontrole.activity.MainActivity;
 import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 
@@ -11,9 +10,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,21 +20,13 @@ import android.widget.TextView;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
-import com.facebook.appevents.AppEventsLogger;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.squareup.otto.Subscribe;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by Des. Android on 27/06/2017.

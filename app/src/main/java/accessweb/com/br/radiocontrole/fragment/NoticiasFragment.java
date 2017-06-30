@@ -1,4 +1,4 @@
-package accessweb.com.br.radiocontrole.activity;
+package accessweb.com.br.radiocontrole.fragment;
 
 import android.app.Activity;
 import android.content.ActivityNotFoundException;

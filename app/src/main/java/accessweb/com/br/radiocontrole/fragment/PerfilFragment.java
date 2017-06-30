@@ -1,4 +1,4 @@
-package accessweb.com.br.radiocontrole.activity;
+package accessweb.com.br.radiocontrole.fragment;
 
 import android.Manifest;
 import android.annotation.TargetApi;
@@ -36,11 +36,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.dialog.EditarPerfilDialogFragment;
+import accessweb.com.br.radiocontrole.activity.MainActivity;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.Manifest.permission.CAMERA;
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
 
 /**
  * Created by Des. Android on 27/06/2017.

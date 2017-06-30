@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context="accessweb.com.br.radiocontrole.activity.EditarPerfilDialogFragment">
+    tools:context="accessweb.com.br.radiocontrole.dialog.EditarPerfilDialogFragment">
 
     <android.support.v7.widget.Toolbar
         xmlns:android="http://schemas.android.com/apk/res/android"

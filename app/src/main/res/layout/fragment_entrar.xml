@@ -2,7 +2,7 @@
     android:id="@+id/fragment_entrar"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="accessweb.com.br.radiocontrole.activity.EntrarFragment"
+    tools:context="accessweb.com.br.radiocontrole.fragment.EntrarFragment"
     android:layout_height="match_parent"
     android:layout_width="match_parent"
     android:paddingLeft="16dp"
