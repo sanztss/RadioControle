@@ -1,15 +1,10 @@
 package accessweb.com.br.radiocontrole.fragment;
 
 import android.app.Activity;
-import android.content.Context;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +14,7 @@ import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.PodcastsListAdapter;
-import accessweb.com.br.radiocontrole.model.Podcast;
-import accessweb.com.br.radiocontrole.model.Programa;
-import accessweb.com.br.radiocontrole.util.RecyclerItemClickListener;
-
-import static java.security.AccessController.getContext;
+import accessweb.com.br.radiocontrole.model.PodcastApp;
 
 /**
  * Created by Des. Android on 29/06/2017.
@@ -33,19 +24,19 @@ public class PodcastsFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private PodcastsListAdapter adapter;
-    List<Podcast> podecasts;
+    List<PodcastApp> podecasts;
 
     public PodcastsFragment() {
         // Required empty public constructor
     }
 
-    public static List<Podcast> getData() {
-        List<Podcast> data = new ArrayList<>();
+    public static List<PodcastApp> getData() {
+        List<PodcastApp> data = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
 
-            Podcast podcast = new Podcast();
+            PodcastApp podcast = new PodcastApp();
 
-            podcast.setTituloPodcast("Podcast título " + i);
+            podcast.setTituloPodcast("PodcastApp título " + i);
             podcast.setLinkPodcast("http://e.mundopodcast.com.br/podprogramar/podprogramar-013-sistemas-controle-versao.mp3");
             podcast.setDataPublicacaoPodcast("Publicado no dia 0" + i + "/06/2017");
 

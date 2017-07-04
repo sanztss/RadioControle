@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -24,8 +25,16 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.auth.BasicSessionCredentials;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+import com.amazonaws.regions.Regions;
 import com.facebook.FacebookSdk;
+import com.ghedeon.AwsInterceptor;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.io.IOException;
@@ -42,8 +51,15 @@ import accessweb.com.br.radiocontrole.fragment.PerfilFragment;
 import accessweb.com.br.radiocontrole.fragment.PodcastsFragment;
 import accessweb.com.br.radiocontrole.fragment.ProgramacaoFragment;
 import accessweb.com.br.radiocontrole.fragment.PromocoesFragment;
+import accessweb.com.br.radiocontrole.model.Empty;
+import accessweb.com.br.radiocontrole.model.Settings;
 import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
+import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 import wseemann.media.FFmpegMediaMetadataRetriever;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener {
@@ -78,6 +94,28 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         mContext = getApplicationContext();
         mActivity = MainActivity.this;
+
+        //new CognitoClientManager(getApplicationContext()).execute();
+        initData();
+
+        new gateWayAsyncTask().execute();
+
+        /*AwsInterceptor awsInterceptor = new AwsInterceptor(
+                CognitoClientManager.getCredentials(), "execute-api",
+                "us-east-1");
+
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(awsInterceptor)
+                .build();
+
+        Request request = new Request.Builder().url("https://wt0vuyzu4c.execute-api.us-east-1.amazonaws.com/alpha/radiogroup").build();
+        Response response = null;
+        try {
+            response = okHttpClient.newCall(request).execute();
+            System.out.println(response.body().string());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }*/
 
         ///////////////////////
         ///     Toolbar     ///
@@ -140,6 +178,32 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         nomeArtista = (TextView) findViewById(R.id.nomeArtista);
         txtNomeCantor = (TextView) findViewById(R.id.txtNomeCantor);
 
+    }
+
+    private void initData() {
+        CognitoClientManager.init(this);
+    }
+
+    class gateWayAsyncTask extends AsyncTask<Void, Void, Void>
+    {
+
+        @Override
+        protected Void doInBackground(Void... params)
+        {
+            ApiClientFactory factory = new ApiClientFactory();
+            factory.credentialsProvider(CognitoClientManager.getCredentials());
+            factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
+            final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
+            Settings output = client.radioIdGet("tradicaoAM");
+            Log.v("aaaaaaaaaaaaaaaaaaaa", "" + output.getLogo());
+
+            return null;
+        }
+        @Override
+        public void onPostExecute(Void var)
+        {
+            Log.d("gateway","gateway succeded!");
+        }
     }
 
     @Override

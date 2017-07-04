@@ -1,16 +1,20 @@
 package accessweb.com.br.radiocontrole.dialog;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.ComponentName;
+import android.content.ContentUris;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -20,6 +24,7 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
 import android.os.SystemClock;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
@@ -39,18 +44,28 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.util.S3Util;
+import okhttp3.internal.Util;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class MuralDialogFragment extends DialogFragment {
 
@@ -87,6 +102,9 @@ public class MuralDialogFragment extends DialogFragment {
     private ArrayList<String> permissions = new ArrayList<>();
     private final static int ALL_PERMISSIONS_RESULT = 107;
 
+    private TransferUtility transferUtility;
+    TransferListener listener = new UploadListener();
+
     public MuralDialogFragment(String title, String modal) {
         modalTitle =  title;
         modalTipo = modal;
@@ -96,6 +114,8 @@ public class MuralDialogFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_modal_mural, null, false);
+
+        transferUtility = S3Util.getTransferUtility(getActivity());
 
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.muralToolbar);
         toolbar.setTitle(modalTitle);
@@ -329,6 +349,20 @@ public class MuralDialogFragment extends DialogFragment {
             if (getPickImageResultUri(data) != null) {
                 picUri = getPickImageResultUri(data);
                 Log.i("aaa", "" + picUri);
+                Uri uri = data.getData();
+                try {
+                    String path = getPath(uri);
+                    beginUpload(path);
+                    Toast.makeText(getActivity(),
+                            "" + path,
+                            Toast.LENGTH_LONG).show();
+                } catch (URISyntaxException e) {
+                    Toast.makeText(getActivity(),
+                            "Unable to get the file from the given URI.  See error log for details",
+                            Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Unable to upload file from the given uri", e);
+                }
+
                 try {
                     myBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), picUri);
                     myBitmap = getResizedBitmap(myBitmap, 500);
@@ -346,6 +380,132 @@ public class MuralDialogFragment extends DialogFragment {
                 nomeFoto.setText(randomNomeFoto + ".png");
             }
         }
+    }
+
+    /*
+     * Gets the file path of the given Uri.
+     */
+    @SuppressLint("NewApi")
+    private String getPath(Uri uri) throws URISyntaxException {
+        final boolean needToCheckUri = Build.VERSION.SDK_INT >= 19;
+        String selection = null;
+        String[] selectionArgs = null;
+        // Uri is different in versions after KITKAT (Android 4.4), we need to
+        // deal with different Uris.
+        if (needToCheckUri && DocumentsContract.isDocumentUri(getApplicationContext(), uri)) {
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+            } else if (isDownloadsDocument(uri)) {
+                final String id = DocumentsContract.getDocumentId(uri);
+                uri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+            } else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+                if ("image".equals(type)) {
+                    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+                selection = "_id=?";
+                selectionArgs = new String[] {
+                        split[1]
+                };
+            }
+        }
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA
+            };
+            Cursor cursor = null;
+            try {
+                cursor = getApplicationContext().getContentResolver()
+                        .query(uri, projection, selection, selectionArgs, null);
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+            }
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    /*
+     * A TransferListener class that can listen to a upload task and be notified
+     * when the status changes.
+     */
+    private class UploadListener implements TransferListener {
+
+        // Simply updates the UI list when notified.
+        @Override
+        public void onError(int id, Exception e) {
+            Log.e(TAG, "Error during upload: " + id, e);
+            //updateList();
+        }
+
+        @Override
+        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+            Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d",
+                    id, bytesTotal, bytesCurrent));
+            //updateList();
+        }
+
+        @Override
+        public void onStateChanged(int id, TransferState newState) {
+            Log.d(TAG, "onStateChanged: " + id + ", " + newState);
+           // updateList();
+        }
+    }
+
+    private void beginUpload(String filePath) {
+        if (filePath == null) {
+            Toast.makeText(getActivity(), "Could not find the filepath of the selected file",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        File file = new File(filePath);
+        TransferObserver observer = transferUtility.upload("radiocontrole", file.getName(),
+                file);
+        /*
+         * Note that usually we set the transfer listener after initializing the
+         * transfer. However it isn't required in this sample app. The flow is
+         * click upload button -> start an activity for image selection
+         * startActivityForResult -> onActivityResult -> beginUpload -> onResume
+         * -> set listeners to in progress transfers.
+         */
+        observer.setTransferListener(new UploadListener());
     }
 
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {

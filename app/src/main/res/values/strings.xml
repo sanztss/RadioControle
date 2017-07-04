@@ -50,6 +50,9 @@
     <string name="facebook_app_id">840705319432205</string>
     <string name="fb_login_protocol_scheme">fb840705319432205</string>
 
+<!--     <string name="facebook_app_id">1673692689618704</string>
+    <string name="fb_login_protocol_scheme">fb1673692689618704</string> -->
+
     <string name="com_facebook_loginview_log_out_button">Sair</string>
 
     <string name="com_facebook_loginview_log_in_button_continue">Entrar com Facebook</string>

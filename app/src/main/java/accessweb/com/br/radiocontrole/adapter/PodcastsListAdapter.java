@@ -19,14 +19,14 @@ import java.util.Collections;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
-import accessweb.com.br.radiocontrole.model.Podcast;
+import accessweb.com.br.radiocontrole.model.PodcastApp;
 
 /**
  * Created by Des. Android on 29/06/2017.
  */
 
 public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapter.MyViewHolder> {
-    List<Podcast> data = Collections.emptyList();
+    List<PodcastApp> data = Collections.emptyList();
     private LayoutInflater inflater;
     private Context context;
     private MediaPlayer mp;
@@ -41,7 +41,7 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
     Runnable notification;
 
 
-    public PodcastsListAdapter(Context context, List<Podcast> data) {
+    public PodcastsListAdapter(Context context, List<PodcastApp> data) {
         this.context = context;
         inflater = LayoutInflater.from(context);
         this.data = data;
@@ -57,7 +57,7 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
 
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
-        final Podcast current = data.get(position);
+        final PodcastApp current = data.get(position);
 
         holder.tituloPodcast.setText(current.getTituloPodcast());
         holder.linkPodcast.setText(current.getLinkPodcast());

@@ -1,44 +1,102 @@
-package accessweb.com.br.radiocontrole.model;
-
-/**
- * Created by Des. Android on 29/06/2017.
+/*
+ * Copyright 2010-2016 Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License").
+ * You may not use this file except in compliance with the License.
+ * A copy of the License is located at
+ *
+ *  http://aws.amazon.com/apache2.0
+ *
+ * or in the "license" file accompanying this file. This file is distributed
+ * on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
+ * express or implied. See the License for the specific language governing
+ * permissions and limitations under the License.
  */
 
+package accessweb.com.br.radiocontrole.model;
+
+import java.math.BigDecimal;
+
 public class Podcast {
-    private String tituloPodcast;
-    private String linkPodcast;
-    private String dataPublicacaoPodcast;
+    @com.google.gson.annotations.SerializedName("duration")
+    private BigDecimal duration = null;
+    @com.google.gson.annotations.SerializedName("timestamp")
+    private BigDecimal timestamp = null;
+    @com.google.gson.annotations.SerializedName("name")
+    private String name = null;
+    @com.google.gson.annotations.SerializedName("file")
+    private String file = null;
 
-    public Podcast() {
+    /**
+     * Gets duration
+     *
+     * @return duration
+     **/
+    public BigDecimal getDuration() {
+        return duration;
     }
 
-    public Podcast(String tituloPodcast, String linkPodcast, String dataPublicacaoPodcast) {
-        this.tituloPodcast = tituloPodcast;
-        this.linkPodcast = linkPodcast;
-        this.dataPublicacaoPodcast = dataPublicacaoPodcast;
+    /**
+     * Sets the value of duration.
+     *
+     * @param duration the new value
+     */
+    public void setDuration(BigDecimal duration) {
+        this.duration = duration;
     }
 
-    public String getTituloPodcast() {
-        return tituloPodcast;
+    /**
+     * Gets timestamp
+     *
+     * @return timestamp
+     **/
+    public BigDecimal getTimestamp() {
+        return timestamp;
     }
 
-    public void setTituloPodcast(String tituloPodcast) {
-        this.tituloPodcast = tituloPodcast;
+    /**
+     * Sets the value of timestamp.
+     *
+     * @param timestamp the new value
+     */
+    public void setTimestamp(BigDecimal timestamp) {
+        this.timestamp = timestamp;
     }
 
-    public String getLinkPodcast() {
-        return linkPodcast;
+    /**
+     * Gets name
+     *
+     * @return name
+     **/
+    public String getName() {
+        return name;
     }
 
-    public void setLinkPodcast(String linkPodcast) {
-        this.linkPodcast = linkPodcast;
+    /**
+     * Sets the value of name.
+     *
+     * @param name the new value
+     */
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getDataPublicacaoPodcast() {
-        return dataPublicacaoPodcast;
+    /**
+     * Gets file
+     *
+     * @return file
+     **/
+    public String getFile() {
+        return file;
     }
 
-    public void setDataPublicacaoPodcast(String dataPublicacaoPodcast) {
-        this.dataPublicacaoPodcast = dataPublicacaoPodcast;
+    /**
+     * Sets the value of file.
+     *
+     * @param file the new value
+     */
+    public void setFile(String file) {
+        this.file = file;
     }
+
 }
