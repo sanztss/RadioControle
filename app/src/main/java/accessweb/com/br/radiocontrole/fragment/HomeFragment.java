@@ -4,12 +4,13 @@ package accessweb.com.br.radiocontrole.fragment;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
-import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.telephony.PhoneNumberUtils;
@@ -20,21 +21,30 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.GridIconAdapter;
-
-import static accessweb.com.br.radiocontrole.R.id.gravarAudio;
-import static accessweb.com.br.radiocontrole.R.id.tempoAudio;
+import accessweb.com.br.radiocontrole.model.Settings;
+import accessweb.com.br.radiocontrole.model.Social;
+import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
+import accessweb.com.br.radiocontrole.util.CacheData;
 
 
 public class HomeFragment extends Fragment {
 
+    private ImageView logo;
     private FloatingActionButton btnHomePlayPause;
+    private TextView txtRedesSociais;
+    private TextView txtContato;
 
     private GridView gridViewSocial;
     List<Integer> socialIconIds = new ArrayList<Integer>();
@@ -52,153 +62,227 @@ public class HomeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_home, container, false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        final View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
+        final CacheData cacheData = new CacheData(getContext());
+
+        // INSTANCIANDO A LOGO INSERINDO NA TELA
+        logo = (ImageView) rootView.findViewById(R.id.logo);
+        Picasso.with(getContext())
+                .load(cacheData.getString("logo"))
+                .error(R.drawable.radio_controle)
+                .into(logo);
+
+        // INSTANCIANDO BOTÃO E ALTERANDO COR
         btnHomePlayPause = (FloatingActionButton) rootView.findViewById(R.id.btnHomePlayPause);
+        btnHomePlayPause.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(cacheData.getString("color"))));
 
-        // ALIMENTANDO LISTAS DAS REDES SOCIAIS
-        socialIconIds.add(R.drawable.ic_facebook_gray);
-        socialIconIds.add(R.drawable.ic_twitter_gray);
-        socialIconIds.add(R.drawable.ic_youtube_play_gray);
-        socialIconIds.add(R.drawable.ic_instagram_gray);
-        socialIconIds.add(R.drawable.ic_google_plus_gray);
-        socialLinks.add("https://www.facebook.com/jovempan/");
-        socialLinks.add("https://www.youtube.com/user/portaljovempan");
-        socialLinks.add("https://www.instagram.com/radiojovempan/?hl=pt-br");
-        socialLinks.add("https://plus.google.com/100662291740097839613");
+        // INSTANCIANDO TEXTVIEW E ALTERANDO COR
+        txtRedesSociais = (TextView) rootView.findViewById(R.id.txtRedesSociais);
+        txtRedesSociais.setTextColor(ColorStateList.valueOf(Color.parseColor(cacheData.getString("color"))));
+        txtContato = (TextView) rootView.findViewById(R.id.txtContato);
+        txtContato.setTextColor(ColorStateList.valueOf(Color.parseColor(cacheData.getString("color"))));
 
-        gridViewSocial = (GridView) rootView.findViewById(R.id.gridViewSocial);
-        gridViewSocial.setAdapter(new GridIconAdapter(getContext(), socialIconIds));
-        gridViewSocial.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id){
-                try {
-                    Intent intentSocial = new Intent(Intent.ACTION_VIEW, Uri.parse(socialLinks.get(position)));
-                    startActivity(intentSocial);
-                } catch (ActivityNotFoundException e) {
-                    e.printStackTrace();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+
+                ApiClientFactory factory = new ApiClientFactory();
+                factory.credentialsProvider(CognitoClientManager.getCredentials());
+                factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
+                final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
+                Settings settings = client.radioIdGet("tradicaoAM");
+
+                // RECUPERANDO AS REDES SOCIAIS
+                for (Social social : settings.getSocial()){
+                    switch (social.getType().toString()){
+                        case "website":
+                            contatoIconIds.add(R.drawable.ic_web_gray);
+                            contatoLinks.add(social.getValue().toString());
+                            contatoTipo.add("site");
+                            break;
+                        case "email":
+                            contatoIconIds.add(R.drawable.ic_email_gray);
+                            contatoLinks.add(social.getValue().toString());
+                            contatoTipo.add("email");
+                            break;
+                        case "phone":
+                            contatoIconIds.add(R.drawable.ic_phone_gray);
+                            contatoLinks.add(social.getValue().toString());
+                            contatoTipo.add("telefone");
+                            break;
+                        case "whatsapp":
+                            contatoIconIds.add(R.drawable.ic_whatsapp_gray);
+                            contatoLinks.add(social.getValue().toString());
+                            contatoTipo.add("whatsapp");
+                            break;
+                        case "endereco":
+                            contatoIconIds.add(R.drawable.ic_map_marker_gray);
+                            contatoLinks.add(social.getValue().toString());
+                            contatoTipo.add("endereco");
+                            break;
+                        case "facebook":
+                            socialIconIds.add(R.drawable.ic_facebook_gray);
+                            socialLinks.add(social.getValue().toString());
+                            break;
+                        case "twitter":
+                            socialIconIds.add(R.drawable.ic_twitter_gray);
+                            socialLinks.add(social.getValue().toString());
+                            break;
+                        case "instagram":
+                            socialIconIds.add(R.drawable.ic_instagram_gray);
+                            socialLinks.add(social.getValue().toString());
+                            break;
+                        case "googleplus":
+                            socialIconIds.add(R.drawable.ic_google_plus_gray);
+                            socialLinks.add(social.getValue().toString());
+                            break;
+                        case "youtube":
+                            socialIconIds.add(R.drawable.ic_youtube_play_gray);
+                            socialLinks.add(social.getValue().toString());
+                            break;
+                        default:
+                            break;
+                    }
                 }
+                return null;
             }
-        });
 
-        // ALIMENTANDO LISTA DE CONTATOS
-        contatoIconIds.add(R.drawable.ic_map_marker_gray);
-        contatoIconIds.add(R.drawable.ic_phone_gray);
-        contatoIconIds.add(R.drawable.ic_whatsapp_gray);
-        contatoIconIds.add(R.drawable.ic_web_gray);
-        contatoIconIds.add(R.drawable.ic_email_gray);
-        contatoLinks.add("Av. Rep. Argentina, 2056 - Água Verde, Curitiba - PR");
-        contatoLinks.add("(41) 3333-3333");
-        contatoLinks.add("(41) 99999-9999");
-        contatoLinks.add("http://www.accessweb.com.br");
-        contatoLinks.add("suporte@accessweb.com.br");
-        contatoTipo.add("endereco");
-        contatoTipo.add("telefone");
-        contatoTipo.add("whatsapp");
-        contatoTipo.add("site");
-        contatoTipo.add("email");
-
-        gridViewContato = (GridView) rootView.findViewById(R.id.gridViewContato);
-        gridViewContato.setAdapter(new GridIconAdapter(getContext(), contatoIconIds));
-        gridViewContato.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View v, int position, long id){
-                Log.v("aaaa", "" + contatoTipo.get(position));
-                switch (contatoTipo.get(position)) {
-                    case "endereco":
-                        /*try {
-                            Intent intentContato = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com.br/maps/place/" + contatoLinks.get(position)));
-                            startActivity(intentContato);
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+                // ALIMENTANDO LISTAS DAS REDES SOCIAIS
+                gridViewSocial = (GridView) rootView.findViewById(R.id.gridViewSocial);
+                gridViewSocial.setAdapter(new GridIconAdapter(getContext(), socialIconIds));
+                gridViewSocial.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View v, int position, long id){
+                        try {
+                            Intent intentSocial = new Intent(Intent.ACTION_VIEW, Uri.parse(socialLinks.get(position)));
+                            startActivity(intentSocial);
                         } catch (ActivityNotFoundException e) {
                             e.printStackTrace();
-                        }*/
-                        Intent intentMapa = new Intent(Intent.ACTION_VIEW);
-                        intentMapa.setData(Uri.parse("geo:0,0?q=" + Uri.encode(contatoLinks.get(position))));
-                        intentMapa.setPackage("com.google.android.apps.maps");
-                        if (intentMapa.resolveActivity(getActivity().getPackageManager()) != null) {
-                            startActivity(intentMapa);
                         }
-                        break;
-                    case "telefone":
-                        final String numeroTelefone = contatoLinks.get(position).replaceAll("[^\\d.]", "");
-                        Log.v("aaaa", "" + numeroTelefone);
-                        AlertDialog.Builder customBuilder  = new AlertDialog.Builder(getActivity());
-                        customBuilder .setTitle("Ligar");
-                        customBuilder .setMessage("Você deseja ligar para a rádio?");
-                        customBuilder .setPositiveButton("SIM", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Uri call = Uri.parse("tel:" + numeroTelefone);
+                    }
+                });
+
+                // ALIMENTANDO LISTA DE CONTATOS
+                gridViewContato = (GridView) rootView.findViewById(R.id.gridViewContato);
+                gridViewContato.setAdapter(new GridIconAdapter(getContext(), contatoIconIds));
+                gridViewContato.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    public void onItemClick(AdapterView<?> parent, View v, int position, long id){
+
+                        switch (contatoTipo.get(position)) {
+                            case "endereco":
+                                /*try {
+                                    Intent intentContato = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com.br/maps/place/" + contatoLinks.get(position)));
+                                    startActivity(intentContato);
+                                } catch (ActivityNotFoundException e) {
+                                    e.printStackTrace();
+                                }*/
+                                Intent intentMapa = new Intent(Intent.ACTION_VIEW);
+                                intentMapa.setData(Uri.parse("geo:0,0?q=" + Uri.encode(contatoLinks.get(position))));
+                                intentMapa.setPackage("com.google.android.apps.maps");
+                                if (intentMapa.resolveActivity(getActivity().getPackageManager()) != null) {
+                                    startActivity(intentMapa);
+                                }
+                                break;
+                            case "telefone":
+                                final String numeroTelefone = contatoLinks.get(position).replaceAll("[^\\d.]", "");
+                                AlertDialog.Builder customBuilder  = new AlertDialog.Builder(getActivity());
+                                customBuilder .setTitle("Ligar");
+                                customBuilder .setMessage("Você deseja ligar para a rádio?");
+                                customBuilder .setPositiveButton("SIM", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        Uri call = Uri.parse("tel:" + numeroTelefone);
+                                        try {
+                                            Intent ligar = new Intent(Intent.ACTION_DIAL, call);
+                                            startActivity(ligar);
+                                        } catch (ActivityNotFoundException e) {
+                                            e.printStackTrace();
+                                        }
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                                customBuilder .setNegativeButton("NÃO", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                    }
+                                });
+
+                                AlertDialog dialog = customBuilder.create();
+
+                                dialog.show();
+                                Button btnNegative = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
+                                btnNegative.setTextColor(Color.parseColor(cacheData.getString("color")));
+
+                                Button btnPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                                btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
+                                break;
+                            case "whatsapp":
+                                final String numeroWhatsapp = contatoLinks.get(position).replaceAll("[^\\d.]", "");
+
+                                Log.e("whats", "" + numeroWhatsapp);
                                 try {
-                                    Intent ligar = new Intent(Intent.ACTION_DIAL, call);
-                                    startActivity(ligar);
+                                    Intent intentWhatsapp = new Intent("android.intent.action.MAIN");
+                                    //intentWhatsapp.setComponent(new ComponentName("com.whatsapp","com.whatsapp.Conversation"));
+                                    intentWhatsapp.setAction(Intent.ACTION_SEND);
+                                    intentWhatsapp.setType("text/plain");
+                                    intentWhatsapp.putExtra("jid", PhoneNumberUtils.stripSeparators(numeroWhatsapp)+"@s.whatsapp.net");
+                                    intentWhatsapp.setPackage("com.whatsapp");
+                                    startActivity(intentWhatsapp);
+                                } catch (ActivityNotFoundException e) {
+                                    e.printStackTrace();
+
+                                    AlertDialog.Builder customBuilderWhatstapp  = new AlertDialog.Builder(getActivity());
+                                    customBuilderWhatstapp .setTitle("Whatsapp");
+                                    customBuilderWhatstapp .setMessage("Você não possui o aplicativo instalado em seu dispositivo.");
+                                    customBuilderWhatstapp .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                        @Override
+                                        public void onClick(DialogInterface dialog, int which) {
+                                            dialog.dismiss();
+                                        }
+                                    });
+
+                                    AlertDialog dialogWhatsapp = customBuilderWhatstapp.create();
+
+                                    dialogWhatsapp.show();
+
+                                    Button btnPositiveWhatsapp = dialogWhatsapp.getButton(DialogInterface.BUTTON_POSITIVE);
+                                    btnPositiveWhatsapp.setTextColor(Color.parseColor(cacheData.getString("color")));
+                                }
+
+                                break;
+                            case "site":
+                                try {
+                                    Intent intentContato = new Intent(Intent.ACTION_VIEW, Uri.parse(contatoLinks.get(position)));
+                                    startActivity(intentContato);
                                 } catch (ActivityNotFoundException e) {
                                     e.printStackTrace();
                                 }
-                                dialog.dismiss();
-                            }
-                        });
-
-                        customBuilder .setNegativeButton("NÃO", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        });
-
-                        AlertDialog dialog = customBuilder.create();
-
-                        dialog.show();
-                        Button btnNegative = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-                        btnNegative.setTextColor(getResources().getColor(R.color.colorPrimary));
-
-                        Button btnPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-                        btnPositive.setTextColor(getResources().getColor(R.color.colorPrimary));
-                        break;
-                    case "whatsapp":
-                        final String numeroWhatsapp = contatoLinks.get(position).replaceAll("[^\\d.]", "");
-
-                        try {
-                            Intent intentWhatsapp = new Intent("android.intent.action.MAIN");
-                            //intentWhatsapp.setComponent(new ComponentName("com.whatsapp","com.whatsapp.Conversation"));
-                            intentWhatsapp.setAction(Intent.ACTION_SEND);
-                            intentWhatsapp.setType("text/plain");
-                            intentWhatsapp.putExtra("jid", PhoneNumberUtils.stripSeparators(numeroWhatsapp)+"@s.whatsapp.net");
-                            intentWhatsapp.setPackage("com.whatsapp");
-                            startActivity(intentWhatsapp);
-                        } catch (ActivityNotFoundException e) {
-                            e.printStackTrace();
+                                break;
+                            case "email":
+                                Intent intentEmail = new Intent(Intent.ACTION_SENDTO);
+                                intentEmail.setData(Uri.parse("mailto:"));
+                                intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{contatoLinks.get(position)});
+                                intentEmail.putExtra(Intent.EXTRA_SUBJECT, "Contato realizado através do aplicativo");
+                                if (intentEmail.resolveActivity(getActivity().getPackageManager()) != null) {
+                                    startActivity(intentEmail);
+                                }
+                                break;
+                            default:
+                                break;
                         }
-
-                        break;
-                    case "site":
-                        try {
-                            Intent intentContato = new Intent(Intent.ACTION_VIEW, Uri.parse(contatoLinks.get(position)));
-                            startActivity(intentContato);
-                        } catch (ActivityNotFoundException e) {
-                            e.printStackTrace();
-                        }
-                        break;
-                    case "email":
-                        Log.v("aaaa", "" + contatoLinks.get(position));
-                        Intent intentEmail = new Intent(Intent.ACTION_SENDTO);
-                        intentEmail.setData(Uri.parse("mailto:"));
-                        intentEmail.putExtra(Intent.EXTRA_EMAIL, new String[]{contatoLinks.get(position)});
-                        intentEmail.putExtra(Intent.EXTRA_SUBJECT, "Contato realizado através do aplicativo");
-                        if (intentEmail.resolveActivity(getActivity().getPackageManager()) != null) {
-                            startActivity(intentEmail);
-                        }
-                        break;
-                    default:
-                        break;
-                }
+                    }
+                });
             }
-        });
-
+        }.execute();
 
         // Inflate the layout for this fragment
         return rootView;
@@ -222,4 +306,5 @@ public class HomeFragment extends Fragment {
         }
 
     }
+
 }

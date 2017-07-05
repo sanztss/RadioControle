@@ -86,5 +86,10 @@ public class PodcastsFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+    }
 }
 

@@ -4,6 +4,7 @@ package accessweb.com.br.radiocontrole.fragment;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
@@ -16,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,7 @@ import java.util.List;
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.NavigationDrawerAdapter;
 import accessweb.com.br.radiocontrole.model.NavDrawerItem;
+import accessweb.com.br.radiocontrole.util.CacheData;
 
 public class FragmentDrawer extends Fragment {
 
@@ -33,9 +36,12 @@ public class FragmentDrawer extends Fragment {
     private DrawerLayout mDrawerLayout;
     private NavigationDrawerAdapter adapter;
     private View containerView;
+    private RelativeLayout nav_header_container;
     private static String[] titles = null;
     private static TypedArray icons = null;
     private FragmentDrawerListener drawerListener;
+
+    private static ArrayList<String> modulos = new ArrayList<String>();
 
     public FragmentDrawer() {
 
@@ -48,13 +54,16 @@ public class FragmentDrawer extends Fragment {
     public static List<NavDrawerItem> getData() {
         List<NavDrawerItem> data = new ArrayList<>();
 
-
         // preparing navigation drawer items
         for (int i = 0; i < titles.length; i++) {
             NavDrawerItem navItem = new NavDrawerItem();
-            navItem.setTitle(titles[i]);
-            navItem.setIcon(icons.getResourceId(i, -1));
-            data.add(navItem);
+            for (String modulo:modulos) {
+                if (modulo.equals(titles[i].toLowerCase())) {
+                    navItem.setTitle(titles[i]);
+                    navItem.setIcon(icons.getResourceId(i, -1));
+                    data.add(navItem);
+                }
+            }
         }
         return data;
     }
@@ -71,8 +80,15 @@ public class FragmentDrawer extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        CacheData cacheData = new CacheData(getContext());
+
+        modulos = cacheData.getListString("modulos");
+
         // Inflating view layout
         View layout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+        nav_header_container = (RelativeLayout) layout.findViewById(R.id.nav_header_container);
+        nav_header_container.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         recyclerView = (RecyclerView) layout.findViewById(R.id.drawerList);
 
         adapter = new NavigationDrawerAdapter(getActivity(), getData());

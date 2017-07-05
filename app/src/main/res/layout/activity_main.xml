@@ -132,12 +132,12 @@
 
     <!-- SLIDING LAYOUT -->
     <RelativeLayout
+        android:id="@+id/dragView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/colorPrimary"
         android:clickable="true"
-        android:focusable="false"
-        android:id="@+id/dragView">
+        android:focusable="false">
 
         <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:local="http://schemas.android.com/apk/res-auto"
@@ -247,6 +247,7 @@
                     android:singleLine="true"
                     android:textColor="#fff"
                     android:text="Texto rotativo deve ter um limite máximo de caracteres..."
+                    android:textAlignment="center"
                     android:textSize="16sp"/>
 
                 <RelativeLayout

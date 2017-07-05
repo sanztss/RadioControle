@@ -15,9 +15,10 @@
 
 package accessweb.com.br.radiocontrole.model;
 
+import java.io.Serializable;
 import java.util.*;
 
-public class Channel {
+public class Channel implements Serializable {
     @com.google.gson.annotations.SerializedName("main")
     private Boolean main = null;
     @com.google.gson.annotations.SerializedName("name")
