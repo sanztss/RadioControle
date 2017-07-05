@@ -23,7 +23,7 @@ import java.util.List;
 
 public class SuaContaDialogFragment extends DialogFragment {
 
-    private static String TAG = EscolherDialogFragment.class.getSimpleName();
+    private static String TAG = SuaContaDialogFragment.class.getSimpleName();
     private TabLayout tabLayout;
     private ViewPager viewPager;
 

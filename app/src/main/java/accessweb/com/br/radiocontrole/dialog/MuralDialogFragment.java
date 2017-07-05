@@ -69,7 +69,7 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class MuralDialogFragment extends DialogFragment {
 
-    private static String TAG = EscolherDialogFragment.class.getSimpleName();
+    private static String TAG = MuralDialogFragment.class.getSimpleName();
 
     private String modalTitle;
     private String modalTipo;

@@ -2,6 +2,7 @@ package accessweb.com.br.radiocontrole.activity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -31,17 +32,12 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.facebook.FacebookSdk;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EscolherDialogFragment;
@@ -60,12 +56,6 @@ import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.CacheData;
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.Headers;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener,MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, OnBufferingUpdateListener {
 
@@ -84,7 +74,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private ImageButton playPauseToolbar;
     private HomeFragment homeFragment;
     private Boolean audioTocando = false;
-    private MediaPlayer mediaPlayer;
     private ImageView albumCoverToolbar;
     private ImageView imgCapaAlbum;
     private TextView nomeMusica;
@@ -101,6 +90,10 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private String urlStreaming =  "";
 
     MediaPlayer myMediaPlayer = null;
+
+    private Boolean firstTime = true;
+
+    ProgressDialog progressDialog;
 
 
     @Override
@@ -192,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         nomeArtista = (TextView) findViewById(R.id.nomeArtista);
         txtNomeCantor = (TextView) findViewById(R.id.txtNomeCantor);
 
+        painel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
     }
 
     private void initCognito() {
@@ -250,11 +244,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             public boolean onMenuItemClick(MenuItem item) {
 
                 if(item.getItemId() == R.id.action_canais){
-                    final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o canal desejado:", "canais");
+                    final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o canal desejado:", "canais", canais);
                     dialogListCanais.show(getSupportFragmentManager(), "test");
 
                 }else if (item.getItemId() == R.id.action_dormir){
-                    final EscolherDialogFragment dialogListDormir = new EscolherDialogFragment("Selecione o tempo para desligar automaticamente:", "dormir");
+                    final EscolherDialogFragment dialogListDormir = new EscolherDialogFragment("Selecione o tempo para desligar automaticamente:", "dormir", null);
                     dialogListDormir.show(getSupportFragmentManager(), "test");
                 }
 
@@ -456,7 +450,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             fragmentTransaction.commit();
             fragmentManager.executePendingTransactions();
             if (position == 0 && audioTocando) {
-                changeIcon("pause");
+                changeIcon("pause", indexCanal);
             }
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
             toolbar.setTitle(title);
@@ -478,32 +472,31 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     public void playPauseStreaming(View view) {
         //Log.v("aaa", ""+ view.getId());
         if (!audioTocando) {
-            changeIcon("pause");
+            changeIcon("play", indexCanal);
         } else {
-            changeIcon("play");
+            changeIcon("pause", indexCanal);
         }
-
     }
 
     // ALTERAR ÍCONE PLAY PAUSE
-    private void changeIcon(final String acao) {
+    public void changeIcon(final String acao, int index) {
         homeFragment = (HomeFragment) getSupportFragmentManager().findFragmentByTag("inicio");
-        if (acao.equals("play")){
+        if (acao.equals("pause")){
             audioTocando = false;
-            mediaPlayer.stop();
+            stop();
             albumCoverToolbar.setImageResource(R.drawable.album_cover);
             imgCapaAlbum.setImageResource(R.drawable.album_cover);
-            nomeMusica.setText("Pausado");
-            txtNomeMusica.setText("Pausado");
+            nomeMusica.setText("Parado");
+            txtNomeMusica.setText("Parado");
             nomeArtista.setText("");
             txtNomeCantor.setText("");
             imgBtnPlayPause.setImageResource(R.drawable.ic_play_white);
             playPauseToolbar.setImageResource(R.drawable.ic_play_gray);
             if (homeFragment != null)
-                homeFragment.changeIcon(acao);
-        }else if (acao.equals("pause")) {
-            audioTocando = true;
-            if (indexCanal == 0){
+                homeFragment.changeIcon("play");
+        }else if (acao.equals("play")) {
+
+            if (index == 0){
                 if (mWifi.isAvailable() == true) {
                     if (canais.get(0).getHighStreams().size() > 0){
                         urlStreaming = canais.get(0).getHighStreams().get(0);
@@ -520,7 +513,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                     AlertDialog.Builder customBuilderWhatstapp  = new AlertDialog.Builder(mActivity);
                     customBuilderWhatstapp .setTitle("Rádio Controle");
                     customBuilderWhatstapp .setMessage("Você precisa estar conectado a internet para utilizar o aplicativo.");
-                    customBuilderWhatstapp .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                    customBuilderWhatstapp .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             dialog.dismiss();
@@ -531,45 +524,48 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
                     dialogWhatsapp.show();
                     CacheData cacheData = new CacheData(mContext);
-                    Button btnPositiveWhatsapp = dialogWhatsapp.getButton(DialogInterface.BUTTON_POSITIVE);
+                    Button btnPositiveWhatsapp = dialogWhatsapp.getButton(DialogInterface.BUTTON_NEUTRAL);
                     btnPositiveWhatsapp.setTextColor(Color.parseColor(cacheData.getString("color")));
                 }
 
-            }
-
-            /*FFmpegMediaMetadataRetriever mmr = new FFmpegMediaMetadataRetriever();
-            Log.e("urlStreaming", "" + urlStreaming);
-            try {
-                mmr.setDataSource(urlStreaming);
-            }catch (Exception e){
-
-            }
-            byte [] artwork = mmr.getEmbeddedPicture();
-            String artist = mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_ARTIST);
-            String album = mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_ALBUM);
-            String title = mmr.extractMetadata(FFmpegMediaMetadataRetriever.METADATA_KEY_TITLE);
-            mmr.release();
-            if (artwork != null){
-                Bitmap bitmap = BitmapFactory.decodeByteArray(artwork, 0, artwork.length);
-                albumCoverToolbar.setImageBitmap(bitmap);
-                imgCapaAlbum.setImageBitmap(bitmap);
             } else {
-                albumCoverToolbar.setImageResource(R.drawable.album_cover);
-                imgCapaAlbum.setImageResource(R.drawable.album_cover);
+                indexCanal = index;
+                if (mWifi.isAvailable() == true) {
+                    if (canais.get(index).getHighStreams().size() > 0){
+                        urlStreaming = canais.get(index).getHighStreams().get(0);
+                    }else {
+                        urlStreaming = canais.get(index).getLowStreams().get(0);
+                    }
+                } else if (mMobile.isAvailable() == true) {
+                    if (canais.get(0).getHighStreams().size() > 0){
+                        urlStreaming = canais.get(index).getLowStreams().get(0);
+                    }else {
+                        urlStreaming = canais.get(index).getHighStreams().get(0);
+                    }
+                } else {
+                    AlertDialog.Builder customBuilderWhatstapp  = new AlertDialog.Builder(mActivity);
+                    customBuilderWhatstapp .setTitle("Rádio Controle");
+                    customBuilderWhatstapp .setMessage("Você precisa estar conectado a internet para utilizar o aplicativo.");
+                    customBuilderWhatstapp .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    AlertDialog dialogWhatsapp = customBuilderWhatstapp.create();
+
+                    dialogWhatsapp.show();
+                    CacheData cacheData = new CacheData(mContext);
+                    Button btnPositiveWhatsapp = dialogWhatsapp.getButton(DialogInterface.BUTTON_NEUTRAL);
+                    btnPositiveWhatsapp.setTextColor(Color.parseColor(cacheData.getString("color")));
+                }
             }
 
-            if (artist != null){
-                nomeMusica.setText(title);
-                txtNomeMusica.setText(title);
-                nomeArtista.setText(artist);
-                txtNomeCantor.setText(artist);
-            } else {
-                nomeMusica.setText("Desconhecido");
-                txtNomeMusica.setText("Desconhecido");
-                nomeArtista.setText("Desconhecido");
-                txtNomeCantor.setText("Desconhecido");
-            }*/
-
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage("Carregando Áudio");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.show();
             Uri myUri = Uri.parse(urlStreaming);
             try {
                 if (myMediaPlayer == null) {
@@ -590,36 +586,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             } catch (Throwable t) {
                 Log.d(TAG, t.toString());
             }
-
-            /*MediaPlayer myMediaPlayer = new MediaPlayer();
-            myMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            try {
-                myMediaPlayer.setDataSource(urlStreaming);
-                myMediaPlayer.prepareAsync();
-
-            } catch (IOException e) {
-                Toast.makeText(this, "mp3 not found", Toast.LENGTH_SHORT).show();
-                e.printStackTrace();
-            }
-
-            myMediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-
-                @Override
-                public void onPrepared(MediaPlayer player) {
-                    player.start();
-                    imgBtnPlayPause.setImageResource(R.drawable.ic_pause_white);
-                    playPauseToolbar.setImageResource(R.drawable.ic_pause_gray);
-                    if (homeFragment != null)
-                        homeFragment.changeIcon(acao);
-                }
-
-            });
-
-            myMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                public void onCompletion(MediaPlayer player) {
-                    player.release();
-                }
-            });*/
         }
     }
 
@@ -628,26 +594,29 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     public void onPrepared(MediaPlayer myMediaPlayer) {
         Log.d(TAG, "Stream is prepared");
         myMediaPlayer.start();
-        imgBtnPlayPause.setImageResource(R.drawable.ic_pause_white);
-        playPauseToolbar.setImageResource(R.drawable.ic_pause_gray);
+        progressDialog.dismiss();
+        firstTime = false;
+        audioTocando = true;
+        albumCoverToolbar.setImageResource(R.drawable.album_cover);
+        imgCapaAlbum.setImageResource(R.drawable.album_cover);
+        nomeMusica.setText("Desconhecido");
+        txtNomeMusica.setText("Desconhecido");
+        nomeArtista.setText("Desconhecido");
+        txtNomeCantor.setText("Desconhecido");
+        imgBtnPlayPause.setImageResource(R.drawable.ic_stop_white);
+        playPauseToolbar.setImageResource(R.drawable.ic_stop_gray);
         if (homeFragment != null)
-            homeFragment.changeIcon("play");
-    }
-
-    private void pause() {
-        myMediaPlayer.pause();
+            homeFragment.changeIcon("pause");
     }
 
     private void stop() {
         myMediaPlayer.stop();
-
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         stop();
-
     }
 
     public void onCompletion(MediaPlayer mp) {
@@ -692,7 +661,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         fragmentTransaction.commit();
         fragmentManager.executePendingTransactions();
         if (audioTocando) {
-            changeIcon("pause");
+            homeFragment.changeIcon("pause");
         }
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Início");

@@ -30,7 +30,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.activity.MainActivity;
 import accessweb.com.br.radiocontrole.adapter.ModalListAdapter;
+import accessweb.com.br.radiocontrole.model.Channel;
 import accessweb.com.br.radiocontrole.model.NavDrawerItem;
 
 public class EscolherDialogFragment extends DialogFragment {
@@ -48,10 +50,14 @@ public class EscolherDialogFragment extends DialogFragment {
     private String modalTitle;
     private String modalTipo;
     //private NavDrawerItem[] itens;
+    private List<Channel> listacanais = null;
 
-    public EscolherDialogFragment(String title, String modal) {
+    public EscolherDialogFragment(String title, String modal, List<Channel> canais) {
         modalTitle =  title;
         modalTipo = modal;
+        if (canais != null){
+            listacanais = canais;
+        }
     }
 
     public void setDrawerListener(ModalListFragmentListener listener) {
@@ -84,12 +90,18 @@ public class EscolherDialogFragment extends DialogFragment {
         icons.clear();
 
         if (modalTipo.equals("canais")){
-            titles.add("Ao vivo");
+            Log.e("nome do canal", "" + listacanais.get(0).getName());
+            for (Channel canal : listacanais){
+                Log.e("nome do canal", "" + canal.getName());
+                titles.add(canal.getName());
+                icons.add(R.drawable.ic_library_music_gray);
+            }
+            /*titles.add("Ao vivo");
             titles.add("Sertanejo");
             titles.add("MPB");
             icons.add(R.drawable.ic_library_music_gray);
             icons.add(R.drawable.ic_library_music_gray);
-            icons.add(R.drawable.ic_library_music_gray);
+            icons.add(R.drawable.ic_library_music_gray);*/
         } else if (modalTipo.equals("dormir")) {
             titles.add("00:30");
             titles.add("01:00");
@@ -201,7 +213,9 @@ public class EscolherDialogFragment extends DialogFragment {
                 int itemPosition = recyclerView.getChildLayoutPosition(view);
                 String abrirTelaTitulo = titles.get(itemPosition);
                 getDialog().dismiss();
-                if (modalTipo.equals("mural")){
+                if (modalTipo.equals("canais")){
+                    ((MainActivity)getActivity()).changeIcon("play", position);
+                } else if (modalTipo.equals("mural")){
                     Log.v("aaaaaaa", abrirTelaTitulo);
                     if (abrirTelaTitulo.equals("Texto")) {
                         MuralDialogFragment dialog = new MuralDialogFragment("Postagem de texto", "texto");

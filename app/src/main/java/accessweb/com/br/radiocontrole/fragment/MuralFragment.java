@@ -134,7 +134,7 @@ public class MuralFragment extends Fragment {
 
         btnAdicionarPostagem.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o tipo da postagem:", "mural");
+                final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o tipo da postagem:", "mural", null);
                 dialogListCanais.show(getActivity().getSupportFragmentManager(), "dialog");
             }
         });

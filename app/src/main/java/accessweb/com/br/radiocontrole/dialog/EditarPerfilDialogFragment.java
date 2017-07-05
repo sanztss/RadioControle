@@ -23,7 +23,7 @@ import accessweb.com.br.radiocontrole.R;
 
 public class EditarPerfilDialogFragment extends DialogFragment {
 
-    private static String TAG = EscolherDialogFragment.class.getSimpleName();
+    private static String TAG = EditarPerfilDialogFragment.class.getSimpleName();
     private Toolbar toolbar;
     private TextView inputNome;
     private TextView inputEmail;

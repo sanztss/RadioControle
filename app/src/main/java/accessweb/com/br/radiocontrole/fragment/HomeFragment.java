@@ -243,7 +243,7 @@ public class HomeFragment extends Fragment {
                                     AlertDialog.Builder customBuilderWhatstapp  = new AlertDialog.Builder(getActivity());
                                     customBuilderWhatstapp .setTitle("Whatsapp");
                                     customBuilderWhatstapp .setMessage("Você não possui o aplicativo instalado em seu dispositivo.");
-                                    customBuilderWhatstapp .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    customBuilderWhatstapp .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
                                             dialog.dismiss();
@@ -254,7 +254,7 @@ public class HomeFragment extends Fragment {
 
                                     dialogWhatsapp.show();
 
-                                    Button btnPositiveWhatsapp = dialogWhatsapp.getButton(DialogInterface.BUTTON_POSITIVE);
+                                    Button btnPositiveWhatsapp = dialogWhatsapp.getButton(DialogInterface.BUTTON_NEUTRAL);
                                     btnPositiveWhatsapp.setTextColor(Color.parseColor(cacheData.getString("color")));
                                 }
 
@@ -302,7 +302,7 @@ public class HomeFragment extends Fragment {
         if (acao.equals("play")){
             btnHomePlayPause.setImageResource(R.drawable.ic_play_white);
         }else if (acao.equals("pause")) {
-            btnHomePlayPause.setImageResource(R.drawable.ic_pause_white);
+            btnHomePlayPause.setImageResource(R.drawable.ic_stop_white);
         }
 
     }
