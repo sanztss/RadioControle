@@ -1,19 +1,32 @@
 package accessweb.com.br.radiocontrole.fragment;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.ProgramacaoAdapter;
+import accessweb.com.br.radiocontrole.model.Host;
+import accessweb.com.br.radiocontrole.model.Program;
 import accessweb.com.br.radiocontrole.model.Programa;
+import accessweb.com.br.radiocontrole.model.Programs;
+import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
+
+import static android.R.attr.data;
 
 /**
  * Created by Des. Android on 26/06/2017.
@@ -23,7 +36,8 @@ public class ProgramacaoDiaFragment extends Fragment{
 
     private RecyclerView recyclerView;
     private ProgramacaoAdapter adapter;
-    private List<Programa> programas = new ArrayList<Programa>();
+    private List<Program> programas = new ArrayList<Program>();
+    private List<Host> hosts = new ArrayList<Host>();
     private static String TAG = ProgramacaoDiaFragment.class.getSimpleName();
     private String diaSemana;
 
@@ -44,8 +58,11 @@ public class ProgramacaoDiaFragment extends Fragment{
 
         Bundle args = getArguments();
         diaSemana = (String) args.get("dia");
+        programas = (List<Program>) args.getSerializable("programas");
+        hosts = (List<Host>) args.getSerializable("hosts");
 
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);
+
         adapter = new ProgramacaoAdapter(getContext(), getData());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -53,61 +70,197 @@ public class ProgramacaoDiaFragment extends Fragment{
     }
 
     public List<Programa> getData() {
-        List<Programa> data = new ArrayList<>();
-        for (int i = 0; i < 5; i++) {
+        final List<Programa> data = new ArrayList<>();
 
-            Programa programa = new Programa();
+        for (Program program : programas){
+
+            Calendar segunda = Calendar.getInstance();
+            segunda.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+            Calendar terca = Calendar.getInstance();
+            terca.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY);
+            Calendar quarta = Calendar.getInstance();
+            quarta.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY);
+            Calendar quinta = Calendar.getInstance();
+            quinta.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY);
+            Calendar sexta = Calendar.getInstance();
+            sexta.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY);
+            Calendar sabado = Calendar.getInstance();
+            sabado.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+            Calendar domingo = Calendar.getInstance();
+            int weekday = domingo.get(Calendar.DAY_OF_WEEK);
+            int days = Calendar.SUNDAY - weekday;
+            if (days < 0) {
+                days += 7;
+            }
+            domingo.add(Calendar.DAY_OF_YEAR, days);
 
             switch (diaSemana){
                 case "segunda":
-                    programa.setHoraInicioPrograma("10:00");
-                    programa.setNomePrograma("Nome do programa de segunda " + i);
-                    programa.setFotoLocutorPrograma("https://www.workinentertainment.com/blog/wp-content/uploads/2013/06/career-in-music-radio-host.jpg");
-                    programa.setNomeLocutorPrograma("Nome do locutor " + i);
+                    if (program.getMon()){
+                        Programa programa = new Programa();
+                        programa.setHoraInicioPrograma(program.getStartTime());
+                        programa.setNomePrograma(program.getName());
+                        for (Host host : hosts){
+                            if (host.getId().equals(program.getHostId())){
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setNomeLocutorPrograma(host.getName());
+                                break;
+                            }
+                        }
+                        String startTime = program.getStartTime();
+                        String[] startTimeSplit = startTime.split(":");
+                        int hora = Integer.parseInt(startTimeSplit[0]);
+                        int minuto = Integer.parseInt(startTimeSplit[1]);
+                        segunda.set(Calendar.HOUR_OF_DAY,hora);
+                        segunda.set(Calendar.MINUTE,minuto);
+                        segunda.set(Calendar.SECOND, 0);
+                        programa.setDataPrograma(segunda);
+                        data.add(programa);
+                    }
+
                     break;
                 case "terca":
-                    programa.setHoraInicioPrograma("10:00");
-                    programa.setNomePrograma("Nome do programa de terça " + i);
-                    programa.setFotoLocutorPrograma("https://www.workinentertainment.com/blog/wp-content/uploads/2013/06/career-in-music-radio-host.jpg");
-                    programa.setNomeLocutorPrograma("Nome do locutor " + i);
+                    if (program.getTue()){
+                        Programa programa = new Programa();
+                        programa.setHoraInicioPrograma(program.getStartTime());
+                        programa.setNomePrograma(program.getName());
+                        for (Host host : hosts){
+                            if (host.getId().equals(program.getHostId())){
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setNomeLocutorPrograma(host.getName());
+                                break;
+                            }
+                        }
+                        String startTime = program.getStartTime();
+                        String[] startTimeSplit = startTime.split(":");
+                        int hora = Integer.parseInt(startTimeSplit[0]);
+                        int minuto = Integer.parseInt(startTimeSplit[1]);
+                        terca.set(Calendar.HOUR_OF_DAY,hora);
+                        terca.set(Calendar.MINUTE,minuto);
+                        terca.set(Calendar.SECOND, 0);
+                        programa.setDataPrograma(terca);
+                        data.add(programa);
+                    }
                     break;
                 case "quarta":
-                    programa.setHoraInicioPrograma("10:00");
-                    programa.setNomePrograma("Nome do programa de quarta " + i);
-                    programa.setFotoLocutorPrograma("https://www.workinentertainment.com/blog/wp-content/uploads/2013/06/career-in-music-radio-host.jpg");
-                    programa.setNomeLocutorPrograma("Nome do locutor " + i);
+                    if (program.getWed()){
+                        Programa programa = new Programa();
+                        programa.setHoraInicioPrograma(program.getStartTime());
+                        programa.setNomePrograma(program.getName());
+                        for (Host host : hosts){
+                            if (host.getId().equals(program.getHostId())){
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setNomeLocutorPrograma(host.getName());
+                                break;
+                            }
+                        }
+                        String startTime = program.getStartTime();
+                        String[] startTimeSplit = startTime.split(":");
+                        int hora = Integer.parseInt(startTimeSplit[0]);
+                        int minuto = Integer.parseInt(startTimeSplit[1]);
+                        quarta.set(Calendar.HOUR_OF_DAY,hora);
+                        quarta.set(Calendar.MINUTE,minuto);
+                        quarta.set(Calendar.SECOND, 0);
+                        programa.setDataPrograma(quarta);
+                        data.add(programa);
+                    }
                     break;
                 case "quinta":
-                    programa.setHoraInicioPrograma("10:00");
-                    programa.setNomePrograma("Nome do programa de quinta " + i);
-                    programa.setFotoLocutorPrograma("https://www.workinentertainment.com/blog/wp-content/uploads/2013/06/career-in-music-radio-host.jpg");
-                    programa.setNomeLocutorPrograma("Nome do locutor " + i);
+                    if (program.getThu()){
+                        Programa programa = new Programa();
+                        programa.setHoraInicioPrograma(program.getStartTime());
+                        programa.setNomePrograma(program.getName());
+                        for (Host host : hosts){
+                            if (host.getId().equals(program.getHostId())){
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setNomeLocutorPrograma(host.getName());
+                                break;
+                            }
+                        }
+                        String startTime = program.getStartTime();
+                        String[] startTimeSplit = startTime.split(":");
+                        int hora = Integer.parseInt(startTimeSplit[0]);
+                        int minuto = Integer.parseInt(startTimeSplit[1]);
+                        quinta.set(Calendar.HOUR_OF_DAY,hora);
+                        quinta.set(Calendar.MINUTE,minuto);
+                        quinta.set(Calendar.SECOND, 0);
+                        programa.setDataPrograma(quinta);
+                        data.add(programa);
+                    }
                     break;
                 case "sexta":
-                    programa.setHoraInicioPrograma("10:00");
-                    programa.setNomePrograma("Nome do programa de sexta " + i);
-                    programa.setFotoLocutorPrograma("https://www.workinentertainment.com/blog/wp-content/uploads/2013/06/career-in-music-radio-host.jpg");
-                    programa.setNomeLocutorPrograma("Nome do locutor " + i);
-                    data.add(programa);
+                    if (program.getFri()){
+                        Programa programa = new Programa();
+                        programa.setHoraInicioPrograma(program.getStartTime());
+                        programa.setNomePrograma(program.getName());
+                        for (Host host : hosts){
+                            if (host.getId().equals(program.getHostId())){
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setNomeLocutorPrograma(host.getName());
+                                break;
+                            }
+                        }
+                        String startTime = program.getStartTime();
+                        String[] startTimeSplit = startTime.split(":");
+                        int hora = Integer.parseInt(startTimeSplit[0]);
+                        int minuto = Integer.parseInt(startTimeSplit[1]);
+                        sexta.set(Calendar.HOUR_OF_DAY,hora);
+                        sexta.set(Calendar.MINUTE,minuto);
+                        sexta.set(Calendar.SECOND, 0);
+                        programa.setDataPrograma(sexta);
+                        System.out.println("AAAAAAAA: " + sexta.getTime());
+                        data.add(programa);
+                    }
                     break;
                 case "sabado":
-                    programa.setHoraInicioPrograma("10:00");
-                    programa.setNomePrograma("Nome do programa de sábado " + i);
-                    programa.setFotoLocutorPrograma("https://www.workinentertainment.com/blog/wp-content/uploads/2013/06/career-in-music-radio-host.jpg");
-                    programa.setNomeLocutorPrograma("Nome do locutor " + i);
+                    if (program.getSat()){
+                        Programa programa = new Programa();
+                        programa.setHoraInicioPrograma(program.getStartTime());
+                        programa.setNomePrograma(program.getName());
+                        for (Host host : hosts){
+                            if (host.getId().equals(program.getHostId())){
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setNomeLocutorPrograma(host.getName());
+                                break;
+                            }
+                        }
+                        String startTime = program.getStartTime();
+                        String[] startTimeSplit = startTime.split(":");
+                        int hora = Integer.parseInt(startTimeSplit[0]);
+                        int minuto = Integer.parseInt(startTimeSplit[1]);
+                        sabado.set(Calendar.HOUR_OF_DAY,hora);
+                        sabado.set(Calendar.MINUTE,minuto);
+                        sabado.set(Calendar.SECOND, 0);
+                        programa.setDataPrograma(sabado);
+                        data.add(programa);
+                    }
                     break;
                 case "domingo":
-                    programa.setHoraInicioPrograma("10:00");
-                    programa.setNomePrograma("Nome do programa de domingo " + i);
-                    programa.setFotoLocutorPrograma("https://www.workinentertainment.com/blog/wp-content/uploads/2013/06/career-in-music-radio-host.jpg");
-                    programa.setNomeLocutorPrograma("Nome do locutor " + i);
-                    data.add(programa);
+                    if (program.getSun()){
+                        Programa programa = new Programa();
+                        programa.setHoraInicioPrograma(program.getStartTime());
+                        programa.setNomePrograma(program.getName());
+                        for (Host host : hosts){
+                            if (host.getId().equals(program.getHostId())){
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setNomeLocutorPrograma(host.getName());
+                                break;
+                            }
+                        }
+                        String startTime = program.getStartTime();
+                        String[] startTimeSplit = startTime.split(":");
+                        int hora = Integer.parseInt(startTimeSplit[0]);
+                        int minuto = Integer.parseInt(startTimeSplit[1]);
+                        domingo.set(Calendar.HOUR_OF_DAY,hora);
+                        domingo.set(Calendar.MINUTE,minuto);
+                        domingo.set(Calendar.SECOND, 0);
+                        programa.setDataPrograma(domingo);
+                        data.add(programa);
+                    }
                     break;
                 default:
                     break;
             }
-
-            data.add(programa);
         }
         return data;
     }

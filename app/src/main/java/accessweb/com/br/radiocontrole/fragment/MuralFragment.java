@@ -1,6 +1,9 @@
 package accessweb.com.br.radiocontrole.fragment;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -12,18 +15,30 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EscolherDialogFragment;
 import accessweb.com.br.radiocontrole.adapter.MuralListAdapter;
 import accessweb.com.br.radiocontrole.model.Mural;
+import accessweb.com.br.radiocontrole.model.Post;
+import accessweb.com.br.radiocontrole.model.Posts;
+import accessweb.com.br.radiocontrole.util.CacheData;
+import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.EndlessRecyclerViewScrollListener;
+import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 import accessweb.com.br.radiocontrole.util.RecyclerItemClickListener;
 
 
 public class MuralFragment extends Fragment {
 
+    private EndlessRecyclerViewScrollListener scrollListener;
     private RecyclerView recyclerView;
     private MuralListAdapter adapter;
     private SwipeRefreshLayout mSwipeRefreshLayout;
@@ -33,13 +48,16 @@ public class MuralFragment extends Fragment {
     private static ArrayList<String> modeloPublicacao = new ArrayList<String>();
     private static ArrayList<String> tempoPublicacao = new ArrayList<String>();
     private static ArrayList<String> textoPublicacao = new ArrayList<String>();
-    List<Mural> items;
+    List<Mural> items = new ArrayList<>();
+
+    private CacheData cacheData;
+    private String lastKey = "";
 
     public MuralFragment() {
         // Required empty public constructor
     }
 
-    public static List<Mural> getData() {
+    /*public static List<Mural> getData() {
         List<Mural> data = new ArrayList<>();
 
         for (int i = 0; i < nomeUsuario.size(); i++) {
@@ -52,7 +70,7 @@ public class MuralFragment extends Fragment {
             data.add(mural);
         }
         return data;
-    }
+    }*/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -82,35 +100,90 @@ public class MuralFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
+        cacheData = new CacheData(getContext());
+
         View rootView = inflater.inflate(R.layout.fragment_mural, container, false);
 
         btnAdicionarPostagem = (FloatingActionButton) rootView.findViewById(R.id.btnAdicionarPostagem);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recycler_view);
+        final LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                ApiClientFactory factory = new ApiClientFactory();
+                factory.credentialsProvider(CognitoClientManager.getCredentials());
+                factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
+                final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
+                Posts posts = client.radioIdPostsGet("tradicaoAM", lastKey);
+                for (Post post : posts.getPosts()){
+                    /*Log.e("AAAAAAAAAAA", "getAuthorId:" + post.getAuthorId());
+                    Log.e("AAAAAAAAAAA", "getAuthorPicture:" + post.getAuthorPicture());
+                    Log.e("AAAAAAAAAAA", "getAuthorName:" + post.getAuthorName());
+                    Log.e("AAAAAAAAAAA", "getContent:" + post.getContent());
+                    Log.e("AAAAAAAAAAA", "getRadioId:" + post.getRadioId());
+                    Log.e("AAAAAAAAAAA", "getTimestamp:" + post.getTimestamp());
+                    Log.e("AAAAAAAAAAA", "getType:" + post.getType());
+                    Log.e("AAAAAAAAAAA", "getAttachment:" + post.getAttachment());*/
+                    Timestamp timestamp = new Timestamp(post.getTimestamp());
+                    Date dataPostagem = new Date(timestamp.getTime());
 
-        /*adapter = new NoticiasListAdapter(getActivity(), getData());
-        recyclerView.setAdapter(adapter);*/
-
-        //items =  new ArrayList<Mural>();
-        adapter = new MuralListAdapter(getContext(), getData());
-        recyclerView.setAdapter(adapter);
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        recyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(getContext(), recyclerView ,new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override public void onItemClick(View view, int position) {
-                        int itemPosition = recyclerView.getChildLayoutPosition(view);
-                        //Mural item = items.get(itemPosition);
-                        Log.v("aaa","" + itemPosition);
+                    lastKey = post.getTimestamp().toString();
+                    Mural mural = new Mural();
+                    if (post.getType().equals("text")){
+                        mural.setFotoUsuario(post.getAuthorPicture());
+                        mural.setNomeUsuario(post.getAuthorName());
+                        mural.setTempoPublicacao(dataPostagem);
+                        mural.setTextoPublicacao(post.getContent());
+                        mural.setModeloPublicacao("texto");
+                        items.add(mural);
+                    } else if (post.getType().equals("image")){
+                        mural.setFotoUsuario(post.getAuthorPicture());
+                        mural.setNomeUsuario(post.getAuthorName());
+                        mural.setTempoPublicacao(dataPostagem);
+                        mural.setTextoPublicacao(post.getContent());
+                        mural.setModeloPublicacao("imagem");
+                        items.add(mural);
+                    } else if (post.getType().equals("audio")){
+                        mural.setFotoUsuario(post.getAuthorPicture());
+                        mural.setNomeUsuario(post.getAuthorName());
+                        mural.setTempoPublicacao(dataPostagem);
+                        mural.setTextoPublicacao("");
+                        mural.setModeloPublicacao("audio");
+                        mural.setAudioPublicacao("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/mural/" + post.getAttachment());
+                        items.add(mural);
                     }
 
-                    @Override public void onLongItemClick(View view, int position) {
-                        // do whatever
-                    }
-                })
-        );
+
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+
+                adapter = new MuralListAdapter(getContext(), items);
+                recyclerView.setAdapter(adapter);
+
+                recyclerView.setLayoutManager(linearLayoutManager);
+
+            }
+        }.execute();
+
+
+
+        scrollListener = new EndlessRecyclerViewScrollListener(linearLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // Triggered only when new data needs to be appended to the list
+                // Add whatever code is needed to append new items to the bottom of the list
+                loadNextDataFromApi(page);
+            }
+        };
+        recyclerView.addOnScrollListener(scrollListener);
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setColorSchemeColors(getResources().getColor(R.color.colorPrimary));
@@ -138,6 +211,7 @@ public class MuralFragment extends Fragment {
                 dialogListCanais.show(getActivity().getSupportFragmentManager(), "dialog");
             }
         });
+        btnAdicionarPostagem.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(cacheData.getString("color"))));
         return rootView;
     }
 
@@ -154,6 +228,112 @@ public class MuralFragment extends Fragment {
     }
 
     protected void updateMural(){
-        mSwipeRefreshLayout.setRefreshing(false);
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+
+                Log.e("VVVVVVVVVVV", lastKey);
+
+                ApiClientFactory factory = new ApiClientFactory();
+                factory.credentialsProvider(CognitoClientManager.getCredentials());
+                factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
+                final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
+                Posts posts = client.radioIdPostsGet("tradicaoAM", "");
+                items.clear();
+                items = new ArrayList<Mural>();
+                for (Post post : posts.getPosts()){
+                    Timestamp timestamp = new Timestamp(post.getTimestamp());
+                    Date dataPostagem = new Date(timestamp.getTime());
+
+                    lastKey = post.getTimestamp().toString();
+                    Mural mural = new Mural();
+                    if (post.getType().equals("text")){
+                        mural.setFotoUsuario(post.getAuthorPicture());
+                        mural.setNomeUsuario(post.getAuthorName());
+                        mural.setTempoPublicacao(dataPostagem);
+                        mural.setTextoPublicacao("aaaaaaaaaaaaaa");
+                        mural.setModeloPublicacao("texto");
+                        items.add(mural);
+                    } else if (post.getType().equals("image")){
+                        mural.setFotoUsuario(post.getAuthorPicture());
+                        mural.setNomeUsuario(post.getAuthorName());
+                        mural.setTempoPublicacao(dataPostagem);
+                        mural.setTextoPublicacao(post.getContent());
+                        mural.setModeloPublicacao("imagem");
+                        items.add(mural);
+                    } else if (post.getType().equals("audio")){
+                        mural.setFotoUsuario(post.getAuthorPicture());
+                        mural.setNomeUsuario(post.getAuthorName());
+                        mural.setTempoPublicacao(dataPostagem);
+                        mural.setTextoPublicacao("");
+                        mural.setModeloPublicacao("audio");
+                        items.add(mural);
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+                adapter.addAllNew(items);
+                mSwipeRefreshLayout.setRefreshing(false);
+            }
+        }.execute();
+    }
+
+    public void loadNextDataFromApi(int offset) {
+        final List<Mural> listaAnterires = new ArrayList<>();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+
+                Log.e("VVVVVVVVVVV", lastKey);
+
+                ApiClientFactory factory = new ApiClientFactory();
+                factory.credentialsProvider(CognitoClientManager.getCredentials());
+                factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
+                final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
+                Posts posts = client.radioIdPostsGet("tradicaoAM", lastKey);
+                for (Post post : posts.getPosts()){
+                    Timestamp timestamp = new Timestamp(post.getTimestamp());
+                    Date dataPostagem = new Date(timestamp.getTime());
+
+                    lastKey = post.getTimestamp().toString();
+                    lastKey = post.getTimestamp().toString();
+                    Mural mural = new Mural();
+                    if (post.getType().equals("text")){
+                        mural.setFotoUsuario(post.getAuthorPicture());
+                        mural.setNomeUsuario(post.getAuthorName());
+                        mural.setTempoPublicacao(dataPostagem);
+                        mural.setTextoPublicacao(post.getContent());
+                        mural.setModeloPublicacao("texto");
+                        listaAnterires.add(mural);
+                    } else if (post.getType().equals("image")){
+                        mural.setFotoUsuario(post.getAuthorPicture());
+                        mural.setNomeUsuario(post.getAuthorName());
+                        mural.setTempoPublicacao(dataPostagem);
+                        mural.setTextoPublicacao(post.getContent());
+                        mural.setModeloPublicacao("imagem");
+                        listaAnterires.add(mural);
+                    } else if (post.getType().equals("audio")){
+                        mural.setFotoUsuario(post.getAuthorPicture());
+                        mural.setNomeUsuario(post.getAuthorName());
+                        mural.setTempoPublicacao(dataPostagem);
+                        mural.setTextoPublicacao("");
+                        mural.setModeloPublicacao("audio");
+                        listaAnterires.add(mural);
+                    }
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+                adapter.addAllOld(listaAnterires, adapter.getItemCount());
+            }
+        }.execute();
     }
 }

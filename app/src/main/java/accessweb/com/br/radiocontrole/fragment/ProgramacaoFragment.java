@@ -1,20 +1,34 @@
 package accessweb.com.br.radiocontrole.fragment;
 
 import android.app.Activity;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EscolherDialogFragment;
+import accessweb.com.br.radiocontrole.model.Hosts;
+import accessweb.com.br.radiocontrole.model.Program;
+import accessweb.com.br.radiocontrole.model.Programa;
+import accessweb.com.br.radiocontrole.model.Programs;
+import accessweb.com.br.radiocontrole.util.CacheData;
+import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 
 /**
  * Created by Des. Android on 26/06/2017.
@@ -25,7 +39,8 @@ public class ProgramacaoFragment extends Fragment {
 	private static String TAG = EscolherDialogFragment.class.getSimpleName();
     private TabLayout tabLayout;
     private ViewPager viewPager;
-
+    Programs programs;
+    Hosts hosts;
     public ProgramacaoFragment() {
         // Required empty public constructor
     }
@@ -43,14 +58,16 @@ public class ProgramacaoFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        CacheData cacheData = new CacheData(getContext());
         View rootView = inflater.inflate(R.layout.fragment_programacao, container, false);
 
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
         setupViewPager(viewPager);
 
         tabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
+        tabLayout.setTabTextColors(Color.parseColor("#8d939b"), Color.parseColor(cacheData.getString("color")));
+        tabLayout.setSelectedTabIndicatorColor(Color.parseColor(cacheData.getString("color")));
         tabLayout.setupWithViewPager(viewPager);
 
         return rootView;
@@ -61,59 +78,92 @@ public class ProgramacaoFragment extends Fragment {
         super.onDetach();
     }
 
-    private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
+    private void setupViewPager(final ViewPager viewPager) {
+        final ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                ApiClientFactory factory = new ApiClientFactory();
+                factory.credentialsProvider(CognitoClientManager.getCredentials());
+                factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
+                final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
 
-        // SEGUNDA
-        ProgramacaoDiaFragment segunda = new ProgramacaoDiaFragment();
-        Bundle argsSegunda = new Bundle();
-        argsSegunda.putString("dia", "segunda");
-        segunda.setArguments(argsSegunda);
-        adapter.addFragment(segunda, "SEG");
+                programs = client.radioIdProgramsGet("tradicaoAM");
+                hosts = client.radioIdHostsGet("tradicaoAM");
+                Log.v("AAAAAAAAAAAAA", "Nome:" + programs.get(0).getName());
+                return null;
+            }
 
-        // TERÇA
-        ProgramacaoDiaFragment terca = new ProgramacaoDiaFragment();
-        Bundle argsTerca = new Bundle();
-        argsTerca.putString("dia", "terca");
-        terca.setArguments(argsTerca);
-        adapter.addFragment(terca, "TER");
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+                // SEGUNDA
+                ProgramacaoDiaFragment segunda = new ProgramacaoDiaFragment();
+                Bundle argsSegunda = new Bundle();
+                argsSegunda.putString("dia", "segunda");
+                argsSegunda.putSerializable("programas", programs);
+                argsSegunda.putSerializable("hosts", hosts);
+                segunda.setArguments(argsSegunda);
+                adapter.addFragment(segunda, "SEG");
 
-        // QUARTA
-        ProgramacaoDiaFragment quarta = new ProgramacaoDiaFragment();
-        Bundle argsQuarta = new Bundle();
-        argsQuarta.putString("dia", "quarta");
-        quarta.setArguments(argsQuarta);
-        adapter.addFragment(quarta, "QUA");
+                // TERÇA
+                ProgramacaoDiaFragment terca = new ProgramacaoDiaFragment();
+                Bundle argsTerca = new Bundle();
+                argsTerca.putString("dia", "terca");
+                argsTerca.putSerializable("programas", programs);
+                argsTerca.putSerializable("hosts", hosts);
+                terca.setArguments(argsTerca);
+                adapter.addFragment(terca, "TER");
 
-        // QUINTA
-        ProgramacaoDiaFragment quinta = new ProgramacaoDiaFragment();
-        Bundle argsQuinta = new Bundle();
-        argsQuinta.putString("dia", "quinta");
-        quinta.setArguments(argsQuinta);
-        adapter.addFragment(quinta, "QUI");
+                // QUARTA
+                ProgramacaoDiaFragment quarta = new ProgramacaoDiaFragment();
+                Bundle argsQuarta = new Bundle();
+                argsQuarta.putString("dia", "quarta");
+                argsQuarta.putSerializable("programas", programs);
+                argsQuarta.putSerializable("hosts", hosts);
+                quarta.setArguments(argsQuarta);
+                adapter.addFragment(quarta, "QUA");
 
-        // SEXTA
-        ProgramacaoDiaFragment sexta = new ProgramacaoDiaFragment();
-        Bundle argsSexta = new Bundle();
-        argsSexta.putString("dia", "sexta");
-        sexta.setArguments(argsSexta);
-        adapter.addFragment(sexta, "SEX");
+                // QUINTA
+                ProgramacaoDiaFragment quinta = new ProgramacaoDiaFragment();
+                Bundle argsQuinta = new Bundle();
+                argsQuinta.putString("dia", "quinta");
+                argsQuinta.putSerializable("programas", programs);
+                argsQuinta.putSerializable("hosts", hosts);
+                quinta.setArguments(argsQuinta);
+                adapter.addFragment(quinta, "QUI");
 
-        // SABADO
-        ProgramacaoDiaFragment sabado = new ProgramacaoDiaFragment();
-        Bundle argsSabado = new Bundle();
-        argsSabado.putString("dia", "sabado");
-        sabado.setArguments(argsSabado);
-        adapter.addFragment(sabado, "SAB");
+                // SEXTA
+                ProgramacaoDiaFragment sexta = new ProgramacaoDiaFragment();
+                Bundle argsSexta = new Bundle();
+                argsSexta.putString("dia", "sexta");
+                argsSexta.putSerializable("programas", programs);
+                argsSexta.putSerializable("hosts", hosts);
+                sexta.setArguments(argsSexta);
+                adapter.addFragment(sexta, "SEX");
 
-        // DOMINGO
-        ProgramacaoDiaFragment domingo = new ProgramacaoDiaFragment();
-        Bundle argsDomingo = new Bundle();
-        argsDomingo.putString("dia", "domingo");
-        domingo.setArguments(argsDomingo);
-        adapter.addFragment(domingo, "DOM");
+                // SABADO
+                ProgramacaoDiaFragment sabado = new ProgramacaoDiaFragment();
+                Bundle argsSabado = new Bundle();
+                argsSabado.putString("dia", "sabado");
+                argsSabado.putSerializable("programas", programs);
+                argsSabado.putSerializable("hosts", hosts);
+                sabado.setArguments(argsSabado);
+                adapter.addFragment(sabado, "SAB");
 
-        viewPager.setAdapter(adapter);
+                // DOMINGO
+                ProgramacaoDiaFragment domingo = new ProgramacaoDiaFragment();
+                Bundle argsDomingo = new Bundle();
+                argsDomingo.putString("dia", "domingo");
+                argsDomingo.putSerializable("programas", programs);
+                argsDomingo.putSerializable("hosts", hosts);
+                domingo.setArguments(argsDomingo);
+                adapter.addFragment(domingo, "DOM");
+
+                viewPager.setAdapter(adapter);
+            }
+        }.execute();
+
     }
 
     class ViewPagerAdapter extends FragmentPagerAdapter {

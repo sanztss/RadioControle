@@ -1,14 +1,17 @@
 package accessweb.com.br.radiocontrole.model;
 
+
+import java.util.Date;
+
 /**
  * Created by Des. Android on 14/06/2017.
  */
 
-public class Mural {
+public class Mural{
 
     private String fotoUsuario;
     private String nomeUsuario;
-    private String tempoPublicacao;
+    private Date tempoPublicacao;
     private String textoPublicacao;
     private String imagemPublicacao;
     private String audioPublicacao;
@@ -18,7 +21,7 @@ public class Mural {
 
     }
 
-    public Mural(String fotoUsuario, String nomeUsuario, String tempoPublicacao, String textoPublicacao, String imagemPublicacao, String audioPublicacao, String modeloPublicacao) {
+    public Mural(String fotoUsuario, String nomeUsuario, Date tempoPublicacao, String textoPublicacao, String imagemPublicacao, String audioPublicacao, String modeloPublicacao) {
         this.fotoUsuario = fotoUsuario;
         this.nomeUsuario = nomeUsuario;
         this.tempoPublicacao = tempoPublicacao;
@@ -44,11 +47,11 @@ public class Mural {
         this.nomeUsuario = nomeUsuario;
     }
 
-    public String getTempoPublicacao() {
+    public Date getTempoPublicacao() {
         return tempoPublicacao;
     }
 
-    public void setTempoPublicacao(String tempoPublicacao) {
+    public void setTempoPublicacao(Date tempoPublicacao) {
         this.tempoPublicacao = tempoPublicacao;
     }
 

@@ -19,7 +19,7 @@ import java.math.BigDecimal;
 
 public class Post {
     @com.google.gson.annotations.SerializedName("timestamp")
-    private BigDecimal timestamp = null;
+    private long timestamp;
     @com.google.gson.annotations.SerializedName("authorId")
     private String authorId = null;
     @com.google.gson.annotations.SerializedName("authorName")
@@ -40,7 +40,7 @@ public class Post {
      *
      * @return timestamp
      **/
-    public BigDecimal getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
@@ -49,7 +49,7 @@ public class Post {
      *
      * @param timestamp the new value
      */
-    public void setTimestamp(BigDecimal timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 

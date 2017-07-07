@@ -14,6 +14,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import accessweb.com.br.radiocontrole.adapter.NoticiasRetrofitAdapter;
 import accessweb.com.br.radiocontrole.dal.DatabaseHandler;
 import accessweb.com.br.radiocontrole.model.Noticia;
 import accessweb.com.br.radiocontrole.model.NoticiaFeed;
+import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.RecyclerItemClickListener;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -45,7 +47,7 @@ public class NoticiasFragment extends Fragment {
     private static ArrayList<String> resumoNoticias = new ArrayList<String>();
     private static ArrayList<String> linkNoticias = new ArrayList<String>();*/
 
-    private static final String RSS_LINK = "http://g1.globo.com/"; // http://g1.globo.com/ http://feeds.feedburner.com/TechCrunch/social/
+    private String RSS_LINK = ""; // http://g1.globo.com/dynamo/rss2.xml http://feeds.feedburner.com/TechCrunch/social
 
     private List<Noticia> cachedList = new ArrayList<Noticia>();
 
@@ -110,15 +112,22 @@ public class NoticiasFragment extends Fragment {
                 .addInterceptor(interceptor)
                 .build();
 
+        Uri rssLink = Uri.parse(RSS_LINK);
+        String path = rssLink.getPath();
+        String[] lastIndex = path.split("/");
+        Log.e("AAAAAAAA", "" + lastIndex[lastIndex.length-1]);
+        Log.e("BBBBBBBB", "" + RSS_LINK.split(lastIndex[lastIndex.length-1])[0]);
+
+
         SimpleXmlConverterFactory conv = SimpleXmlConverterFactory.createNonStrict();
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(RSS_LINK)
+                .baseUrl(RSS_LINK.split(lastIndex[lastIndex.length-1])[0])
                 .client(client)
                 .addConverterFactory(conv)
                 .build();
 
         NoticiasRetrofitAdapter retrofitService = retrofit.create(NoticiasRetrofitAdapter.class);
-        Call<NoticiaFeed> call = retrofitService.getItems();
+        Call<NoticiaFeed> call = retrofitService.getItems(lastIndex[lastIndex.length-1]);
         call.enqueue(new Callback<NoticiaFeed>() {
             @Override
             public void onResponse(Call<NoticiaFeed> call, Response<NoticiaFeed> response) {
@@ -179,6 +188,9 @@ public class NoticiasFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
+        CacheData cacheData = new CacheData(getContext());
+
+        RSS_LINK = cacheData.getString("rssLink");
 
         View rootView = inflater.inflate(R.layout.fragment_noticias, container, false);
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);

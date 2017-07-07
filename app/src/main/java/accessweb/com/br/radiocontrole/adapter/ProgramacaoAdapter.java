@@ -68,14 +68,24 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Programa current = data.get(position);
 
+        final Calendar now = Calendar.getInstance();
         holder.horaInicioPrograma.setText(current.getHoraInicioPrograma());
         holder.nomePrograma.setText(current.getNomePrograma());
-        Picasso.with(context)
-                .load(current.getFotoLocutorPrograma())
-                .placeholder(R.drawable.user)
-                .error(R.drawable.user)
-                .into(holder.fotoLocutorPrograma);
-        holder.nomeLocutorPrograma.setText(current.getNomeLocutorPrograma());
+        if (current.getNomeLocutorPrograma() != null){
+            Picasso.with(context)
+                    .load(current.getFotoLocutorPrograma())
+                    .placeholder(R.drawable.user)
+                    .error(R.drawable.user)
+                    .into(holder.fotoLocutorPrograma);
+            holder.nomeLocutorPrograma.setText(current.getNomeLocutorPrograma());
+        }else {
+            holder.fotoLocutorPrograma.getLayoutParams().height = 0;
+            holder.fotoLocutorPrograma.getLayoutParams().width = 0;
+            holder.fotoLocutorPrograma.requestLayout();
+            holder.nomeLocutorPrograma.getLayoutParams().height = 0;
+            holder.nomeLocutorPrograma.getLayoutParams().width = 0;
+            holder.nomeLocutorPrograma.requestLayout();
+        }
 
         holder.btnNotificar.setOnClickListener(new View.OnClickListener() {
             public void onClick(final View v) {
@@ -138,20 +148,68 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
                         if (selectedItem[0] != null){
                             switch (selectedItem[0]){
                                 case "5 Minutos":
-                                    setUpAlarm(5 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                    holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                    if (now.getTime().before(current.getDataPrograma().getTime())){
+                                        long min5 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 5 * 60000;
+                                        setUpAlarm(min5, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                        System.out.println("Data FUTURA: " + current.getDataPrograma().getTime());
+                                        System.out.println("Data agora: " + now.getTime());
+                                    }else {
+                                        current.getDataPrograma().add(Calendar.DATE, 7);
+                                        long min5 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 5 * 60000;
+                                        setUpAlarm(min5, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                        System.out.println("Data PASSADA: " + current.getDataPrograma().getTime());
+                                        System.out.println("Data agora: " + now.getTime());
+                                    }
                                     break;
                                 case "15 Minutos":
-                                    setUpAlarm(15 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                    holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                    if (now.getTime().before(current.getDataPrograma().getTime())){
+                                        long min15 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 15 * 60000;
+                                        setUpAlarm(min15, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                        System.out.println("Data FUTURA: " + current.getDataPrograma().getTime());
+                                        System.out.println("Data agora: " + now.getTime());
+                                    }else {
+                                        current.getDataPrograma().add(Calendar.DATE, 7);
+                                        long min15 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 15 * 60000;
+                                        setUpAlarm(min15, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                        System.out.println("Data PASSADA: " + current.getDataPrograma().getTime());
+                                        System.out.println("Data agora: " + now.getTime());
+                                    }
                                     break;
                                 case "30 Minutos":
-                                    setUpAlarm(30 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                    holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                    if (now.getTime().before(current.getDataPrograma().getTime())){
+                                        long min30 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 30 * 60000;
+                                        setUpAlarm(min30, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                        System.out.println("Data FUTURA: " + current.getDataPrograma().getTime());
+                                        System.out.println("Data agora: " + now.getTime());
+                                    }else {
+                                        current.getDataPrograma().add(Calendar.DATE, 7);
+                                        long min30 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 30 * 60000;
+                                        setUpAlarm(min30, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                        System.out.println("Data PASSADA: " + current.getDataPrograma().getTime());
+                                        System.out.println("Data agora: " + now.getTime());
+                                    }
                                     break;
                                 case "60 Minutos":
-                                    setUpAlarm(60 * 60000, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                    holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                    if (now.getTime().before(current.getDataPrograma().getTime())){
+                                        long min60 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 60 * 60000;
+                                        setUpAlarm(min60, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                        System.out.println("Data FUTURA: " + current.getDataPrograma().getTime());
+                                        System.out.println("Data agora: " + now.getTime());
+                                    }else {
+                                        current.getDataPrograma().add(Calendar.DATE, 7);
+                                        long min60 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 60 * 60000;
+                                        setUpAlarm(min60, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                        System.out.println("Data PASSADA: " + current.getDataPrograma().getTime());
+                                        System.out.println("Data agora: " + now.getTime());
+                                    }
                                     break;
                                 default:
                                     break;
@@ -237,7 +295,7 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("message", message);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1,  intent, 0);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+triggerTimeInMS , pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTimeInMS , pendingIntent);
         Toast toast = Toast.makeText(context, "Alarm configurado e ativado", Toast.LENGTH_SHORT);
         toast.show();
     }

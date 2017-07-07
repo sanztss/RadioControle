@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     card_view:cardCornerRadius="2dp"
-    android:layout_margin="6dp"
+    android:layout_marginLeft="6dp"
+    android:layout_marginRight="6dp"
     card_view:cardElevation="4dp"
     card_view:contentPadding="10dp"
     card_view:cardMaxElevation="6dp"
@@ -118,7 +119,7 @@
                 android:layout_height="match_parent"
                 android:maxHeight="250dp"
                 android:layout_marginTop="5dp"
-                android:background="@color/colorPrimary"
+                android:background="@null"
                 android:adjustViewBounds="true"
                 android:scaleType="center"/>
         </RelativeLayout>
@@ -176,7 +177,7 @@
                 android:background="@color/colorPrimary">
 
                 <ImageButton
-                    android:id="@+id/imgBtnPlayPause"
+                    android:id="@+id/btnPlayPauseAudio"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
                     android:layout_centerVertical="true"
@@ -186,8 +187,17 @@
                     android:scaleType="fitXY"
                     android:src="@drawable/ic_play_white" />
 
+                <ProgressBar
+                    android:id="@+id/loadingIcon"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="10dp"
+                    android:indeterminate="true"
+                    android:visibility="gone"/>
+
                 <SeekBar
-                    android:id="@+id/sbAudio"
+                    android:id="@+id/progressBarAudio"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_centerVertical="true"
@@ -202,7 +212,7 @@
                     android:thumb="@drawable/custom_thumb" />
 
                 <TextView
-                    android:id="@+id/txtTempoAudio"
+                    android:id="@+id/tempoAudio"
                     android:layout_width="40dp"
                     android:layout_height="wrap_content"
                     android:layout_alignParentRight="true"

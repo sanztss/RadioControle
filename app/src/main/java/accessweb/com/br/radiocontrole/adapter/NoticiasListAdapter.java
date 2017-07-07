@@ -92,10 +92,12 @@ public class NoticiasListAdapter extends RecyclerView.Adapter<NoticiasListAdapte
             notifyDataSetChanged();
         }
     }
+
     public void addAll(List<Noticia> list) {
         this.data.addAll(list);
         notifyDataSetChanged();
     }
+
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView tempoNoticia;
         TextView tituloNoticia;

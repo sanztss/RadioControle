@@ -34,6 +34,7 @@ import accessweb.com.br.radiocontrole.activity.MainActivity;
 import accessweb.com.br.radiocontrole.adapter.ModalListAdapter;
 import accessweb.com.br.radiocontrole.model.Channel;
 import accessweb.com.br.radiocontrole.model.NavDrawerItem;
+import accessweb.com.br.radiocontrole.util.CacheData;
 
 public class EscolherDialogFragment extends DialogFragment {
 
@@ -183,7 +184,7 @@ public class EscolherDialogFragment extends DialogFragment {
         LLayout.setPadding(15,15,15,15);
         TextView tv_title = new TextView(this.getContext());
         tv_title.setLayoutParams(params);
-        tv_title.setTextColor(Color.parseColor("#0074c8"));
+        tv_title.setTextColor(Color.parseColor(new CacheData(getContext()).getString("color")));
         tv_title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
         tv_title.setGravity(Gravity.CENTER_HORIZONTAL);
         tv_title.setText(spannableStringBuilder);
@@ -246,8 +247,9 @@ public class EscolherDialogFragment extends DialogFragment {
     @Override
     public void onStart() {
         super.onStart();
-        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.colorPrimary));
-        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.colorPrimary));
+        CacheData cacheData = new CacheData(getContext());
+        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(Color.parseColor(cacheData.getString("color")));
+        ((AlertDialog) getDialog()).getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(Color.parseColor(cacheData.getString("color")));
     }
 
     public static interface ClickListener {

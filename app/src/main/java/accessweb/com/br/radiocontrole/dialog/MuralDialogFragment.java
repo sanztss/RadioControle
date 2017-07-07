@@ -14,8 +14,12 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
@@ -30,6 +34,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.PermissionChecker;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -59,6 +64,7 @@ import java.util.List;
 import java.util.Random;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.S3Util;
 import okhttp3.internal.Util;
 
@@ -113,12 +119,14 @@ public class MuralDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        final CacheData cacheData = new CacheData(getActivity());
         View rootView = inflater.inflate(R.layout.fragment_modal_mural, null, false);
 
         transferUtility = S3Util.getTransferUtility(getActivity());
 
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.muralToolbar);
         toolbar.setTitle(modalTitle);
+        toolbar.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         //toolbar.setNavigationIcon(R.drawable.ic_arrow_down_white);
 
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
@@ -144,12 +152,23 @@ public class MuralDialogFragment extends DialogFragment {
         nomeFoto = (TextView) rootView.findViewById(R.id.nomeFoto);
         tempoAudio = (Chronometer) rootView.findViewById(R.id.tempoAudio);
 
+        Drawable wrappedDrawable = DrawableCompat.wrap(textoPublicacao.getBackground());
+        DrawableCompat.setTint(wrappedDrawable.mutate(), Color.parseColor(cacheData.getString("color")));
+        textoPublicacao.setBackgroundDrawable(wrappedDrawable);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            textoPublicacao.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(cacheData.getString("color"))));
+        }
+
+        btnEnviarPostagem.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            btnEnviarPostagem.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(cacheData.getString("color"))));
+        }
         if (modalTipo == "texto") {
             textoPublicacao.setVisibility(View.VISIBLE);
         } else if (modalTipo == "imagem") {
             textoPublicacao.setVisibility(View.VISIBLE);
             templateFormImagem.setVisibility(View.VISIBLE);
-            if (android.os.Build.VERSION.SDK_INT > 23) {
+            if (Build.VERSION.SDK_INT > 23) {
                 if (permissionsToRequest.size() > 0)
                     getActivity().requestPermissions(permissionsToRequest.toArray(new String[permissionsToRequest.size()]), ALL_PERMISSIONS_RESULT);
             }else {
@@ -259,10 +278,10 @@ public class MuralDialogFragment extends DialogFragment {
 
                     dialog.show();
                     Button btnNegative = dialog.getButton(DialogInterface.BUTTON_NEGATIVE);
-                    btnNegative.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    btnNegative.setTextColor(cacheData.getInt("color"));
 
                     Button btnPositive = dialog.getButton(DialogInterface.BUTTON_POSITIVE);
-                    btnPositive.setTextColor(getResources().getColor(R.color.colorPrimary));
+                    btnPositive.setTextColor(cacheData.getInt("color"));
                 }
             }
         });
