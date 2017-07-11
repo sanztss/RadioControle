@@ -17,6 +17,6 @@ package accessweb.com.br.radiocontrole.model;
 
 import java.util.ArrayList;
 
-public class Podcasts extends ArrayList<PodcastApp>{
+public class Podcasts extends ArrayList<Podcast>{
 
 }

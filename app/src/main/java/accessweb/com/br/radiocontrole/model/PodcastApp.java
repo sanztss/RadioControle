@@ -1,5 +1,7 @@
 package accessweb.com.br.radiocontrole.model;
 
+import java.util.Date;
+
 /**
  * Created by Des. Android on 29/06/2017.
  */
@@ -7,12 +9,12 @@ package accessweb.com.br.radiocontrole.model;
 public class PodcastApp {
     private String tituloPodcast;
     private String linkPodcast;
-    private String dataPublicacaoPodcast;
+    private Date dataPublicacaoPodcast;
 
     public PodcastApp() {
     }
 
-    public PodcastApp(String tituloPodcast, String linkPodcast, String dataPublicacaoPodcast) {
+    public PodcastApp(String tituloPodcast, String linkPodcast, Date dataPublicacaoPodcast) {
         this.tituloPodcast = tituloPodcast;
         this.linkPodcast = linkPodcast;
         this.dataPublicacaoPodcast = dataPublicacaoPodcast;
@@ -34,11 +36,11 @@ public class PodcastApp {
         this.linkPodcast = linkPodcast;
     }
 
-    public String getDataPublicacaoPodcast() {
+    public Date getDataPublicacaoPodcast() {
         return dataPublicacaoPodcast;
     }
 
-    public void setDataPublicacaoPodcast(String dataPublicacaoPodcast) {
+    public void setDataPublicacaoPodcast(Date dataPublicacaoPodcast) {
         this.dataPublicacaoPodcast = dataPublicacaoPodcast;
     }
 }

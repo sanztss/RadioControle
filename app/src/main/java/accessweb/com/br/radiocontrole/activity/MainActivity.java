@@ -36,6 +36,7 @@ import android.widget.TextView;
 import com.facebook.FacebookSdk;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -610,13 +611,14 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     }
 
     private void stop() {
-        myMediaPlayer.stop();
+        if (myMediaPlayer != null)
+            myMediaPlayer.stop();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        stop();
+        //stop();
     }
 
     public void onCompletion(MediaPlayer mp) {

@@ -3,9 +3,11 @@ package accessweb.com.br.radiocontrole.dialog;
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.fragment.CadastroFragment;
 import accessweb.com.br.radiocontrole.fragment.EntrarFragment;
+import accessweb.com.br.radiocontrole.util.CacheData;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.graphics.Color;
 import android.os.*;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.*;
@@ -45,10 +47,11 @@ public class SuaContaDialogFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        CacheData cacheData = new CacheData(getContext());
         View rootView = inflater.inflate(R.layout.fragment_sua_conta, null, false);
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.suaContaToolbar);
         toolbar.setTitle("Sua Conta");
+        toolbar.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
@@ -66,6 +69,8 @@ public class SuaContaDialogFragment extends DialogFragment {
 
         tabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabTextColors(Color.parseColor("#8d939b"), Color.parseColor(cacheData.getString("color")));
+        tabLayout.setSelectedTabIndicatorColor(Color.parseColor(cacheData.getString("color")));
 
         return rootView;
     }

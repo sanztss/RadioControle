@@ -1,6 +1,7 @@
 package accessweb.com.br.radiocontrole.adapter;
 
 import android.content.Context;
+import android.support.v7.widget.AppCompatImageView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -37,17 +38,17 @@ public class GridIconAdapter extends BaseAdapter {
 
     // create a new ImageView for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
-        ImageView imageView;
+        AppCompatImageView imageView;
 
         if (convertView == null) {
-            imageView = new ImageView(mContext);
+            imageView = new AppCompatImageView(mContext);
             imageView.setLayoutParams(new GridView.LayoutParams(100, 100));
             imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
             imageView.setPadding(8, 8, 8, 8);
         }
         else
         {
-            imageView = (ImageView) convertView;
+            imageView = (AppCompatImageView) convertView;
         }
         imageView.setImageResource(drawables.get(position));
         return imageView;

@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -79,7 +80,7 @@ public class ProgramacaoFragment extends Fragment {
     }
 
     private void setupViewPager(final ViewPager viewPager) {
-        final ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
+        final ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -90,13 +91,13 @@ public class ProgramacaoFragment extends Fragment {
 
                 programs = client.radioIdProgramsGet("tradicaoAM");
                 hosts = client.radioIdHostsGet("tradicaoAM");
-                Log.v("AAAAAAAAAAAAA", "Nome:" + programs.get(0).getName());
                 return null;
             }
 
             @Override
             protected void onPostExecute(Void result) {
                 super.onPostExecute(result);
+                Log.v("AAAAAAAAAAAAA", "Nome:" + programs.get(0).getName());
                 // SEGUNDA
                 ProgramacaoDiaFragment segunda = new ProgramacaoDiaFragment();
                 Bundle argsSegunda = new Bundle();

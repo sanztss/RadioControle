@@ -21,7 +21,7 @@ public class Podcast {
     @com.google.gson.annotations.SerializedName("duration")
     private BigDecimal duration = null;
     @com.google.gson.annotations.SerializedName("timestamp")
-    private BigDecimal timestamp = null;
+    private long timestamp;
     @com.google.gson.annotations.SerializedName("name")
     private String name = null;
     @com.google.gson.annotations.SerializedName("file")
@@ -50,7 +50,7 @@ public class Podcast {
      *
      * @return timestamp
      **/
-    public BigDecimal getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 
@@ -59,7 +59,7 @@ public class Podcast {
      *
      * @param timestamp the new value
      */
-    public void setTimestamp(BigDecimal timestamp) {
+    public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
     }
 

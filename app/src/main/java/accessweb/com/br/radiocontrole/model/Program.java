@@ -15,9 +15,10 @@
 
 package accessweb.com.br.radiocontrole.model;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 
-public class Program {
+public class Program implements Serializable{
     @com.google.gson.annotations.SerializedName("id")
     private BigDecimal id = null;
     @com.google.gson.annotations.SerializedName("name")

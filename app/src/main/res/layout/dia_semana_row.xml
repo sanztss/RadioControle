@@ -78,6 +78,7 @@
 
                 <ImageButton
                     android:id="@+id/btnNotificar"
+                    android:tag="notificar"
                     android:layout_below="@+id/fotoLocutorPrograma"
                     android:layout_width="35dp"
                     android:layout_height="35dp"

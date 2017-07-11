@@ -110,7 +110,7 @@
                         android:layout_height="40dp"
                         android:layout_alignParentRight="true"
                         android:layout_centerVertical="true"
-                        android:src="@drawable/ic_play_gray"
+                        app:srcCompat="@drawable/ic_play_gray"
                         android:scaleType="fitXY"
                         android:background="@color/textColorPrimary"/>
 
@@ -171,7 +171,7 @@
                         android:id="@+id/btnTocaMenos"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/ic_thumb_down_white"
+                        app:srcCompat="@drawable/ic_thumb_down_white"
                         android:layout_alignParentLeft="true"
                         android:layout_marginTop="90dp"
                         android:background="@drawable/thumb_shadow"/>
@@ -220,7 +220,7 @@
                         android:id="@+id/btnTocaMais"
                         android:layout_width="50dp"
                         android:layout_height="50dp"
-                        android:src="@drawable/ic_thumb_up_white"
+                        app:srcCompat="@drawable/ic_thumb_up_white"
                         android:layout_alignParentRight="true"
                         android:layout_marginTop="90dp"
                         android:background="@drawable/thumb_shadow"/>
@@ -312,7 +312,7 @@
             android:onClick="playPauseStreaming"
             android:layout_width="75dp"
             android:layout_height="75dp"
-            android:src="@drawable/ic_play_white"
+            app:srcCompat="@drawable/ic_play_white"
             android:background="@drawable/play_shadow"
             android:layout_alignParentBottom="true"
             android:layout_marginBottom="90dp"

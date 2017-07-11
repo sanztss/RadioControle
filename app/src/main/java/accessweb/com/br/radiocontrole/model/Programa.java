@@ -1,5 +1,6 @@
 package accessweb.com.br.radiocontrole.model;
 
+import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -13,17 +14,23 @@ public class Programa {
     private String fotoLocutorPrograma;
     private String nomeLocutorPrograma;
     private Calendar dataPrograma;
+    private Boolean notificarPrograma = false;
+    private BigDecimal idPrograma;
+    private String diaPrograma;
 
     public Programa(){
 
     }
 
-    public Programa(String horaInicioPrograma, String nomePrograma, String fotoLocutorPrograma, String nomeLocutorPrograma, Calendar dataPrograma) {
+    public Programa(String horaInicioPrograma, String nomePrograma, String fotoLocutorPrograma, String nomeLocutorPrograma, Calendar dataPrograma, Boolean notificarPrograma, BigDecimal idPrograma, String diaPrograma) {
         this.horaInicioPrograma = horaInicioPrograma;
         this.nomePrograma = nomePrograma;
         this.fotoLocutorPrograma = fotoLocutorPrograma;
         this.nomeLocutorPrograma = nomeLocutorPrograma;
         this.dataPrograma = dataPrograma;
+        this.notificarPrograma = notificarPrograma;
+        this.idPrograma = idPrograma;
+        this.diaPrograma = diaPrograma;
     }
 
     public String getHoraInicioPrograma() {
@@ -64,5 +71,29 @@ public class Programa {
 
     public void setDataPrograma(Calendar dataPrograma) {
         this.dataPrograma = dataPrograma;
+    }
+
+    public Boolean getNotificarPrograma() {
+        return notificarPrograma;
+    }
+
+    public void setNotificarPrograma(Boolean notificarPrograma) {
+        this.notificarPrograma = notificarPrograma;
+    }
+
+    public BigDecimal getIdPrograma() {
+        return idPrograma;
+    }
+
+    public void setIdPrograma(BigDecimal idPrograma) {
+        this.idPrograma = idPrograma;
+    }
+
+    public String getDiaPrograma() {
+        return diaPrograma;
+    }
+
+    public void setDiaPrograma(String diaPrograma) {
+        this.diaPrograma = diaPrograma;
     }
 }

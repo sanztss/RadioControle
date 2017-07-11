@@ -1,6 +1,7 @@
 package accessweb.com.br.radiocontrole.fragment;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -16,6 +17,7 @@ import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EscolherDialogFragment;
+import accessweb.com.br.radiocontrole.util.CacheData;
 
 /**
  * Created by Des. Android on 29/06/2017.
@@ -46,6 +48,7 @@ public class PromocoesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        CacheData cacheData = new CacheData(getContext());
         View rootView = inflater.inflate(R.layout.fragment_promocoes, container, false);
 
         viewPager = (ViewPager) rootView.findViewById(R.id.viewpager);
@@ -53,6 +56,8 @@ public class PromocoesFragment extends Fragment {
 
         tabLayout = (TabLayout) rootView.findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setTabTextColors(Color.parseColor("#8d939b"), Color.parseColor(cacheData.getString("color")));
+        tabLayout.setSelectedTabIndicatorColor(Color.parseColor(cacheData.getString("color")));
 
         return rootView;
     }

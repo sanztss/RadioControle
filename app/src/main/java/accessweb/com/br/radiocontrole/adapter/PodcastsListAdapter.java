@@ -16,7 +16,9 @@ import android.widget.TextView;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.model.PodcastApp;
@@ -35,6 +37,7 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
     private Boolean isPlaying = false;
     private Boolean firstTime = true;
     private int lastPodcast;
+    private String timeAgo;
 
     RecyclerView mRecyclerView;
 
@@ -61,7 +64,18 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
 
         holder.tituloPodcast.setText(current.getTituloPodcast());
         holder.linkPodcast.setText(current.getLinkPodcast());
-        holder.dataPublicacaoPodcast.setText(current.getDataPublicacaoPodcast());
+        Date now = new Date();
+        Date past = current.getDataPublicacaoPodcast();
+        if (TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) > 0) {
+            timeAgo = TimeUnit.MILLISECONDS.toDays(now.getTime() - past.getTime()) + " dias atrás";
+        } else if (TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) > 0 ) {
+            timeAgo = TimeUnit.MILLISECONDS.toHours(now.getTime() - past.getTime()) + " horas atrás";
+        } else if (TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime())> 0 ) {
+            timeAgo = TimeUnit.MILLISECONDS.toMinutes(now.getTime() - past.getTime()) + " minutos atrás";
+        } else {
+            timeAgo = "agora";
+        }
+        holder.dataPublicacaoPodcast.setText(timeAgo);
 
         holder.btnPlayPausePodcast.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

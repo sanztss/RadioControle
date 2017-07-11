@@ -36,7 +36,7 @@
                 android:layout_below="@id/anuncio"
                 android:layout_width="fill_parent"
                 android:layout_marginTop="0dp"
-                android:layout_height="250dp"
+                android:layout_height="244dp"
                 android:background="#bec2c2"
                 android:paddingTop="20dp"
                 android:paddingBottom="20dp">
@@ -160,9 +160,9 @@
                 android:elevation="4dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
-                android:src="@drawable/ic_play_white"
+                app:srcCompat="@drawable/ic_play_white"
                 app:backgroundTint="@color/colorPrimary"
-                android:layout_marginTop="272dp"
+                android:layout_marginTop="266dp"
                 app:useCompatPadding="true"/>
 
         </RelativeLayout>

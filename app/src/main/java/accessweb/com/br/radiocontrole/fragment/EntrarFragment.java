@@ -4,14 +4,20 @@ import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.activity.MainActivity;
 import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
+import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +25,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.regions.Regions;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -36,6 +45,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static accessweb.com.br.radiocontrole.R.id.textoPublicacao;
+import static android.R.attr.phoneNumber;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -63,7 +74,7 @@ public class EntrarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        //final CognitoCachingCredentialsProvider credentialsProvider = new CognitoCachingCredentialsProvider(getApplicationContext(), "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17", Regions.US_EAST_1);
+        CacheData cacheData = new CacheData(getContext());
 
         callbackManager = CallbackManager.Factory.create();
 
@@ -77,11 +88,12 @@ public class EntrarFragment extends Fragment {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Btn Entrar");
-                Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
+
+                /*Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
                 if (prev != null) {
                     DialogFragment df = (DialogFragment) prev;
                     df.dismiss();
-                }
+                }*/
             }
         });
 

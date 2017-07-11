@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -23,6 +24,7 @@ import accessweb.com.br.radiocontrole.model.Host;
 import accessweb.com.br.radiocontrole.model.Program;
 import accessweb.com.br.radiocontrole.model.Programa;
 import accessweb.com.br.radiocontrole.model.Programs;
+import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 
@@ -40,6 +42,7 @@ public class ProgramacaoDiaFragment extends Fragment{
     private List<Host> hosts = new ArrayList<Host>();
     private static String TAG = ProgramacaoDiaFragment.class.getSimpleName();
     private String diaSemana;
+    private ArrayList<String> programasNotificar = null;
 
     public ProgramacaoDiaFragment() {
         // Required empty public constructor
@@ -71,6 +74,10 @@ public class ProgramacaoDiaFragment extends Fragment{
 
     public List<Programa> getData() {
         final List<Programa> data = new ArrayList<>();
+
+        CacheData cacheData = new CacheData(getContext());
+
+        programasNotificar =  cacheData.getListString("programasNotificar");
 
         for (Program program : programas){
 
@@ -115,6 +122,18 @@ public class ProgramacaoDiaFragment extends Fragment{
                         segunda.set(Calendar.MINUTE,minuto);
                         segunda.set(Calendar.SECOND, 0);
                         programa.setDataPrograma(segunda);
+                        for (String programaNotificar : programasNotificar){
+                            String diaPrograma = programaNotificar.replaceAll("[^A-Za-z]+", "");
+                            long idPrograma = Long.parseLong(programaNotificar.replaceAll("\\D+",""));
+                            if (diaPrograma.equals("segunda") && idPrograma == program.getId().longValue()){
+                                programa.setNotificarPrograma(true);
+                                break;
+                            }else {
+                                programa.setNotificarPrograma(false);
+                            }
+                        }
+                        programa.setIdPrograma(program.getId());
+                        programa.setDiaPrograma("segunda");
                         data.add(programa);
                     }
 
@@ -139,6 +158,18 @@ public class ProgramacaoDiaFragment extends Fragment{
                         terca.set(Calendar.MINUTE,minuto);
                         terca.set(Calendar.SECOND, 0);
                         programa.setDataPrograma(terca);
+                        for (String programaNotificar : programasNotificar){
+                            String diaPrograma = programaNotificar.replaceAll("[^A-Za-z]+", "");
+                            long idPrograma = Long.parseLong(programaNotificar.replaceAll("\\D+",""));
+                            if (diaPrograma.equals("terca") && idPrograma == program.getId().longValue()){
+                                programa.setNotificarPrograma(true);
+                                break;
+                            }else {
+                                programa.setNotificarPrograma(false);
+                            }
+                        }
+                        programa.setIdPrograma(program.getId());
+                        programa.setDiaPrograma("terca");
                         data.add(programa);
                     }
                     break;
@@ -162,6 +193,18 @@ public class ProgramacaoDiaFragment extends Fragment{
                         quarta.set(Calendar.MINUTE,minuto);
                         quarta.set(Calendar.SECOND, 0);
                         programa.setDataPrograma(quarta);
+                        for (String programaNotificar : programasNotificar){
+                            String diaPrograma = programaNotificar.replaceAll("[^A-Za-z]+", "");
+                            long idPrograma = Long.parseLong(programaNotificar.replaceAll("\\D+",""));
+                            if (diaPrograma.equals("quarta") && idPrograma == program.getId().longValue()){
+                                programa.setNotificarPrograma(true);
+                                break;
+                            }else {
+                                programa.setNotificarPrograma(false);
+                            }
+                        }
+                        programa.setIdPrograma(program.getId());
+                        programa.setDiaPrograma("quarta");
                         data.add(programa);
                     }
                     break;
@@ -185,6 +228,18 @@ public class ProgramacaoDiaFragment extends Fragment{
                         quinta.set(Calendar.MINUTE,minuto);
                         quinta.set(Calendar.SECOND, 0);
                         programa.setDataPrograma(quinta);
+                        for (String programaNotificar : programasNotificar){
+                            String diaPrograma = programaNotificar.replaceAll("[^A-Za-z]+", "");
+                            long idPrograma = Long.parseLong(programaNotificar.replaceAll("\\D+",""));
+                            if (diaPrograma.equals("quinta") && idPrograma == program.getId().longValue()){
+                                programa.setNotificarPrograma(true);
+                                break;
+                            }else {
+                                programa.setNotificarPrograma(false);
+                            }
+                        }
+                        programa.setIdPrograma(program.getId());
+                        programa.setDiaPrograma("quinta");
                         data.add(programa);
                     }
                     break;
@@ -208,7 +263,18 @@ public class ProgramacaoDiaFragment extends Fragment{
                         sexta.set(Calendar.MINUTE,minuto);
                         sexta.set(Calendar.SECOND, 0);
                         programa.setDataPrograma(sexta);
-                        System.out.println("AAAAAAAA: " + sexta.getTime());
+                        for (String programaNotificar : programasNotificar){
+                            String diaPrograma = programaNotificar.replaceAll("[^A-Za-z]+", "");
+                            long idPrograma = Long.parseLong(programaNotificar.replaceAll("\\D+",""));
+                            if (diaPrograma.equals("sexta") && idPrograma == program.getId().longValue()){
+                                programa.setNotificarPrograma(true);
+                                break;
+                            }else {
+                                programa.setNotificarPrograma(false);
+                            }
+                        }
+                        programa.setIdPrograma(program.getId());
+                        programa.setDiaPrograma("sexta");
                         data.add(programa);
                     }
                     break;
@@ -232,6 +298,18 @@ public class ProgramacaoDiaFragment extends Fragment{
                         sabado.set(Calendar.MINUTE,minuto);
                         sabado.set(Calendar.SECOND, 0);
                         programa.setDataPrograma(sabado);
+                        for (String programaNotificar : programasNotificar){
+                            String diaPrograma = programaNotificar.replaceAll("[^A-Za-z]+", "");
+                            long idPrograma = Long.parseLong(programaNotificar.replaceAll("\\D+",""));
+                            if (diaPrograma.equals("sabado") && idPrograma == program.getId().longValue()){
+                                programa.setNotificarPrograma(true);
+                                break;
+                            }else {
+                                programa.setNotificarPrograma(false);
+                            }
+                        }
+                        programa.setIdPrograma(program.getId());
+                        programa.setDiaPrograma("sabado");
                         data.add(programa);
                     }
                     break;
@@ -255,6 +333,18 @@ public class ProgramacaoDiaFragment extends Fragment{
                         domingo.set(Calendar.MINUTE,minuto);
                         domingo.set(Calendar.SECOND, 0);
                         programa.setDataPrograma(domingo);
+                        for (String programaNotificar : programasNotificar){
+                            String diaPrograma = programaNotificar.replaceAll("[^A-Za-z]+", "");
+                            long idPrograma = Long.parseLong(programaNotificar.replaceAll("\\D+",""));
+                            if (diaPrograma.equals("domingo") && idPrograma == program.getId().longValue()){
+                                programa.setNotificarPrograma(true);
+                                break;
+                            }else {
+                                programa.setNotificarPrograma(false);
+                            }
+                        }
+                        programa.setIdPrograma(program.getId());
+                        programa.setDiaPrograma("domingo");
                         data.add(programa);
                     }
                     break;

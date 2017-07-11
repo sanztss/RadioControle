@@ -16,7 +16,9 @@
 package accessweb.com.br.radiocontrole.model;
 
 
-public class Host {
+import java.io.Serializable;
+
+public class Host implements Serializable {
     @com.google.gson.annotations.SerializedName("id")
     private String id = null;
     @com.google.gson.annotations.SerializedName("name")

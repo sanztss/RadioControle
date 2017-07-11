@@ -15,10 +15,11 @@
 
 package accessweb.com.br.radiocontrole.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.*;
 import accessweb.com.br.radiocontrole.model.Program;
 
-public class Programs extends ArrayList<Program>{
+public class Programs extends ArrayList<Program> implements Serializable{
 
 }

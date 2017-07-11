@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -21,6 +22,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.util.CacheData;
 
 /**
  * Created by Des. Android on 30/06/2017.
@@ -53,10 +55,11 @@ public class SobreDialogFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
+        CacheData cacheData = new CacheData(getContext());
         View rootView = inflater.inflate(R.layout.fragment_sobre, null, false);
         toolbar = (Toolbar) rootView.findViewById(R.id.editarPerfilToolbar);
         toolbar.setTitle("Sobre o aplicativo");
+        toolbar.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 

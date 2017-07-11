@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
@@ -34,7 +35,10 @@ import java.util.List;
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.model.Programa;
 import accessweb.com.br.radiocontrole.util.AlarmReceiver;
+import accessweb.com.br.radiocontrole.util.CacheData;
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.content.Context.ALARM_SERVICE;
 
 /**
  * Created by Des. Android on 26/06/2017.
@@ -45,6 +49,7 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
     List<Programa> data = Collections.emptyList();
     private LayoutInflater inflater;
     private Context context;
+    private ArrayList<String> programasNotificar = null;
 
     public ProgramacaoAdapter(Context context, List<Programa> data) {
         this.context = context;
@@ -67,7 +72,7 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
     @Override
     public void onBindViewHolder(final MyViewHolder holder, int position) {
         final Programa current = data.get(position);
-
+        final CacheData cacheData = new CacheData(context);
         final Calendar now = Calendar.getInstance();
         holder.horaInicioPrograma.setText(current.getHoraInicioPrograma());
         holder.nomePrograma.setText(current.getNomePrograma());
@@ -87,149 +92,180 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
             holder.nomeLocutorPrograma.requestLayout();
         }
 
+        if (current.getNotificarPrograma()){
+            holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+            holder.btnNotificar.setTag("naoNotificar");
+        }
+
         holder.btnNotificar.setOnClickListener(new View.OnClickListener() {
             public void onClick(final View v) {
-                Log.v("Click", "Botão notificar.");
 
-                final String[] selectedItem = {null};
+                if (holder.btnNotificar.getTag().equals("notificar")){
+                    final String[] selectedItem = {null};
 
-                RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(1.0f);
-                SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder("Com quantos minutos antes quer ser notificado?");
-                spannableStringBuilder.setSpan(
-                        relativeSizeSpan,
-                        0,
-                        1,
-                        Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-                );
-                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
-                        DrawerLayout.LayoutParams.MATCH_PARENT, DrawerLayout.LayoutParams.WRAP_CONTENT
-                );
-                LinearLayout LLayout = new LinearLayout(context);
-                LLayout.setOrientation(LinearLayout.VERTICAL);
-                params.setMargins(15,15,15,15);
-                LLayout.setLayoutParams(params);
-                LLayout.setPadding(15,15,15,15);
-                TextView tv_title = new TextView(context);
-                tv_title.setLayoutParams(params);
-                tv_title.setTextColor(Color.parseColor("#0074c8"));
-                tv_title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
-                tv_title.setGravity(Gravity.CENTER_HORIZONTAL);
-                tv_title.setText(spannableStringBuilder);
-                LLayout.addView(tv_title);
+                    RelativeSizeSpan relativeSizeSpan = new RelativeSizeSpan(1.0f);
+                    SpannableStringBuilder spannableStringBuilder = new SpannableStringBuilder("Com quantos minutos antes quer ser notificado?");
+                    spannableStringBuilder.setSpan(
+                            relativeSizeSpan,
+                            0,
+                            1,
+                            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+                    );
+                    LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                            DrawerLayout.LayoutParams.MATCH_PARENT, DrawerLayout.LayoutParams.WRAP_CONTENT
+                    );
+                    LinearLayout LLayout = new LinearLayout(context);
+                    LLayout.setOrientation(LinearLayout.VERTICAL);
+                    params.setMargins(15,15,15,15);
+                    LLayout.setLayoutParams(params);
+                    LLayout.setPadding(15,15,15,15);
+                    TextView tv_title = new TextView(context);
+                    tv_title.setLayoutParams(params);
+                    tv_title.setTextColor(Color.parseColor("#0074c8"));
+                    tv_title.setTextSize(TypedValue.COMPLEX_UNIT_DIP,20);
+                    tv_title.setGravity(Gravity.CENTER_HORIZONTAL);
+                    tv_title.setText(spannableStringBuilder);
+                    LLayout.addView(tv_title);
 
-                final AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(context);
 
-                builder.setCustomTitle(LLayout);
+                    builder.setCustomTitle(LLayout);
 
-                final String[] minutos = new String[]{
-                        "5 Minutos",
-                        "15 Minutos",
-                        "30 Minutos",
-                        "60 Minutos",
-                };
+                    final String[] minutos = new String[]{
+                            "5 Minutos",
+                            "15 Minutos",
+                            "30 Minutos",
+                            "60 Minutos",
+                    };
 
-                builder.setSingleChoiceItems(
-                        minutos,
-                        -1,
-                        new DialogInterface.OnClickListener()
-                        {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                selectedItem[0] = Arrays.asList(minutos).get(i);
-                            }
-                        });
+                    builder.setSingleChoiceItems(
+                            minutos,
+                            -1,
+                            new DialogInterface.OnClickListener()
+                            {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    selectedItem[0] = Arrays.asList(minutos).get(i);
+                                }
+                            });
 
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-                        Date rightNow = Calendar.getInstance().getTime();
-                        Log.v("aaaa", "" + rightNow);
+                    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            Date rightNow = Calendar.getInstance().getTime();
+                            Log.v("aaaa", "" + rightNow);
 
-                        if (selectedItem[0] != null){
-                            switch (selectedItem[0]){
-                                case "5 Minutos":
-                                    if (now.getTime().before(current.getDataPrograma().getTime())){
-                                        long min5 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 5 * 60000;
-                                        setUpAlarm(min5, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
-                                        System.out.println("Data FUTURA: " + current.getDataPrograma().getTime());
-                                        System.out.println("Data agora: " + now.getTime());
-                                    }else {
-                                        current.getDataPrograma().add(Calendar.DATE, 7);
-                                        long min5 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 5 * 60000;
-                                        setUpAlarm(min5, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
-                                        System.out.println("Data PASSADA: " + current.getDataPrograma().getTime());
-                                        System.out.println("Data agora: " + now.getTime());
-                                    }
-                                    break;
-                                case "15 Minutos":
-                                    if (now.getTime().before(current.getDataPrograma().getTime())){
-                                        long min15 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 15 * 60000;
-                                        setUpAlarm(min15, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
-                                        System.out.println("Data FUTURA: " + current.getDataPrograma().getTime());
-                                        System.out.println("Data agora: " + now.getTime());
-                                    }else {
-                                        current.getDataPrograma().add(Calendar.DATE, 7);
-                                        long min15 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 15 * 60000;
-                                        setUpAlarm(min15, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
-                                        System.out.println("Data PASSADA: " + current.getDataPrograma().getTime());
-                                        System.out.println("Data agora: " + now.getTime());
-                                    }
-                                    break;
-                                case "30 Minutos":
-                                    if (now.getTime().before(current.getDataPrograma().getTime())){
-                                        long min30 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 30 * 60000;
-                                        setUpAlarm(min30, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
-                                        System.out.println("Data FUTURA: " + current.getDataPrograma().getTime());
-                                        System.out.println("Data agora: " + now.getTime());
-                                    }else {
-                                        current.getDataPrograma().add(Calendar.DATE, 7);
-                                        long min30 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 30 * 60000;
-                                        setUpAlarm(min30, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
-                                        System.out.println("Data PASSADA: " + current.getDataPrograma().getTime());
-                                        System.out.println("Data agora: " + now.getTime());
-                                    }
-                                    break;
-                                case "60 Minutos":
-                                    if (now.getTime().before(current.getDataPrograma().getTime())){
-                                        long min60 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 60 * 60000;
-                                        setUpAlarm(min60, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
-                                        System.out.println("Data FUTURA: " + current.getDataPrograma().getTime());
-                                        System.out.println("Data agora: " + now.getTime());
-                                    }else {
-                                        current.getDataPrograma().add(Calendar.DATE, 7);
-                                        long min60 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 60 * 60000;
-                                        setUpAlarm(min60, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
-                                        holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
-                                        System.out.println("Data PASSADA: " + current.getDataPrograma().getTime());
-                                        System.out.println("Data agora: " + now.getTime());
-                                    }
-                                    break;
-                                default:
-                                    break;
+                            if (selectedItem[0] != null){
+                                switch (selectedItem[0]){
+                                    case "5 Minutos":
+                                        if (now.getTime().before(current.getDataPrograma().getTime())){
+                                            long min5 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 5 * 60000;
+                                            setUpAlarm(min5, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                            holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                            holder.btnNotificar.setTag("naoNotificar");
+                                            programasNotificar.add(current.getIdPrograma() + current.getDiaPrograma());
+                                            cacheData.putListString("programasNotificar", programasNotificar);
+                                        }else {
+                                            current.getDataPrograma().add(Calendar.DATE, 7);
+                                            long min5 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 5 * 60000;
+                                            setUpAlarm(min5, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                            holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                            holder.btnNotificar.setTag("naoNotificar");
+                                            programasNotificar.add(current.getIdPrograma() + current.getDiaPrograma());
+                                            cacheData.putListString("programasNotificar", programasNotificar);
+                                        }
+                                        break;
+                                    case "15 Minutos":
+                                        if (now.getTime().before(current.getDataPrograma().getTime())){
+                                            long min15 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 15 * 60000;
+                                            setUpAlarm(min15, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                            holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                            holder.btnNotificar.setTag("naoNotificar");
+                                            programasNotificar.add(current.getIdPrograma() + current.getDiaPrograma());
+                                            cacheData.putListString("programasNotificar", programasNotificar);
+                                        }else {
+                                            current.getDataPrograma().add(Calendar.DATE, 7);
+                                            long min15 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 15 * 60000;
+                                            setUpAlarm(min15, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                            holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                            holder.btnNotificar.setTag("naoNotificar");
+                                            programasNotificar.add(current.getIdPrograma() + current.getDiaPrograma());
+                                            cacheData.putListString("programasNotificar", programasNotificar);
+                                        }
+                                        break;
+                                    case "30 Minutos":
+                                        if (now.getTime().before(current.getDataPrograma().getTime())){
+                                            long min30 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 30 * 60000;
+                                            setUpAlarm(min30, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                            holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                            holder.btnNotificar.setTag("naoNotificar");
+                                            programasNotificar.add(current.getIdPrograma() + current.getDiaPrograma());
+                                            cacheData.putListString("programasNotificar", programasNotificar);
+                                        }else {
+                                            current.getDataPrograma().add(Calendar.DATE, 7);
+                                            long min30 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 30 * 60000;
+                                            setUpAlarm(min30, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                            holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                            holder.btnNotificar.setTag("naoNotificar");
+                                            programasNotificar.add(current.getIdPrograma() + current.getDiaPrograma());
+                                            cacheData.putListString("programasNotificar", programasNotificar);
+                                        }
+                                        break;
+                                    case "60 Minutos":
+                                        if (now.getTime().before(current.getDataPrograma().getTime())){
+                                            long min60 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 60 * 60000;
+                                            setUpAlarm(min60, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                            holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                            holder.btnNotificar.setTag("naoNotificar");
+                                            programasNotificar.add(current.getIdPrograma() + current.getDiaPrograma());
+                                            cacheData.putListString("programasNotificar", programasNotificar);
+                                        }else {
+                                            current.getDataPrograma().add(Calendar.DATE, 7);
+                                            long min60 = (current.getDataPrograma().getTimeInMillis() - now.getTimeInMillis()) - 60 * 60000;
+                                            setUpAlarm(min60, "O programa " + current.getNomePrograma() + " que você marcou um lembrete começa às " + current.getHoraInicioPrograma() + ".");
+                                            holder.btnNotificar.setImageResource(R.drawable.ic_bell_green);
+                                            holder.btnNotificar.setTag("naoNotificar");
+                                            programasNotificar.add(current.getIdPrograma() + current.getDiaPrograma());
+                                            cacheData.putListString("programasNotificar", programasNotificar);
+                                        }
+                                        break;
+                                    default:
+                                        break;
+                                }
                             }
                         }
+                    });
+
+                    builder.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+
+                        }
+                    });
+
+                    AlertDialog dialog = builder.create();
+
+                    dialog.show();
+                    dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(context.getResources().getColor(R.color.colorPrimary));
+                    dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(context.getResources().getColor(R.color.colorPrimary));
+                }else {
+                    Intent intent = new Intent(context, AlarmReceiver.class);
+                    PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1,  intent, 0);
+                    AlarmManager alarmManager = (AlarmManager)context.getSystemService(ALARM_SERVICE);
+                    alarmManager.cancel(pendingIntent);
+                    holder.btnNotificar.setImageResource(R.drawable.ic_bell_gray);
+                    holder.btnNotificar.setTag("notificar");
+
+                    Log.e("programasNotificar", "" + programasNotificar.size());
+                    for (String programaNotificar : programasNotificar){
+                        if (programaNotificar.equals(current.getIdPrograma() + current.getDiaPrograma())){
+                            programasNotificar.remove(programaNotificar);
+                            break;
+                        }
                     }
-                });
+                    cacheData.putListString("programasNotificar", programasNotificar);
+                }
 
-                builder.setNegativeButton("CANCELAR", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialogInterface, int i) {
-
-                    }
-                });
-
-                AlertDialog dialog = builder.create();
-
-                dialog.show();
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setTextColor(context.getResources().getColor(R.color.colorPrimary));
-                dialog.getButton(AlertDialog.BUTTON_NEGATIVE).setTextColor(context.getResources().getColor(R.color.colorPrimary));
             }
         });
 
@@ -280,6 +316,9 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
 
         public MyViewHolder(View itemView) {
             super(itemView);
+
+            final CacheData cacheData = new CacheData(context);
+            programasNotificar = cacheData.getListString("programasNotificar");
             horaInicioPrograma = (TextView) itemView.findViewById(R.id.horaInicioPrograma);
             nomePrograma = (TextView) itemView.findViewById(R.id.nomePrograma);
             fotoLocutorPrograma = (CircleImageView) itemView.findViewById(R.id.fotoLocutorPrograma);
@@ -291,11 +330,12 @@ public class ProgramacaoAdapter extends RecyclerView.Adapter<ProgramacaoAdapter.
     }
 
     public void setUpAlarm(long triggerTimeInMS, String message) {
-        AlarmManager alarmManager = (AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
+        AlarmManager alarmManager = (AlarmManager)context.getSystemService(ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmReceiver.class);
         intent.putExtra("message", message);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 1,  intent, 0);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTimeInMS , pendingIntent);
+        //alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTimeInMS , pendingIntent);
+        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 60000 , pendingIntent);
         Toast toast = Toast.makeText(context, "Alarm configurado e ativado", Toast.LENGTH_SHORT);
         toast.show();
     }
