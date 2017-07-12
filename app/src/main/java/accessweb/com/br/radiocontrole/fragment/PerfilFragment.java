@@ -38,6 +38,7 @@ import java.util.List;
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EditarPerfilDialogFragment;
 import accessweb.com.br.radiocontrole.activity.MainActivity;
+import accessweb.com.br.radiocontrole.util.CacheData;
 import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
@@ -112,20 +113,17 @@ public class PerfilFragment extends Fragment {
         nomeUsuario = (TextView) rootView.findViewById(R.id.nomeUsuario);
         emailUsuario = (TextView) rootView.findViewById(R.id.emailUsuario);
 
-        SharedPreferences sharedPrefs  = getActivity().getSharedPreferences("UserData", 0);
+        CacheData cacheData = new CacheData(getContext());
+        if (!cacheData.getString("userUrlFoto").equals("")){
+            Picasso.with(getContext())
+                    .load(cacheData.getString("userUrlFoto"))
+                    .placeholder(R.drawable.user)
+                    .error(R.drawable.user)
+                    .into(fotoUsuario);
+        }
 
-
-
-        Picasso.with(getContext())
-                .load(sharedPrefs.getString("userUrlFoto",""))
-                .placeholder(R.drawable.user)
-                .error(R.drawable.user)
-                .into(fotoUsuario);
-
-        System.out.println(sharedPrefs.getString("userUrlFoto",""));
-
-        nomeUsuario.setText(sharedPrefs.getString("userNome",""));
-        emailUsuario.setText(sharedPrefs.getString("userEmail",""));
+        nomeUsuario.setText(cacheData.getString("userNome"));
+        emailUsuario.setText(cacheData.getString("userEmail"));
 
         btnEditarPerfil = (Button) rootView.findViewById(R.id.btnEditarPerfil);
         btnAlterarFoto = (Button) rootView.findViewById(R.id.btnAlterarFoto);
@@ -153,13 +151,12 @@ public class PerfilFragment extends Fragment {
 
                 LoginManager.getInstance().logOut();
 
-                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("UserData", 0);
-                SharedPreferences.Editor editor = sharedPrefs.edit();
-                editor.putString("userId", "");
-                editor.putString("userEmail", "");
-                editor.putString("userNome", "");
-                editor.putString("userUrlFoto", "");
-                editor.commit();
+                CacheData cacheData = new CacheData(getContext());
+                cacheData.putString("userId", "");
+                cacheData.putString("userEmail", "");
+                cacheData.putString("userNome", "");
+                cacheData.putString("userTelefone", "");
+                cacheData.putString("userUrlFoto", "");
 
                 ((MainActivity)getActivity()).fecharPerfil();
             }

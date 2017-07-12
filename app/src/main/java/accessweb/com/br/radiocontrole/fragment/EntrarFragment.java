@@ -1,12 +1,18 @@
 package accessweb.com.br.radiocontrole.fragment;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.activity.ForgotPasswordActivity;
 import accessweb.com.br.radiocontrole.activity.MainActivity;
+import accessweb.com.br.radiocontrole.activity.SignUpConfirm;
 import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
+import accessweb.com.br.radiocontrole.util.AppHelper;
 import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -23,12 +29,31 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
+import com.amazonaws.mobileconnectors.cognito.Dataset;
+import com.amazonaws.mobileconnectors.cognito.Record;
+import com.amazonaws.mobileconnectors.cognito.SyncConflict;
+import com.amazonaws.mobileconnectors.cognito.exceptions.DataStorageException;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationDetails;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ChallengeContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.ForgotPasswordContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.NewPasswordContinuation;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
+import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler;
 import com.amazonaws.regions.Regions;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
@@ -43,10 +68,17 @@ import com.squareup.otto.Subscribe;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
+import static accessweb.com.br.radiocontrole.R.drawable.ao;
+import static accessweb.com.br.radiocontrole.R.id.inputNome;
 import static accessweb.com.br.radiocontrole.R.id.textoPublicacao;
+import static android.R.attr.password;
 import static android.R.attr.phoneNumber;
+import static android.R.id.input;
+import static android.app.Activity.RESULT_OK;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -55,11 +87,22 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class EntrarFragment extends Fragment {
     private static String TAG = ProgramacaoDiaFragment.class.getSimpleName();
-    private TextView inputEmail;
-    private TextView inputSenha;
+    private EditText inputEmail;
+    private EditText inputSenha;
     private Button btnLogin;
+    private TextView esqueceuSenha;
     CallbackManager callbackManager;
     JSONObject resposta, profile_pic_data, profile_pic_url;
+
+    private MultiFactorAuthenticationContinuation multiFactorAuthenticationContinuation;
+    private ForgotPasswordContinuation forgotPasswordContinuation;
+    private NewPasswordContinuation newPasswordContinuation;
+    private String username;
+    private String password;
+    private AlertDialog userDialog;
+    private AlertDialog confirmDialog;
+    private ProgressDialog waitDialog;
+
 
     public EntrarFragment() {
         // Required empty public constructor
@@ -74,26 +117,74 @@ public class EntrarFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        CacheData cacheData = new CacheData(getContext());
-
         callbackManager = CallbackManager.Factory.create();
 
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_entrar, container, false);
 
-        inputEmail = (TextView) rootView.findViewById(R.id.inputEmail);
-        inputSenha = (TextView) rootView.findViewById(R.id.inputSenha);
-        btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
+        inputEmail = (EditText) rootView.findViewById(R.id.inputEmail);
+        inputSenha = (EditText) rootView.findViewById(R.id.inputSenha);
 
+        inputSenha.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (hasFocus) {
+                    if (inputSenha.getText().toString().trim().length() < 6) {
+                        inputSenha.setError("A senha deve conter no mínimo 6 dígitos.");
+                    } else {
+                        inputSenha.setError(null);
+                    }
+                } else {
+                    if (inputSenha.getText().toString().trim().length() < 6) {
+                        inputSenha.setError("A senha deve conter no mínimo 6 dígitos.");
+                    } else {
+                        inputSenha.setError(null);
+                    }
+                }
+            }
+        });
+
+        btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Btn Entrar");
 
-                /*Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
-                if (prev != null) {
-                    DialogFragment df = (DialogFragment) prev;
-                    df.dismiss();
-                }*/
+                waitDialog = new ProgressDialog(getActivity());
+                waitDialog.setMessage("Fazendo login...");
+                waitDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+                waitDialog.show();
+
+                username = inputEmail.getText().toString().toLowerCase();
+                if(username == null || username.length() < 1) {
+                    showDialogMessage("Rádio Controle", "Por favor, informe seu email.");
+                    return;
+                }
+
+                password = inputSenha.getText().toString();
+                if(password == null || password.length() < 6) {
+                    inputSenha.setError("A senha deve conter no mínimo 6 dígitos.");
+                    return;
+                }
+
+                ClientConfiguration clientConfiguration = new ClientConfiguration();
+                CognitoUserPool userPool = new CognitoUserPool(getContext(), "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+                userPool.getUser(username).getSessionInBackground(authenticationHandler);
+
+            }
+        });
+
+        esqueceuSenha = (TextView) rootView.findViewById(R.id.esqueceuSenha);
+        esqueceuSenha.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                username = inputEmail.getText().toString().toLowerCase();
+                if(username == null || username.length() < 1) {
+                    showDialogMessage("Rádio Controle", "Por favor, informe seu email.");
+                    return;
+                }else {
+                    ClientConfiguration clientConfiguration = new ClientConfiguration();
+                    CognitoUserPool userPool = new CognitoUserPool(getContext(), "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+                    userPool.getUser(username).forgotPasswordInBackground(forgotPasswordHandler);
+                }
             }
         });
 
@@ -125,6 +216,223 @@ public class EntrarFragment extends Fragment {
         return rootView;
     }
 
+    private void getForgotPasswordCode(ForgotPasswordContinuation forgotPasswordContinuation) {
+        this.forgotPasswordContinuation = forgotPasswordContinuation;
+        Intent intent = new Intent(getContext(), ForgotPasswordActivity.class);
+        intent.putExtra("destination",forgotPasswordContinuation.getParameters().getDestination());
+        intent.putExtra("deliveryMed", forgotPasswordContinuation.getParameters().getDeliveryMedium());
+        startActivityForResult(intent, 3);
+    }
+
+    ForgotPasswordHandler forgotPasswordHandler = new ForgotPasswordHandler() {
+        @Override
+        public void onSuccess() {
+            closeWaitDialog();
+            showDialogMessage("Rádio Controle", "Senha alterada com sucesso.");
+            inputSenha.setText("");
+            inputSenha.requestFocus();
+        }
+
+        @Override
+        public void getResetCode(ForgotPasswordContinuation forgotPasswordContinuation) {
+            closeWaitDialog();
+            getForgotPasswordCode(forgotPasswordContinuation);
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            closeWaitDialog();
+            showDialogMessage("Rádio Controle", "Erro ao alterar senha, tente novamente mais tarde");
+        }
+    };
+
+    AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
+        @Override
+        public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
+            Log.e(TAG, "Auth Success");
+            closeWaitDialog();
+            CognitoCachingCredentialsProvider provider = new CognitoCachingCredentialsProvider(getContext(), "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17", Regions.US_EAST_1);
+            CognitoSyncManager client = new CognitoSyncManager(
+                    getApplicationContext(),
+                    Regions.US_EAST_1,
+                    provider);
+            final Dataset profileData = client.openOrCreateDataset("profileData");
+            new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected Void doInBackground(Void... params) {
+                    synchronize(profileData);
+
+                    return null;
+                }
+
+                @Override
+                protected void onPostExecute(Void result) {
+                    super.onPostExecute(result);
+
+                    abrirPerfil();
+
+                }
+            }.execute();
+
+        }
+
+        @Override
+        public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String username) {
+            closeWaitDialog();
+            //Locale.setDefault(Locale.US);
+            getUserAuthentication(authenticationContinuation, username);
+        }
+
+        @Override
+        public void getMFACode(MultiFactorAuthenticationContinuation multiFactorAuthenticationContinuation) {
+            closeWaitDialog();
+            mfaAuth(multiFactorAuthenticationContinuation);
+        }
+
+        @Override
+        public void authenticationChallenge(ChallengeContinuation continuation) {
+            closeWaitDialog();
+        }
+
+        @Override
+        public void onFailure(Exception e) {
+            closeWaitDialog();
+            System.out.println(AppHelper.formatException(e));
+            if (AppHelper.formatException(e).equals("User is not confirmed. ")){
+                AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+                builder.setTitle("Rádio Controle").setMessage("Falha ao fazer login, você precisa confirmar o cadastro antes.").setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        try {
+                            confirmDialog.dismiss();
+                            Intent intent = new Intent(getContext(), SignUpConfirm.class);
+                            intent.putExtra("source","signin");
+                            intent.putExtra("name", inputEmail.getText().toString().toLowerCase());
+                            startActivityForResult(intent, 10);
+                        } catch (Exception e) {
+                            //
+                        }
+                    }
+                });
+                confirmDialog = builder.create();
+                confirmDialog.show();
+
+            } else if (AppHelper.formatException(e).equals("User does not exist. ")){
+                showDialogMessage("Rádio Controle", "Falha ao fazer login, o usuário não existe.");
+            } else if (AppHelper.formatException(e).equals("Incorrect username or password. ")){
+                showDialogMessage("Rádio Controle", "Usuário ou senha incorreto.");
+            } else if (AppHelper.formatException(e).equals("Password attempts exceeded ")){
+                showDialogMessage("Rádio Controle", "Tentativas excedidas de login, tente novamente mais tarde.");
+            }
+
+        }
+    };
+
+    private void synchronize(Dataset profileData) {
+
+        profileData.synchronize(new SyncCallback() {
+
+            @Override
+            public void onSuccess(Dataset dataset, List<Record> updatedRecords) {
+                Log.d(TAG, "Sync success");
+                System.out.println(dataset.get("name"));
+                System.out.println(dataset.get("email"));
+                System.out.println(dataset.get("phone"));
+                CacheData cacheData = new CacheData(getContext());
+                cacheData.putString("userId", dataset.get("email"));
+                cacheData.putString("userEmail", dataset.get("email"));
+                cacheData.putString("userNome", dataset.get("name"));
+                cacheData.putString("userTelefone", dataset.get("phone"));
+                cacheData.putString("userUrlFoto", "");
+
+            }
+
+            @Override
+            public boolean onConflict(Dataset dataset, List<SyncConflict> conflicts) {
+                Log.d(TAG, "Conflict");
+                return false;
+            }
+
+            @Override
+            public boolean onDatasetDeleted(Dataset dataset, String datasetName) {
+                Log.d(TAG, "Dataset deleted");
+                return false;
+            }
+
+            @Override
+            public boolean onDatasetsMerged(Dataset dataset, List<String> datasetNames) {
+                Log.d(TAG, "Datasets merged");
+                return false;
+            }
+
+            @Override
+            public void onFailure(DataStorageException dse) {
+                Log.e(TAG, "Sync fails", dse);
+            }
+        });
+    }
+
+    private void abrirPerfil() {
+        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
+        if (prev != null) {
+            DialogFragment df = (DialogFragment) prev;
+            ((MainActivity)getActivity()).abrirPerfil();
+            df.dismiss();
+        }
+    }
+
+    private void closeWaitDialog() {
+        try {
+            waitDialog.dismiss();
+        }
+        catch (Exception e) {
+            //
+        }
+    }
+
+    private void showDialogMessage(String title, String body) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle(title).setMessage(body).setNeutralButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                try {
+                    userDialog.dismiss();
+                } catch (Exception e) {
+                    //
+                }
+            }
+        });
+        userDialog = builder.create();
+        userDialog.show();
+    }
+
+    private void mfaAuth(MultiFactorAuthenticationContinuation continuation) {
+        multiFactorAuthenticationContinuation = continuation;
+        /*Intent mfaActivity = new Intent(this, MFAActivity.class);
+        mfaActivity.putExtra("mode", multiFactorAuthenticationContinuation.getParameters().getDeliveryMedium());
+        startActivityForResult(mfaActivity, 5);*/
+    }
+
+    private void getUserAuthentication(AuthenticationContinuation continuation, String username) {
+        if(username != null) {
+            this.username = username;
+        }
+
+        if(username == null) {
+            showDialogMessage("Rádio Controle","Por favor, informe sua email.");
+        }else if(this.password == null) {
+            password = inputSenha.getText().toString();
+            if(password == null || password.length() < 6) {
+                showDialogMessage("Rádio Controle","Por favor, informe sua senha de usuário.");
+                return;
+            }
+        }else {
+            AuthenticationDetails authenticationDetails = new AuthenticationDetails(this.username.toLowerCase(), password, null);
+            continuation.setAuthenticationDetails(authenticationDetails);
+            continuation.continueTask();
+        }
+    }
+
     /*@Override
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -146,13 +454,13 @@ public class EntrarFragment extends Fragment {
                             profile_pic_url = new JSONObject(profile_pic_data.getString("data"));
                             Log.v("Url foto facebook: ", profile_pic_url.getString("url"));
 
-                            SharedPreferences sharedPrefs = getActivity().getSharedPreferences("UserData", 0);
-                            SharedPreferences.Editor editor = sharedPrefs.edit();
-                            editor.putString("userId", resposta.get("id").toString());
-                            editor.putString("userEmail", resposta.get("email").toString());
-                            editor.putString("userNome", resposta.get("name").toString());
-                            editor.putString("userUrlFoto", profile_pic_url.getString("url"));
-                            editor.commit();
+
+                            CacheData cacheData = new CacheData(getContext());
+                            cacheData.putString("userId", resposta.get("id").toString());
+                            cacheData.putString("userEmail", resposta.get("email").toString());
+                            cacheData.putString("userNome", resposta.get("name").toString());
+                            cacheData.putString("userTelefone", "");
+                            cacheData.putString("userUrlFoto", profile_pic_url.getString("url"));
                             Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
                             if (prev != null) {
                                 DialogFragment df = (DialogFragment) prev;
@@ -197,7 +505,21 @@ public class EntrarFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        System.out.println(requestCode);
+        if(resultCode == RESULT_OK && requestCode == 3) {
+            String newPass = data.getStringExtra("newPass");
+            String code = data.getStringExtra("code");
+            if (newPass != null && code != null) {
+                if (!newPass.isEmpty() && !code.isEmpty()) {
+                    //showWaitDialog("Setting new password...");
+                    forgotPasswordContinuation.setPassword(newPass);
+                    forgotPasswordContinuation.setVerificationCode(code);
+                    forgotPasswordContinuation.continueTask();
+                }
+            }
+        }else {
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     class InsertUserTask extends AsyncTask<Void, Void, Void> {

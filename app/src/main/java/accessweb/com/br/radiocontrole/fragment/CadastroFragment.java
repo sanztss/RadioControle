@@ -4,6 +4,7 @@ import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.activity.SignUpConfirm;
 import accessweb.com.br.radiocontrole.adapter.PaisAdapter;
 import accessweb.com.br.radiocontrole.model.Pais;
+import accessweb.com.br.radiocontrole.util.AppHelper;
 import accessweb.com.br.radiocontrole.util.BrPhoneNumberFormatter;
 
 import android.app.AlertDialog;
@@ -20,14 +21,21 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
+import com.amazonaws.mobileconnectors.cognito.Dataset;
+import com.amazonaws.mobileconnectors.cognito.Record;
+import com.amazonaws.mobileconnectors.cognito.SyncConflict;
+import com.amazonaws.mobileconnectors.cognito.exceptions.DataStorageException;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUser;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDeliveryDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.SignUpHandler;
+import com.amazonaws.regions.Regions;
+import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,18 +45,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import static accessweb.com.br.radiocontrole.R.id.bandeiraPais;
-import static accessweb.com.br.radiocontrole.R.id.codigoPais;
-import static accessweb.com.br.radiocontrole.R.id.inputNome;
-import static android.R.attr.data;
-import static android.R.attr.password;
-import static android.R.attr.value;
-import static android.R.id.list;
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by Des. Android on 27/06/2017.
@@ -87,6 +88,10 @@ public class CadastroFragment extends Fragment {
         mAdapter = new PaisAdapter(getActivity(), getData());
         mSpinner.setAdapter(mAdapter);
         mSpinner.setSelection(27);
+
+        CognitoCachingCredentialsProvider provider = new CognitoCachingCredentialsProvider(getContext(), "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17", Regions.US_EAST_1);
+
+        System.out.println(provider.getIdentityId());
 
         inputNome = (EditText) rootView.findViewById(R.id.inputNome);
         inputEmail = (EditText) rootView.findViewById(R.id.inputEmail);
@@ -142,7 +147,7 @@ public class CadastroFragment extends Fragment {
 
                     showWaitDialog("Cadastrando...");
 
-                    userPool.signUpInBackground( String.valueOf(inputNome.getText()),  String.valueOf(inputSenha.getText()), userAttributes, null, signupCallback);
+                    userPool.signUpInBackground( String.valueOf(inputEmail.getText()).toLowerCase(),  String.valueOf(inputSenha.getText()), userAttributes, null, signupCallback);
                 }
             }
         });
@@ -155,6 +160,46 @@ public class CadastroFragment extends Fragment {
         @Override
         public void onSuccess(CognitoUser cognitoUser, boolean userConfirmed, CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
             // Sign-up was successful
+
+            CognitoCachingCredentialsProvider provider = new CognitoCachingCredentialsProvider(getContext(), "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17", Regions.US_EAST_1);
+            CognitoSyncManager client = new CognitoSyncManager(
+                    getApplicationContext(),
+                    Regions.US_EAST_1,
+                    provider);
+            Dataset profileData = client.openOrCreateDataset("profileData");
+            profileData.put("name", inputNome.getText().toString());
+            profileData.put("email", inputEmail.getText().toString().toLowerCase());
+            profileData.put("phone", inputTelefone.getText().toString().toLowerCase());
+            profileData.synchronize(new SyncCallback() {
+
+                @Override
+                public void onSuccess(Dataset dataset, List<Record> updatedRecords) {
+                    Log.d(TAG, "Sync success");
+                }
+
+                @Override
+                public boolean onConflict(Dataset dataset, List<SyncConflict> conflicts) {
+                    Log.d(TAG, "Conflict");
+                    return false;
+                }
+
+                @Override
+                public boolean onDatasetDeleted(Dataset dataset, String datasetName) {
+                    Log.d(TAG, "Dataset deleted");
+                    return false;
+                }
+
+                @Override
+                public boolean onDatasetsMerged(Dataset dataset, List<String> datasetNames) {
+                    Log.d(TAG, "Datasets merged");
+                    return false;
+                }
+
+                @Override
+                public void onFailure(DataStorageException dse) {
+                    Log.e(TAG, "Sync fails", dse);
+                }
+            });
 
             Log.e("onSuccess", "" + cognitoUserCodeDeliveryDetails);
             closeWaitDialog();
@@ -171,16 +216,26 @@ public class CadastroFragment extends Fragment {
         @Override
         public void onFailure(Exception exception) {
             // Sign-up failed, check exception for the cause
-            Log.e("onFailure", "onFailureonFailureonFailure" + exception);
             closeWaitDialog();
-            showDialogMessage("Rádio Controle", "Erro ao realizar cadastro.");
+            if (AppHelper.formatException(exception).equals("User already exists ")){
+                showDialogMessage("Rádio Controle", "Erro ao realizar cadastro, usuário já cadastrado.");
+            } else {
+                showDialogMessage("Rádio Controle", "Erro ao realizar cadastro, verifique os campos e tente novamente.");
+            }
         }
     };
+
+    private void clearInputs() {
+        inputNome.setText("");
+        inputEmail.setText("");
+        inputTelefone.setText("");
+        inputSenha.setText("");
+    }
 
     private void confirmSignUp(CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
         Intent intent = new Intent(getContext(), SignUpConfirm.class);
         intent.putExtra("source","signup");
-        intent.putExtra("name", inputNome.getText().toString());
+        intent.putExtra("name", inputEmail.getText().toString().toLowerCase());
         intent.putExtra("destination", cognitoUserCodeDeliveryDetails.getDestination());
         intent.putExtra("deliveryMed", cognitoUserCodeDeliveryDetails.getDeliveryMedium());
         intent.putExtra("attribute", cognitoUserCodeDeliveryDetails.getAttributeName());

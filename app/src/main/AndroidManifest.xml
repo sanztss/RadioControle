@@ -44,7 +44,10 @@
         </activity>
 
         <activity
-            android:name=".activity.SignUpConfirm"/>
+        android:name=".activity.SignUpConfirm"/>
+
+        <activity
+            android:name=".activity.ForgotPasswordActivity"/>
 
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"

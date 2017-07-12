@@ -406,9 +406,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 tag = "programacao";
                 break;
             case 4:
-                SharedPreferences sharedPrefs  = getSharedPreferences("UserData", 0);
-                System.out.println("sashauisha" + sharedPrefs.getString("userNome",""));
-                if (!sharedPrefs.contains("userId") || sharedPrefs.getString("userId","").equals("")){
+                CacheData cacheData = new CacheData(mContext);
+                System.out.println("sashauisha" + cacheData.getString("userId"));
+                if (cacheData.getString("userId").equals("")){
                     System.out.println("Usuário deslogado!!!");
                     SuaContaDialogFragment dialog = new SuaContaDialogFragment();
                     dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);

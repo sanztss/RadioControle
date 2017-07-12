@@ -4,36 +4,36 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserCodeDeliveryDetails;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GenericHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.VerificationHandler;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.util.AppHelper;
 
+import static java.security.AccessController.getContext;
+
 /**
  * Created by Des. Android on 11/07/2017.
  */
 
 public class SignUpConfirm extends AppCompatActivity {
-    private EditText username;
+    private EditText userName;
     private EditText confCode;
 
     private Button confirm;
     private TextView reqCode;
-    private String userName;
+    private String usuarioArgs;
     private AlertDialog userDialog;
 
 
@@ -46,8 +46,6 @@ public class SignUpConfirm extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Confirmação");
         setSupportActionBar(toolbar);
-
-
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
@@ -63,14 +61,15 @@ public class SignUpConfirm extends AppCompatActivity {
 
     private void init() {
 
+        userName = (EditText) findViewById(R.id.editTextConfirmUserId);
+        confCode = (EditText) findViewById(R.id.editTextConfirmCode);
+
         Bundle extras = getIntent().getExtras();
         if (extras !=null) {
             if(extras.containsKey("name")) {
-                userName = extras.getString("name");
-                username = (EditText) findViewById(R.id.editTextConfirmUserId);
-                username.setText(userName);
+                usuarioArgs = extras.getString("name");
+                userName.setText(usuarioArgs);
 
-                confCode = (EditText) findViewById(R.id.editTextConfirmCode);
                 confCode.requestFocus();
 
                 if(extras.containsKey("destination")) {
@@ -93,50 +92,6 @@ public class SignUpConfirm extends AppCompatActivity {
 
         }
 
-        username = (EditText) findViewById(R.id.editTextConfirmUserId);
-        username.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if(s.length() == 0) {
-
-                }
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(s.length() == 0) {
-
-                }
-            }
-        });
-
-        confCode = (EditText) findViewById(R.id.editTextConfirmCode);
-        confCode.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                if(s.length() == 0) {
-
-                }
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if(s.length() == 0) {
-
-                }
-            }
-        });
-
         confirm = (Button) findViewById(R.id.confirm_button);
         confirm.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -157,53 +112,55 @@ public class SignUpConfirm extends AppCompatActivity {
 
 
     private void sendConfCode() {
-        userName = username.getText().toString();
+        usuarioArgs = userName.getText().toString().toLowerCase();
         String confirmCode = confCode.getText().toString();
 
-        if(userName == null || userName.length() < 1) {
-            // erro
+        if(usuarioArgs == null || usuarioArgs.length() < 1) {
+            showDialogMessage("Rádio Controle","Por favor, informe o nome de usuário.", false);
             return;
-        }
-
-        if(confirmCode == null || confirmCode.length() < 1) {
-            // erro
+        }else if(confirmCode == null || confirmCode.length() < 1) {
+            showDialogMessage("Rádio Controle","Por favor, informe o código de confirmação.", false);
             return;
+        }else {
+            ClientConfiguration clientConfiguration = new ClientConfiguration();
+            CognitoUserPool userPool = new CognitoUserPool(this, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+            userPool.getUser(usuarioArgs).confirmSignUpInBackground(confirmCode, true, confHandler);
         }
-
-        AppHelper.getPool().getUser(userName).confirmSignUpInBackground(confirmCode, true, confHandler);
     }
 
     private void reqConfCode() {
-        userName = username.getText().toString();
-        if(userName == null || userName.length() < 1) {
-
+        usuarioArgs = userName.getText().toString().toLowerCase();
+        if(usuarioArgs == null || usuarioArgs.length() < 1) {
+            showDialogMessage("Rádio Controle","Por favor, informe o nome de usuário.", false);
             return;
+        }else{
+            ClientConfiguration clientConfiguration = new ClientConfiguration();
+            CognitoUserPool userPool = new CognitoUserPool(this, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+            userPool.getUser(usuarioArgs).resendConfirmationCodeInBackground(resendConfCodeHandler);
         }
-        AppHelper.getPool().getUser(userName).resendConfirmationCodeInBackground(resendConfCodeHandler);
-
     }
 
     GenericHandler confHandler = new GenericHandler() {
         @Override
         public void onSuccess() {
-            showDialogMessage("Rádio Controle",userName+" foi confirmado com sucesso!", true);
+            showDialogMessage("Rádio Controle", "O usuário " + usuarioArgs +" foi confirmado com sucesso!", true);
         }
 
         @Override
         public void onFailure(Exception exception) {
-            showDialogMessage("Rádio Controle", AppHelper.formatException(exception), false);
+            showDialogMessage("Rádio Controle", "Erro ao realizar a confirmação, usuário ou código inválido, verifique os dados e tente novamente.", false);
         }
     };
 
     VerificationHandler resendConfCodeHandler = new VerificationHandler() {
         @Override
         public void onSuccess(CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
-            showDialogMessage("Rádio Controle","Código enviado "+cognitoUserCodeDeliveryDetails.getDestination()+" via "+cognitoUserCodeDeliveryDetails.getDeliveryMedium()+".", false);
+            showDialogMessage("Rádio Controle","Código enviado com sucesso para "+cognitoUserCodeDeliveryDetails.getDestination()+" via "+cognitoUserCodeDeliveryDetails.getDeliveryMedium()+".", false);
         }
 
         @Override
         public void onFailure(Exception exception) {
-            showDialogMessage("Rádio Controle","Confirmação falhou, " +  AppHelper.formatException(exception), false);
+            showDialogMessage("Rádio Controle","Erro ao reenviar código, tente novamente mais tarde.", false);
         }
     };
 
@@ -228,9 +185,9 @@ public class SignUpConfirm extends AppCompatActivity {
 
     private void exit() {
         Intent intent = new Intent();
-        if(userName == null)
-            userName = "";
-        intent.putExtra("name",userName);
+        if(usuarioArgs == null)
+            usuarioArgs = "";
+        intent.putExtra("name", usuarioArgs);
         setResult(RESULT_OK, intent);
         finish();
     }

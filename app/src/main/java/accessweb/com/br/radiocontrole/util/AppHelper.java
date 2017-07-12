@@ -221,7 +221,6 @@ public class AppHelper {
                 return formattedString;
             }
         }
-
         return  formattedString;
     }
 
