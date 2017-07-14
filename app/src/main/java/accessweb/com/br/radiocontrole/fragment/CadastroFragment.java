@@ -6,6 +6,8 @@ import accessweb.com.br.radiocontrole.adapter.PaisAdapter;
 import accessweb.com.br.radiocontrole.model.Pais;
 import accessweb.com.br.radiocontrole.util.AppHelper;
 import accessweb.com.br.radiocontrole.util.BrPhoneNumberFormatter;
+import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -89,9 +91,9 @@ public class CadastroFragment extends Fragment {
         mSpinner.setAdapter(mAdapter);
         mSpinner.setSelection(27);
 
-        CognitoCachingCredentialsProvider provider = new CognitoCachingCredentialsProvider(getContext(), "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17", Regions.US_EAST_1);
+        /*CognitoCachingCredentialsProvider provider = new CognitoCachingCredentialsProvider(getContext(), "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17", Regions.US_EAST_1);
 
-        System.out.println(provider.getIdentityId());
+        System.out.println(provider.getIdentityId());*/
 
         inputNome = (EditText) rootView.findViewById(R.id.inputNome);
         inputEmail = (EditText) rootView.findViewById(R.id.inputEmail);
@@ -102,7 +104,7 @@ public class CadastroFragment extends Fragment {
         BrPhoneNumberFormatter addLineNumberFormatter = new BrPhoneNumberFormatter(new WeakReference<EditText>(inputTelefone));
         inputTelefone.addTextChangedListener(addLineNumberFormatter);
 
-        inputSenha.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        /*inputSenha.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -119,7 +121,7 @@ public class CadastroFragment extends Fragment {
                     }
                 }
             }
-        });
+        });*/
 
         btnCadastrar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -146,7 +148,7 @@ public class CadastroFragment extends Fragment {
                     userAttributes.addAttribute("email", String.valueOf(inputEmail.getText()));
 
                     showWaitDialog("Cadastrando...");
-
+                    Log.d(TAG, "S))))))))))))))))))" + CognitoClientManager.getCredentials().getIdentityId());
                     userPool.signUpInBackground( String.valueOf(inputEmail.getText()).toLowerCase(),  String.valueOf(inputSenha.getText()), userAttributes, null, signupCallback);
                 }
             }
@@ -161,12 +163,11 @@ public class CadastroFragment extends Fragment {
         public void onSuccess(CognitoUser cognitoUser, boolean userConfirmed, CognitoUserCodeDeliveryDetails cognitoUserCodeDeliveryDetails) {
             // Sign-up was successful
 
-            CognitoCachingCredentialsProvider provider = new CognitoCachingCredentialsProvider(getContext(), "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17", Regions.US_EAST_1);
             CognitoSyncManager client = new CognitoSyncManager(
                     getApplicationContext(),
                     Regions.US_EAST_1,
-                    provider);
-            Dataset profileData = client.openOrCreateDataset("profileData");
+                    CognitoClientManager.getCredentials());
+            Dataset profileData = CognitoSyncClientManager.openOrCreateDataset("profileData");
             profileData.put("name", inputNome.getText().toString());
             profileData.put("email", inputEmail.getText().toString().toLowerCase());
             profileData.put("phone", inputTelefone.getText().toString().toLowerCase());
@@ -266,7 +267,7 @@ public class CadastroFragment extends Fragment {
     private void showWaitDialog(String message) {
         closeWaitDialog();
         waitDialog = new ProgressDialog(getContext());
-        waitDialog.setTitle(message);
+        waitDialog.setMessage(message);
         waitDialog.show();
     }
 

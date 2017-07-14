@@ -11,7 +11,9 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -27,6 +29,16 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.amazonaws.ClientConfiguration;
+import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
+import com.amazonaws.mobileconnectors.cognito.Dataset;
+import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
+import com.amazonaws.mobileconnectors.cognito.Record;
+import com.amazonaws.mobileconnectors.cognito.SyncConflict;
+import com.amazonaws.mobileconnectors.cognito.exceptions.DataStorageException;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
+import com.amazonaws.regions.Regions;
 import com.facebook.login.LoginManager;
 import com.squareup.picasso.Picasso;
 
@@ -39,10 +51,17 @@ import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EditarPerfilDialogFragment;
 import accessweb.com.br.radiocontrole.activity.MainActivity;
 import accessweb.com.br.radiocontrole.util.CacheData;
+import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
 import de.hdodenhof.circleimageview.CircleImageView;
 
+import static accessweb.com.br.radiocontrole.R.id.inputEmail;
+import static accessweb.com.br.radiocontrole.R.id.inputNome;
+import static accessweb.com.br.radiocontrole.R.id.inputTelefone;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.Manifest.permission.CAMERA;
+import static android.R.attr.name;
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by Des. Android on 27/06/2017.
@@ -57,7 +76,7 @@ public class PerfilFragment extends Fragment {
     private CircleImageView fotoUsuario;
     private TextView nomeUsuario;
     private TextView emailUsuario;
-
+    private View bgFotoUsuario;
     private ArrayList<String> permissions = new ArrayList<>();
     private ArrayList<String> permissionsToRequest;
     private ArrayList<String> permissionsRejected = new ArrayList<>();
@@ -112,8 +131,11 @@ public class PerfilFragment extends Fragment {
         fotoUsuario = (CircleImageView) rootView.findViewById(R.id.fotoUsuario);
         nomeUsuario = (TextView) rootView.findViewById(R.id.nomeUsuario);
         emailUsuario = (TextView) rootView.findViewById(R.id.emailUsuario);
+        bgFotoUsuario = (View) rootView.findViewById(R.id.bgFotoUsuario);
 
         CacheData cacheData = new CacheData(getContext());
+        bgFotoUsuario.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
+
         if (!cacheData.getString("userUrlFoto").equals("")){
             Picasso.with(getContext())
                     .load(cacheData.getString("userUrlFoto"))
@@ -129,6 +151,7 @@ public class PerfilFragment extends Fragment {
         btnAlterarFoto = (Button) rootView.findViewById(R.id.btnAlterarFoto);
         btnSair = (Button) rootView.findViewById(R.id.btnSair);
 
+        btnEditarPerfil.setTextColor(Color.parseColor(cacheData.getString("color")));
         btnEditarPerfil.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Btn btnEditarPerfil");
@@ -138,6 +161,7 @@ public class PerfilFragment extends Fragment {
             }
         });
 
+        btnAlterarFoto.setTextColor(Color.parseColor(cacheData.getString("color")));
         btnAlterarFoto.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Btn btnAlterarFoto");
@@ -158,6 +182,9 @@ public class PerfilFragment extends Fragment {
                 cacheData.putString("userTelefone", "");
                 cacheData.putString("userUrlFoto", "");
 
+                ClientConfiguration clientConfiguration = new ClientConfiguration();
+                CognitoUserPool userPool = new CognitoUserPool(getContext(), "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+                userPool.getCurrentUser().signOut();
                 ((MainActivity)getActivity()).fecharPerfil();
             }
         });

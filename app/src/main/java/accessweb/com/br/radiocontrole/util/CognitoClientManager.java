@@ -30,7 +30,7 @@ public class CognitoClientManager {
         if (provider == null){
             provider = new CognitoCachingCredentialsProvider(context, "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17", Regions.US_EAST_1);
             //provider.getCredentials();
-            //Log.i("Cognito provider ID ->", provider.getIdentityId());
+            Log.i("CognitoClientManager", "provider.getIdentityId()");
         }
     }
 
@@ -67,6 +67,7 @@ public class CognitoClientManager {
     /**
      * Forces this credentials provider to refresh its credentials.
      */
+
     public static void refresh() {
         checkCredentialAvailability();
         provider.refresh();

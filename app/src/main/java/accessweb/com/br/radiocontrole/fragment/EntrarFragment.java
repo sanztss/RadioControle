@@ -9,6 +9,7 @@ import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 import accessweb.com.br.radiocontrole.util.AppHelper;
 import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -71,8 +72,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import static accessweb.com.br.radiocontrole.R.drawable.ao;
+import static accessweb.com.br.radiocontrole.R.drawable.ca;
+import static accessweb.com.br.radiocontrole.R.drawable.ge;
+import static accessweb.com.br.radiocontrole.R.drawable.sy;
 import static accessweb.com.br.radiocontrole.R.id.inputNome;
 import static accessweb.com.br.radiocontrole.R.id.textoPublicacao;
 import static android.R.attr.password;
@@ -86,7 +91,7 @@ import static com.facebook.FacebookSdk.getApplicationContext;
  */
 
 public class EntrarFragment extends Fragment {
-    private static String TAG = ProgramacaoDiaFragment.class.getSimpleName();
+    private static String TAG = EntrarFragment.class.getSimpleName();
     private EditText inputEmail;
     private EditText inputSenha;
     private Button btnLogin;
@@ -122,10 +127,12 @@ public class EntrarFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_entrar, container, false);
 
+        CognitoSyncClientManager.init(getContext());
+
         inputEmail = (EditText) rootView.findViewById(R.id.inputEmail);
         inputSenha = (EditText) rootView.findViewById(R.id.inputSenha);
 
-        inputSenha.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+        /*inputSenha.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (hasFocus) {
@@ -142,17 +149,14 @@ public class EntrarFragment extends Fragment {
                     }
                 }
             }
-        });
+        });*/
 
         btnLogin = (Button) rootView.findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Btn Entrar");
 
-                waitDialog = new ProgressDialog(getActivity());
-                waitDialog.setMessage("Fazendo login...");
-                waitDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-                waitDialog.show();
+                showWaitDialog("Entrando...");
 
                 username = inputEmail.getText().toString().toLowerCase();
                 if(username == null || username.length() < 1) {
@@ -247,51 +251,33 @@ public class EntrarFragment extends Fragment {
     };
 
     AuthenticationHandler authenticationHandler = new AuthenticationHandler() {
-        @Override
+            @Override
         public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
             Log.e(TAG, "Auth Success");
-            closeWaitDialog();
-            CognitoCachingCredentialsProvider provider = new CognitoCachingCredentialsProvider(getContext(), "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17", Regions.US_EAST_1);
-            CognitoSyncManager client = new CognitoSyncManager(
-                    getApplicationContext(),
-                    Regions.US_EAST_1,
-                    provider);
-            final Dataset profileData = client.openOrCreateDataset("profileData");
-            new AsyncTask<Void, Void, Void>() {
-                @Override
-                protected Void doInBackground(Void... params) {
-                    synchronize(profileData);
-
-                    return null;
-                }
-
-                @Override
-                protected void onPostExecute(Void result) {
-                    super.onPostExecute(result);
-
-                    abrirPerfil();
-
-                }
-            }.execute();
+            CognitoClientManager.addLogins("cognito-idp.us-east-1.amazonaws.com/us-east-1_uEcyGgDBj", cognitoUserSession.getIdToken().getJWTToken());
+            //og.i(TAG, "userID = " + CognitoClientManager.getCredentials().getIdentityId());
+            new InsertUserTask().execute();
+            CacheData cacheData = new CacheData(getContext());
+            cacheData.putString("userId", "aaa");
 
         }
 
         @Override
         public void getAuthenticationDetails(AuthenticationContinuation authenticationContinuation, String username) {
-            closeWaitDialog();
+            //closeWaitDialog();
             //Locale.setDefault(Locale.US);
             getUserAuthentication(authenticationContinuation, username);
         }
 
         @Override
         public void getMFACode(MultiFactorAuthenticationContinuation multiFactorAuthenticationContinuation) {
-            closeWaitDialog();
+            //closeWaitDialog();
             mfaAuth(multiFactorAuthenticationContinuation);
         }
 
         @Override
         public void authenticationChallenge(ChallengeContinuation continuation) {
-            closeWaitDialog();
+            //closeWaitDialog();
         }
 
         @Override
@@ -328,49 +314,6 @@ public class EntrarFragment extends Fragment {
         }
     };
 
-    private void synchronize(Dataset profileData) {
-
-        profileData.synchronize(new SyncCallback() {
-
-            @Override
-            public void onSuccess(Dataset dataset, List<Record> updatedRecords) {
-                Log.d(TAG, "Sync success");
-                System.out.println(dataset.get("name"));
-                System.out.println(dataset.get("email"));
-                System.out.println(dataset.get("phone"));
-                CacheData cacheData = new CacheData(getContext());
-                cacheData.putString("userId", dataset.get("email"));
-                cacheData.putString("userEmail", dataset.get("email"));
-                cacheData.putString("userNome", dataset.get("name"));
-                cacheData.putString("userTelefone", dataset.get("phone"));
-                cacheData.putString("userUrlFoto", "");
-
-            }
-
-            @Override
-            public boolean onConflict(Dataset dataset, List<SyncConflict> conflicts) {
-                Log.d(TAG, "Conflict");
-                return false;
-            }
-
-            @Override
-            public boolean onDatasetDeleted(Dataset dataset, String datasetName) {
-                Log.d(TAG, "Dataset deleted");
-                return false;
-            }
-
-            @Override
-            public boolean onDatasetsMerged(Dataset dataset, List<String> datasetNames) {
-                Log.d(TAG, "Datasets merged");
-                return false;
-            }
-
-            @Override
-            public void onFailure(DataStorageException dse) {
-                Log.e(TAG, "Sync fails", dse);
-            }
-        });
-    }
 
     private void abrirPerfil() {
         Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
@@ -511,7 +454,7 @@ public class EntrarFragment extends Fragment {
             String code = data.getStringExtra("code");
             if (newPass != null && code != null) {
                 if (!newPass.isEmpty() && !code.isEmpty()) {
-                    //showWaitDialog("Setting new password...");
+                    showWaitDialog("Salvando nova senha...");
                     forgotPasswordContinuation.setPassword(newPass);
                     forgotPasswordContinuation.setVerificationCode(code);
                     forgotPasswordContinuation.continueTask();
@@ -522,19 +465,75 @@ public class EntrarFragment extends Fragment {
         }
     }
 
+    private void showWaitDialog(String message) {
+        closeWaitDialog();
+        waitDialog = new ProgressDialog(getContext());
+        waitDialog.setMessage(message);
+        waitDialog.show();
+    }
+
+
     class InsertUserTask extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected Void doInBackground(Void... arg0) {
             String userID = null;
             if (CognitoClientManager.isAuthenticated()) {
+
+                Log.i(TAG, "userID = " + CognitoClientManager.getCredentials().getIdentityId());
+
+                CognitoClientManager.getCredentials().refresh();
                 userID = CognitoClientManager.getCredentials().getIdentityId();
                 Log.i(TAG, "userID = " + userID);
 
-                SharedPreferences sharedPrefs = getActivity().getSharedPreferences("UserData", 0);
-                SharedPreferences.Editor editor = sharedPrefs.edit();
-                editor.putString("cognitoId", userID);
-                editor.commit();
+                Dataset profileData = CognitoSyncClientManager.openOrCreateDataset("profileData");
+
+                profileData.synchronize(new SyncCallback() {
+
+                    @Override
+                    public void onSuccess(Dataset dataset, List<Record> updatedRecords) {
+                        Log.d(TAG, "Sync success" + dataset);
+                        System.out.println(dataset.get("name"));
+                        System.out.println(dataset.get("email"));
+                        System.out.println(dataset.get("phone"));
+                        CacheData cacheData = new CacheData(getContext());
+                        cacheData.putString("userId", dataset.get("email"));
+                        cacheData.putString("userEmail", dataset.get("email"));
+                        cacheData.putString("userNome", dataset.get("name"));
+                        cacheData.putString("userTelefone", dataset.get("phone"));
+                        cacheData.putString("userUrlFoto", "");
+                        Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
+                        closeWaitDialog();
+                        if (prev != null) {
+                            DialogFragment df = (DialogFragment) prev;
+                            df.dismiss();
+                            ((MainActivity)getActivity()).abrirPerfil();
+                        }
+                    }
+
+                    @Override
+                    public boolean onConflict(Dataset dataset, List<SyncConflict> conflicts) {
+                        //Log.d(TAG, "Conflict");
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onDatasetDeleted(Dataset dataset, String datasetName) {
+                        //Log.d(TAG, "Dataset deleted");
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onDatasetsMerged(Dataset dataset, List<String> datasetNames) {
+                        //Log.d(TAG, "Datasets merged");
+                        return false;
+                    }
+
+                    @Override
+                    public void onFailure(DataStorageException dse) {
+                        //Log.e(TAG, "Sync fails", dse);
+                    }
+                });
 
             } else {
                 return null;
@@ -544,9 +543,7 @@ public class EntrarFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Void result) {
-            if (CognitoClientManager.isAuthenticated()) {
 
-            }
         }
     }
 }

@@ -1,6 +1,7 @@
 package accessweb.com.br.radiocontrole.dialog;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.activity.MainActivity;
 import accessweb.com.br.radiocontrole.fragment.CadastroFragment;
 import accessweb.com.br.radiocontrole.fragment.EntrarFragment;
 import accessweb.com.br.radiocontrole.util.CacheData;
@@ -18,6 +19,8 @@ import android.view.*;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static accessweb.com.br.radiocontrole.R.drawable.ge;
 
 /**
  * Created by Des. Android on 27/06/2017.
@@ -42,7 +45,6 @@ public class SuaContaDialogFragment extends DialogFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
     }
 
     @Override
@@ -87,7 +89,7 @@ public class SuaContaDialogFragment extends DialogFragment {
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         return dialog;
     }
-
+    
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
 
