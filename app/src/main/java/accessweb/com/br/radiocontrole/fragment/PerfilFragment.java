@@ -1,15 +1,18 @@
 package accessweb.com.br.radiocontrole.fragment;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
+import android.content.ContentUris;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
@@ -18,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Parcelable;
+import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -28,22 +32,28 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
 import com.amazonaws.mobileconnectors.cognito.Dataset;
 import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
 import com.amazonaws.mobileconnectors.cognito.Record;
 import com.amazonaws.mobileconnectors.cognito.SyncConflict;
 import com.amazonaws.mobileconnectors.cognito.exceptions.DataStorageException;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
-import com.amazonaws.regions.Regions;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
+import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.facebook.login.LoginManager;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,16 +61,12 @@ import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EditarPerfilDialogFragment;
 import accessweb.com.br.radiocontrole.activity.MainActivity;
 import accessweb.com.br.radiocontrole.util.CacheData;
-import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
+import accessweb.com.br.radiocontrole.util.S3Util;
 import de.hdodenhof.circleimageview.CircleImageView;
 
-import static accessweb.com.br.radiocontrole.R.id.inputEmail;
-import static accessweb.com.br.radiocontrole.R.id.inputNome;
-import static accessweb.com.br.radiocontrole.R.id.inputTelefone;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
 import static android.Manifest.permission.CAMERA;
-import static android.R.attr.name;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -86,6 +92,11 @@ public class PerfilFragment extends Fragment {
     private Uri picUri;
     private Uri outputFileUri;
 
+    private TransferUtility transferUtility;
+
+    private ProgressDialog waitDialog;
+    private String s3FileKey;
+
     public PerfilFragment() {
         // Required empty public constructor
     }
@@ -96,6 +107,7 @@ public class PerfilFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         permissions.add(CAMERA);
+        permissions.add(WRITE_EXTERNAL_STORAGE);
         permissionsToRequest = findUnAskedPermissions(permissions);
 
     }
@@ -104,6 +116,8 @@ public class PerfilFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_perfil, container, false);
+
+        transferUtility = S3Util.getTransferUtility(getActivity());
 
         if (android.os.Build.VERSION.SDK_INT > 23) {
             if (permissionsToRequest.size() > 0)
@@ -135,8 +149,9 @@ public class PerfilFragment extends Fragment {
 
         CacheData cacheData = new CacheData(getContext());
         bgFotoUsuario.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
-
+        System.out.println("AAAAAAAAAAAAAAAAA" + cacheData.getString("userUrlFoto"));
         if (!cacheData.getString("userUrlFoto").equals("")){
+
             Picasso.with(getContext())
                     .load(cacheData.getString("userUrlFoto"))
                     .placeholder(R.drawable.user)
@@ -258,7 +273,7 @@ public class PerfilFragment extends Fragment {
         if(!getImage.exists())
             getImage.mkdirs();
         if (getImage != null) {
-            outputFileUri = Uri.fromFile(new File(getImage.getPath(), "profilepic.png"));
+            outputFileUri = Uri.fromFile(new File(getImage.getPath(), "profile.png"));
         }
         return outputFileUri;
     }
@@ -271,15 +286,44 @@ public class PerfilFragment extends Fragment {
         if (resultCode == Activity.RESULT_OK) {
             if (getPickImageResultUri(data) != null) {
                 picUri = getPickImageResultUri(data);
-                Log.i("aaa", "" + picUri);
+
+                /*try {
+                    String path = getPath(picUri);
+                    beginUpload(path);
+                } catch (URISyntaxException e) {
+                    Toast.makeText(getActivity(),
+                            "Unable to get the file from the given URI.  See error log for details",
+                            Toast.LENGTH_LONG).show();
+                    Log.e(TAG, "Unable to upload file from the given uri", e);
+                }*/
+
                 try {
                     myBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), picUri);
                     myBitmap = getResizedBitmap(myBitmap, 500);
-                    //imgFoto.setImageBitmap(myBitmap);
 
+                    fotoUsuario.setImageBitmap(myBitmap);
+
+                    File imageFile = new File(getContext().getCacheDir(), "imagem.jpg");
+
+                    OutputStream os;
+                    try {
+                        os = new FileOutputStream(imageFile);
+                        myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                        os.flush();
+                        os.close();
+                        try {
+                            String path = getPath(Uri.fromFile(imageFile));
+                            beginUpload(path);
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                    } catch (Exception e) {
+                        Log.e(getClass().getSimpleName(), "Error writing bitmap", e);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
             } else {
                 bitmap = (Bitmap) data.getExtras().get("data");
 
@@ -287,6 +331,189 @@ public class PerfilFragment extends Fragment {
                 //imgFoto.setImageBitmap(myBitmap);
             }
         }
+    }
+
+    /*
+     * Gets the file path of the given Uri.
+     */
+    @SuppressLint("NewApi")
+    private String getPath(Uri uri) throws URISyntaxException {
+        final boolean needToCheckUri = Build.VERSION.SDK_INT >= 19;
+        String selection = null;
+        String[] selectionArgs = null;
+        // Uri is different in versions after KITKAT (Android 4.4), we need to
+        // deal with different Uris.
+        if (needToCheckUri && DocumentsContract.isDocumentUri(getApplicationContext(), uri)) {
+            if (isExternalStorageDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                return Environment.getExternalStorageDirectory() + "/" + split[1];
+            } else if (isDownloadsDocument(uri)) {
+                final String id = DocumentsContract.getDocumentId(uri);
+                uri = ContentUris.withAppendedId(
+                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+            } else if (isMediaDocument(uri)) {
+                final String docId = DocumentsContract.getDocumentId(uri);
+                final String[] split = docId.split(":");
+                final String type = split[0];
+                if ("image".equals(type)) {
+                    uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+                } else if ("video".equals(type)) {
+                    uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+                } else if ("audio".equals(type)) {
+                    uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+                }
+                selection = "_id=?";
+                selectionArgs = new String[] {
+                        split[1]
+                };
+            }
+        }
+        if ("content".equalsIgnoreCase(uri.getScheme())) {
+            String[] projection = {
+                    MediaStore.Images.Media.DATA
+            };
+            Cursor cursor = null;
+            try {
+                cursor = getApplicationContext().getContentResolver()
+                        .query(uri, projection, selection, selectionArgs, null);
+                int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                if (cursor.moveToFirst()) {
+                    return cursor.getString(column_index);
+                }
+            } catch (Exception e) {
+            }
+        } else if ("file".equalsIgnoreCase(uri.getScheme())) {
+            return uri.getPath();
+        }
+        return null;
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is ExternalStorageProvider.
+     */
+    public static boolean isExternalStorageDocument(Uri uri) {
+        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is DownloadsProvider.
+     */
+    public static boolean isDownloadsDocument(Uri uri) {
+        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+    }
+
+    /**
+     * @param uri The Uri to check.
+     * @return Whether the Uri authority is MediaProvider.
+     */
+    public static boolean isMediaDocument(Uri uri) {
+        return "com.android.providers.media.documents".equals(uri.getAuthority());
+    }
+
+    /*
+     * A TransferListener class that can listen to a upload task and be notified
+     * when the status changes.
+     */
+    private class UploadListener implements TransferListener {
+
+        // Simply updates the UI list when notified.
+        @Override
+        public void onError(int id, Exception e) {
+            Log.e(TAG, "Error during upload: " + id, e);
+            closeWaitDialog();
+        }
+
+        @Override
+        public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
+            Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d",
+                    id, bytesTotal, bytesCurrent));
+            //updateList();
+        }
+
+        @Override
+        public void onStateChanged(int id, TransferState newState) {
+            Log.d(TAG, "onStateChanged: " + id + ", " + newState);
+            String check =  "" + newState;
+            if (check.equals("COMPLETED")){
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        S3Util.getS3Client(getContext()).setObjectAcl("radiocontrole/users", s3FileKey , CannedAccessControlList.PublicRead);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void result) {
+                        super.onPostExecute(result);
+
+                        Dataset profileData = CognitoSyncClientManager.openOrCreateDataset("profileData");
+                        CacheData cacheData = new CacheData(getContext());
+                        profileData.put("name", cacheData.getString("userNome"));
+                        profileData.put("email", cacheData.getString("userEmail"));
+                        profileData.put("phone", cacheData.getString("userTelefone"));
+                        profileData.put("picture", "http://s3.amazonaws.com/radiocontrole/users/" + s3FileKey);
+                        profileData.synchronize(new SyncCallback() {
+
+                            @Override
+                            public void onSuccess(Dataset dataset, List<Record> updatedRecords) {
+                                Log.d(TAG, "Sync success" + dataset);
+                                System.out.println(dataset.get("picture"));
+                                CacheData cacheData = new CacheData(getContext());
+                                cacheData.putString("userUrlFoto", dataset.get("picture"));
+                                closeWaitDialog();
+                            }
+
+                            @Override
+                            public boolean onConflict(Dataset dataset, List<SyncConflict> conflicts) {
+                                //Log.d(TAG, "Conflict");
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onDatasetDeleted(Dataset dataset, String datasetName) {
+                                //Log.d(TAG, "Dataset deleted");
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onDatasetsMerged(Dataset dataset, List<String> datasetNames) {
+                                //Log.d(TAG, "Datasets merged");
+                                return false;
+                            }
+
+                            @Override
+                            public void onFailure(DataStorageException dse) {
+                                //Log.e(TAG, "Sync fails", dse);
+                            }
+                        });
+                    }
+                }.execute();
+            }
+        }
+    }
+
+    private void beginUpload(String filePath) {
+        showWaitDialog("Enviando foto...");
+        Long timestampLong = System.currentTimeMillis()/1000;
+        String timestamp = timestampLong.toString();
+
+        if (filePath == null) {
+            Toast.makeText(getActivity(), "Could not find the filepath of the selected file",
+                    Toast.LENGTH_LONG).show();
+            return;
+        }
+        File file = new File(filePath);
+
+        String extension = file.getName().substring(file.getName().lastIndexOf("."));
+        Log.e("AAAAAAAA","radiocontrole/users/" + timestamp + extension);
+        s3FileKey = timestamp + extension;
+        TransferObserver observer = transferUtility.upload("radiocontrole/users", timestamp + extension,
+                file);
+
+        observer.setTransferListener(new UploadListener());
     }
 
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
@@ -391,5 +618,20 @@ public class PerfilFragment extends Fragment {
 
     }
 
+    private void showWaitDialog(String message) {
+        closeWaitDialog();
+        waitDialog = new ProgressDialog(getContext());
+        waitDialog.setMessage(message);
+        waitDialog.show();
+    }
+
+    private void closeWaitDialog() {
+        try {
+            waitDialog.dismiss();
+        }
+        catch (Exception e) {
+            //
+        }
+    }
 }
 

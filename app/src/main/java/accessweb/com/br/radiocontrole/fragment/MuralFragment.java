@@ -151,7 +151,7 @@ public class MuralFragment extends Fragment {
                         mural.setTempoPublicacao(dataPostagem);
                         mural.setTextoPublicacao("");
                         mural.setModeloPublicacao("audio");
-                        mural.setAudioPublicacao("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/mural/" + post.getAttachment());
+                        mural.setAudioPublicacao("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/wall/" + post.getAttachment());
                         items.add(mural);
                     }
 
@@ -251,7 +251,7 @@ public class MuralFragment extends Fragment {
                         mural.setFotoUsuario(post.getAuthorPicture());
                         mural.setNomeUsuario(post.getAuthorName());
                         mural.setTempoPublicacao(dataPostagem);
-                        mural.setTextoPublicacao("aaaaaaaaaaaaaa");
+                        mural.setTextoPublicacao(post.getContent());
                         mural.setModeloPublicacao("texto");
                         items.add(mural);
                     } else if (post.getType().equals("image")){
@@ -259,6 +259,7 @@ public class MuralFragment extends Fragment {
                         mural.setNomeUsuario(post.getAuthorName());
                         mural.setTempoPublicacao(dataPostagem);
                         mural.setTextoPublicacao(post.getContent());
+                        mural.setImagemPublicacao(post.getAttachment());
                         mural.setModeloPublicacao("imagem");
                         items.add(mural);
                     } else if (post.getType().equals("audio")){

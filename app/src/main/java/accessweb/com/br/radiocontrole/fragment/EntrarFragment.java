@@ -105,8 +105,8 @@ public class EntrarFragment extends Fragment {
     private String username;
     private String password;
     private AlertDialog userDialog;
-    private AlertDialog confirmDialog;
-    private ProgressDialog waitDialog;
+        private AlertDialog confirmDialog;
+        private ProgressDialog waitDialog;
 
 
     public EntrarFragment() {

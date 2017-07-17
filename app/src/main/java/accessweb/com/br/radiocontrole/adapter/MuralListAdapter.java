@@ -114,7 +114,6 @@ public class MuralListAdapter extends RecyclerView.Adapter<MuralListAdapter.MyVi
             holder.textoPublicacao2.setText(current.getTextoPublicacao());
             Picasso.with(context)
                     .load(current.getImagemPublicacao())
-                    .placeholder(R.drawable.picture)
                     .error(R.drawable.picture)
                     .into(holder.imagemPublicacao);
         } else if (current.getModeloPublicacao().equals("audio")) {

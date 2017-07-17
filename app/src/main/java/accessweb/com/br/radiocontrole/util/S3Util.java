@@ -9,6 +9,7 @@ import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -16,6 +17,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
 import java.util.UUID;
+
+import static android.R.attr.key;
 
 /**
  * Created by Des. Android on 03/07/2017.
@@ -36,10 +39,11 @@ public class S3Util {
      */
     private static CognitoCachingCredentialsProvider getCredProvider(Context context) {
         if (sCredProvider == null) {
-            sCredProvider = new CognitoCachingCredentialsProvider(
+            /*sCredProvider = new CognitoCachingCredentialsProvider(
                     context.getApplicationContext(),
                     "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17",
-                    Regions.US_EAST_1);
+                    Regions.US_EAST_1);*/
+            sCredProvider = CognitoClientManager.getCredentials();
         }
         return sCredProvider;
     }
@@ -55,6 +59,7 @@ public class S3Util {
         if (sS3Client == null) {
             sS3Client = new AmazonS3Client(getCredProvider(context.getApplicationContext()));
             //sS3Client.setRegion(Region.getRegion(Regions.fromName(Constants.BUCKET_REGION)));
+
         }
         return sS3Client;
     }

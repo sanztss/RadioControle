@@ -7,9 +7,9 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.ContentUris;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,11 +18,11 @@ import android.content.res.ColorStateList;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -51,26 +51,36 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferListener;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferObserver;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferState;
 import com.amazonaws.mobileconnectors.s3.transferutility.TransferUtility;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.model.Post;
 import accessweb.com.br.radiocontrole.util.CacheData;
+import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 import accessweb.com.br.radiocontrole.util.S3Util;
-import okhttp3.internal.Util;
+import rx.Observable;
+import rx.Observer;
+import rx.Subscriber;
 
 import static android.Manifest.permission.CAMERA;
 import static android.Manifest.permission.RECORD_AUDIO;
 import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class MuralDialogFragment extends DialogFragment {
@@ -111,6 +121,14 @@ public class MuralDialogFragment extends DialogFragment {
     private TransferUtility transferUtility;
     TransferListener listener = new UploadListener();
 
+    private File imageFile;
+    private ProgressDialog waitDialog;
+
+    private Observable<String> myObservable;
+    private Observer myObserver;
+    private String uploadCheck = "";
+    private String s3FileKey;
+
     public MuralDialogFragment(String title, String modal) {
         modalTitle =  title;
         modalTipo = modal;
@@ -121,6 +139,15 @@ public class MuralDialogFragment extends DialogFragment {
 
         final CacheData cacheData = new CacheData(getActivity());
         View rootView = inflater.inflate(R.layout.fragment_modal_mural, null, false);
+        myObservable = Observable.create(
+                new Observable.OnSubscribe<String>() {
+                    @Override
+                    public void call(Subscriber<? super String> sub) {
+                        sub.onNext(uploadCheck);
+                        sub.onCompleted();
+                    }
+                }
+        );
 
         transferUtility = S3Util.getTransferUtility(getActivity());
 
@@ -290,6 +317,146 @@ public class MuralDialogFragment extends DialogFragment {
         btnEnviarPostagem.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v(TAG,"click btn enviar postagem - texto: " + textoPublicacao.getText());
+
+
+                ApiClientFactory factory = new ApiClientFactory();
+                factory.credentialsProvider(CognitoClientManager.getCredentials());
+                factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
+                final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
+
+                final CacheData cacheData = new CacheData(getApplicationContext());
+                final Post post = new Post();
+                post.setAuthorId(CognitoClientManager.getCredentials().getIdentityId());
+                post.setAuthorName(cacheData.getString("userNome"));
+                post.setAuthorPicture(cacheData.getString("userUrlFoto"));
+                if (modalTipo == "texto") {
+                    post.setType("text");
+                    post.setContent(textoPublicacao.getText().toString());
+                    new AsyncTask<Void, Void, Void>() {
+                        @Override
+                        protected Void doInBackground(Void... params) {
+                            client.radioIdPostsPost("tradicaoAM", post);
+                            return null;
+                        }
+
+                        @Override
+                        protected void onPostExecute(Void result) {
+                            super.onPostExecute(result);
+                            AlertDialog.Builder customBuilder  = new AlertDialog.Builder(getActivity());
+                            customBuilder.setTitle("Rádio Controle");
+                            customBuilder.setMessage("Postagem realizada com sucesso, aguarde a aprovação da moderação.");
+                            customBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                    dismiss();
+                                }
+                            });
+
+                            AlertDialog dialog = customBuilder.create();
+
+                            dialog.show();
+                            Button btnPositive = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+                            btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
+
+                        }
+                    }.execute();
+                } else if (modalTipo == "imagem") {
+                    post.setType("image");
+                    post.setContent(textoPublicacao.getText().toString());
+                    if (imageFile != null){
+                        try {
+                            String path = getPath(Uri.fromFile(imageFile));
+                            post.setAttachment(beginUpload(path));
+                            System.out.println("////" + post.getAttachment());
+                        } catch (URISyntaxException e) {
+                            e.printStackTrace();
+                        }
+                        myObserver = new Observer<String>() {
+
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(String text) {
+                                Log.e("AAAAAAAAAA", uploadCheck);
+                                new AsyncTask<Void, Void, Void>() {
+                                    @Override
+                                    protected Void doInBackground(Void... params) {
+                                        client.radioIdPostsPost("tradicaoAM", post);
+                                        return null;
+                                    }
+
+                                    @Override
+                                    protected void onPostExecute(Void result) {
+                                        super.onPostExecute(result);
+                                        AlertDialog.Builder customBuilder  = new AlertDialog.Builder(getActivity());
+                                        customBuilder.setTitle("Rádio Controle");
+                                        customBuilder.setMessage("Postagem realizada com sucesso, aguarde a aprovação da moderação.");
+                                        customBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                dialog.dismiss();
+                                                dismiss();
+                                            }
+                                        });
+
+                                        AlertDialog dialog = customBuilder.create();
+
+                                        dialog.show();
+                                        Button btnPositive = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+                                        btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
+
+                                    }
+                                }.execute();
+                            }
+                        };
+                    }else {
+                        Toast.makeText(getApplicationContext(), "Selecione uma imagem para enviar.", Toast.LENGTH_SHORT) .show();
+                    }
+
+
+                } else if (modalTipo == "audio") {
+                    post.setType("audio");
+                    post.setAttachment("");
+                }
+
+                /*new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        client.radioIdPostsPost("tradicaoAM", post);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void result) {
+                        super.onPostExecute(result);
+                        AlertDialog.Builder customBuilder  = new AlertDialog.Builder(getActivity());
+                        customBuilder.setTitle("Rádio Controle");
+                        customBuilder.setMessage("Postagem realizada com sucesso, aguarde a aprovação da moderação.");
+                        customBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                dismiss();
+                            }
+                        });
+
+                        AlertDialog dialog = customBuilder.create();
+
+                        dialog.show();
+                        Button btnPositive = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+                        btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
+
+                    }
+                }.execute();*/
             }
         });
 
@@ -368,19 +535,6 @@ public class MuralDialogFragment extends DialogFragment {
             if (getPickImageResultUri(data) != null) {
                 picUri = getPickImageResultUri(data);
                 Log.i("aaa", "" + picUri);
-                Uri uri = data.getData();
-                try {
-                    String path = getPath(uri);
-                    beginUpload(path);
-                    Toast.makeText(getActivity(),
-                            "" + path,
-                            Toast.LENGTH_LONG).show();
-                } catch (URISyntaxException e) {
-                    Toast.makeText(getActivity(),
-                            "Unable to get the file from the given URI.  See error log for details",
-                            Toast.LENGTH_LONG).show();
-                    Log.e(TAG, "Unable to upload file from the given uri", e);
-                }
 
                 try {
                     myBitmap = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), picUri);
@@ -388,9 +542,22 @@ public class MuralDialogFragment extends DialogFragment {
                     imgFoto.setImageBitmap(myBitmap);
                     nomeFoto.setText(randomNomeFoto + ".png");
 
+
+                    imageFile = new File(getApplicationContext().getCacheDir(), "imagem.jpg");
+
+                    OutputStream os;
+                    try {
+                        os = new FileOutputStream(imageFile);
+                        myBitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
+                        os.flush();
+                        os.close();
+                    } catch (Exception e) {
+                        Log.e(getClass().getSimpleName(), "Error writing bitmap", e);
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
             } else {
                 bitmap = (Bitmap) data.getExtras().get("data");
 
@@ -491,40 +658,60 @@ public class MuralDialogFragment extends DialogFragment {
         @Override
         public void onError(int id, Exception e) {
             Log.e(TAG, "Error during upload: " + id, e);
-            //updateList();
         }
 
         @Override
         public void onProgressChanged(int id, long bytesCurrent, long bytesTotal) {
             Log.d(TAG, String.format("onProgressChanged: %d, total: %d, current: %d",
                     id, bytesTotal, bytesCurrent));
-            //updateList();
         }
 
         @Override
         public void onStateChanged(int id, TransferState newState) {
             Log.d(TAG, "onStateChanged: " + id + ", " + newState);
-           // updateList();
+            String check =  "" + newState;
+            if (check.equals("COMPLETED")){
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        S3Util.getS3Client(getApplicationContext()).setObjectAcl("radiocontrole/radios/tradicaoAM/wall", s3FileKey , CannedAccessControlList.PublicRead);
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void result) {
+                        super.onPostExecute(result);
+
+                        uploadCheck = "uploaded";
+                        myObservable.subscribe(myObserver);
+                    }
+                }.execute();
+            }
         }
     }
 
-    private void beginUpload(String filePath) {
+    private String beginUpload(String filePath) {
+
+        //showWaitDialog("Enviando foto...");
+
+        Long timestampLong = System.currentTimeMillis()/1000;
+        String timestamp = timestampLong.toString();
+
+
         if (filePath == null) {
             Toast.makeText(getActivity(), "Could not find the filepath of the selected file",
                     Toast.LENGTH_LONG).show();
-            return;
+            return null;
         }
         File file = new File(filePath);
-        TransferObserver observer = transferUtility.upload("radiocontrole", file.getName(),
+
+        String extension = file.getName().substring(file.getName().lastIndexOf("."));
+        Log.e("AAAAAAAA","radiocontrole/users/" + timestamp + extension);
+        s3FileKey = timestamp + extension;
+        TransferObserver observer = transferUtility.upload("radiocontrole/radios/tradicaoAM/wall", timestamp + extension,
                 file);
-        /*
-         * Note that usually we set the transfer listener after initializing the
-         * transfer. However it isn't required in this sample app. The flow is
-         * click upload button -> start an activity for image selection
-         * startActivityForResult -> onActivityResult -> beginUpload -> onResume
-         * -> set listeners to in progress transfers.
-         */
         observer.setTransferListener(new UploadListener());
+        return "http://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/wall/" + timestamp + extension;
     }
 
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {
@@ -682,4 +869,21 @@ public class MuralDialogFragment extends DialogFragment {
         }
 
     }
+
+    private void showWaitDialog(String message) {
+        closeWaitDialog();
+        waitDialog = new ProgressDialog(getApplicationContext());
+        waitDialog.setMessage(message);
+        waitDialog.show();
+    }
+
+    private void closeWaitDialog() {
+        try {
+            waitDialog.dismiss();
+        }
+        catch (Exception e) {
+            //
+        }
+    }
+
 }

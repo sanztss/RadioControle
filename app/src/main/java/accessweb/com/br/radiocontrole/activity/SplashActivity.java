@@ -120,7 +120,7 @@ public class SplashActivity extends Activity {
                             cacheData.putString("userEmail", dataset.get("email"));
                             cacheData.putString("userNome", dataset.get("name"));
                             cacheData.putString("userTelefone", dataset.get("phone"));
-                            cacheData.putString("userUrlFoto", "");
+                            cacheData.putString("userUrlFoto", dataset.get("picture"));
 
                         }
 
@@ -235,7 +235,7 @@ public class SplashActivity extends Activity {
             new AsyncTask<Void, Void, Void>() {
                 @Override
                 protected Void doInBackground(Void... params) {
-                    CognitoClientManager.getCredentials().getIdentityId();
+                    //CognitoClientManager.getCredentials().getIdentityId();
                     ApiClientFactory factory = new ApiClientFactory();
                     factory.credentialsProvider(CognitoClientManager.getCredentials());
                     factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");

@@ -8,6 +8,7 @@
     card_view:cardCornerRadius="2dp"
     android:layout_marginLeft="6dp"
     android:layout_marginRight="6dp"
+    android:layout_marginBottom="6dp"
     card_view:cardElevation="4dp"
     card_view:contentPadding="10dp"
     card_view:cardMaxElevation="6dp"
@@ -117,11 +118,10 @@
                 android:layout_below="@id/textoPublicacao2"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:maxHeight="250dp"
+                android:maxHeight="245dp"
                 android:layout_marginTop="5dp"
                 android:background="@null"
-                android:adjustViewBounds="true"
-                android:scaleType="center"/>
+                android:adjustViewBounds="true" />
         </RelativeLayout>
 
         <RelativeLayout
