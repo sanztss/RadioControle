@@ -14,11 +14,13 @@ import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -27,6 +29,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -47,6 +51,7 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EscolherDialogFragment;
@@ -106,6 +111,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     ProgressDialog progressDialog;
 
+    private Stack<Fragment> fragmentStack;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +139,20 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         ///////////////////////
         ///     Toolbar     ///
         ///////////////////////
+
+        if (Build.VERSION.SDK_INT > 23) {
+            float[] hsv = new float[3];
+            int color = Color.parseColor(cacheData.getString("color"));
+            Color.colorToHSV(color, hsv);
+            hsv[2] *= 0.8f;
+            color = Color.HSVToColor(hsv);
+
+            Window window = mActivity.getWindow();
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.setStatusBarColor(color);
+        }
+
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mToolbar.setTitle("Início");
 
@@ -207,9 +228,20 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     public void onBackPressed() {
         if(isDrawerOpen()) {
             drawerLayout.closeDrawer(GravityCompat.START);
+        } else if(painel.getPanelState().equals(SlidingUpPanelLayout.PanelState.EXPANDED)){
+            painel.setPanelState(SlidingUpPanelLayout.PanelState.HIDDEN);
+        } else if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+            // Get the fragment fragment manager - and pop the backstack
+            for (int i = 0; i < getSupportFragmentManager().getBackStackEntryCount(); i++){
+                System.out.println("AAAAAAAAAAAAAA" +getSupportFragmentManager().getBackStackEntryCount());
+                getSupportFragmentManager().popBackStack();
+            }
+
+
         } else {
             super.onBackPressed();
         }
+
     }
 
     public boolean isDrawerOpen() {
@@ -421,6 +453,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 if (cacheData.getString("userId").equals("")){
                     System.out.println("Usuário deslogado!!!");
                     SuaContaDialogFragment dialog = new SuaContaDialogFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("tela", "perfil");
+                    dialog.setArguments(bundle);
                     dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
                     FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
                     //dialog.show(this.getSupportFragmentManager(), "dialog");
@@ -458,6 +493,10 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             FragmentManager fragmentManager = getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container_body, fragment, tag);
+
+            if (position != 0){
+                fragmentTransaction.addToBackStack(tag);
+            }
             fragmentTransaction.commit();
             fragmentManager.executePendingTransactions();
             if (position == 0 && audioTocando) {
@@ -664,7 +703,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     }
 
     // FECHAR FRAGMENTO PERFIL
-    public void fecharPerfil() {
+    public void voltarTelaInicial() {
         Fragment fragment = null;
         fragment = new HomeFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
@@ -685,7 +724,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         fragment = new PerfilFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-        fragmentTransaction.replace(R.id.container_body, fragment, "inicio");
+        fragmentTransaction.replace(R.id.container_body, fragment, "perfil");
+        fragmentTransaction.addToBackStack("perfil");
         fragmentTransaction.commit();
         fragmentManager.executePendingTransactions();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);

@@ -3,6 +3,8 @@ package accessweb.com.br.radiocontrole.dialog;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
@@ -30,6 +32,9 @@ import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.PremiosAdapter;
 import accessweb.com.br.radiocontrole.model.Premio;
 import accessweb.com.br.radiocontrole.model.Promocao;
+import accessweb.com.br.radiocontrole.util.CacheData;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 
 /**
@@ -77,9 +82,12 @@ public class PromocaoDialogFragment extends DialogFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
+        CacheData cacheData = new CacheData(getContext());
+
         View rootView = inflater.inflate(R.layout.fragment_promocao, null, false);
         toolbar = (Toolbar) rootView.findViewById(R.id.editarPerfilToolbar);
         toolbar.setTitle("Promoção");
+        toolbar.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
 
@@ -172,6 +180,17 @@ public class PromocaoDialogFragment extends DialogFragment {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        CacheData cacheData = new CacheData(getApplicationContext());
+        if (Build.VERSION.SDK_INT > 23) {
+            float[] hsv = new float[3];
+            int color = Color.parseColor(cacheData.getString("color"));
+            Color.colorToHSV(color, hsv);
+            hsv[2] *= 0.8f;
+            color = Color.HSVToColor(hsv);
+
+            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            dialog.getWindow().setStatusBarColor(color);
+        }
         return dialog;
     }
 

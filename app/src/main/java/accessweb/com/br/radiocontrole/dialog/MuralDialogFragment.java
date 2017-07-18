@@ -102,6 +102,7 @@ public class MuralDialogFragment extends DialogFragment {
     private Chronometer tempoAudio;
     private String AudioSavePathInDevice = null;
     private MediaRecorder mediaRecorder;
+    private Boolean mediaRecorderGravando = false;
     private MediaPlayer mediaPlayer;
     private String RandomAudioFileName = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     public static final int RequestPermissionCode = 1;
@@ -237,12 +238,15 @@ public class MuralDialogFragment extends DialogFragment {
                 if (gravarAudio.getTag().equals("record")){
                     if(checkPermission()) {
                         AudioSavePathInDevice = Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + CreateRandomAudioFileName(5) + "AudioRecording.m4a";
+                        System.out.println("////" + AudioSavePathInDevice);
+                        System.out.println("////" + AudioSavePathInDevice);
 
                         MediaRecorderReady();
 
                         try {
                             mediaRecorder.prepare();
                             mediaRecorder.start();
+                            mediaRecorderGravando = true;
 
                             tempoAudio.setBase(SystemClock.elapsedRealtime());
                             tempoAudio.start();
@@ -267,6 +271,7 @@ public class MuralDialogFragment extends DialogFragment {
                     tempoAudio.stop();
 
                     mediaRecorder.stop();
+                    mediaRecorderGravando = false;
                 } else if (gravarAudio.getTag().equals("play")){
                     mediaPlayer = new MediaPlayer();
                     try {
@@ -316,8 +321,7 @@ public class MuralDialogFragment extends DialogFragment {
         // ADICIONAR CLIQUE BTN ENVIAR POSTAGEM
         btnEnviarPostagem.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                Log.v(TAG,"click btn enviar postagem - texto: " + textoPublicacao.getText());
-
+                Log.v(TAG,"click btn enviar postagem");
 
                 ApiClientFactory factory = new ApiClientFactory();
                 factory.credentialsProvider(CognitoClientManager.getCredentials());
@@ -362,6 +366,7 @@ public class MuralDialogFragment extends DialogFragment {
                         }
                     }.execute();
                 } else if (modalTipo == "imagem") {
+                    showWaitDialog("Enviando foto...");
                     post.setType("image");
                     post.setContent(textoPublicacao.getText().toString());
                     if (imageFile != null){
@@ -373,17 +378,12 @@ public class MuralDialogFragment extends DialogFragment {
                             e.printStackTrace();
                         }
                         myObserver = new Observer<String>() {
-
                             @Override
                             public void onCompleted() {
-
                             }
-
                             @Override
                             public void onError(Throwable e) {
-
                             }
-
                             @Override
                             public void onNext(String text) {
                                 Log.e("AAAAAAAAAA", uploadCheck);
@@ -419,13 +419,117 @@ public class MuralDialogFragment extends DialogFragment {
                             }
                         };
                     }else {
-                        Toast.makeText(getApplicationContext(), "Selecione uma imagem para enviar.", Toast.LENGTH_SHORT) .show();
+                        Toast.makeText(getApplicationContext(), "Selecione uma foto para enviar.", Toast.LENGTH_SHORT) .show();
                     }
 
 
                 } else if (modalTipo == "audio") {
-                    post.setType("audio");
-                    post.setAttachment("");
+                    if (AudioSavePathInDevice != null){
+                        if (!mediaRecorderGravando){
+                            showWaitDialog("Enviando áudio...");
+                            post.setType("audio");
+                            post.setAttachment(beginUpload(AudioSavePathInDevice));
+                            System.out.println("////" + post.getAttachment());
+                            myObserver = new Observer<String>() {
+                                @Override
+                                public void onCompleted() {
+                                }
+                                @Override
+                                public void onError(Throwable e) {
+                                }
+                                @Override
+                                public void onNext(String text) {
+                                    Log.e("AAAAAAAAAA", uploadCheck);
+                                    new AsyncTask<Void, Void, Void>() {
+                                        @Override
+                                        protected Void doInBackground(Void... params) {
+                                            client.radioIdPostsPost("tradicaoAM", post);
+                                            return null;
+                                        }
+
+                                        @Override
+                                        protected void onPostExecute(Void result) {
+                                            super.onPostExecute(result);
+                                            AlertDialog.Builder customBuilder  = new AlertDialog.Builder(getActivity());
+                                            customBuilder.setTitle("Rádio Controle");
+                                            customBuilder.setMessage("Postagem realizada com sucesso, aguarde a aprovação da moderação.");
+                                            customBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    dismiss();
+                                                }
+                                            });
+
+                                            AlertDialog dialog = customBuilder.create();
+
+                                            dialog.show();
+                                            Button btnPositive = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+                                            btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
+
+                                        }
+                                    }.execute();
+                                }
+                            };
+                        }else {
+                            showWaitDialog("Enviando áudio...");
+                            gravarAudio.setTag("play");
+                            gravarAudio.setImageResource(R.drawable.ic_play_white);
+                            timeWhenStopped = tempoAudio.getBase() - SystemClock.elapsedRealtime();
+
+                            tempoAudio.stop();
+
+                            mediaRecorder.stop();
+                            mediaRecorderGravando = false;
+                            post.setType("audio");
+                            post.setAttachment(beginUpload(AudioSavePathInDevice));
+                            System.out.println("////" + post.getAttachment());
+                            myObserver = new Observer<String>() {
+                                @Override
+                                public void onCompleted() {
+                                }
+                                @Override
+                                public void onError(Throwable e) {
+                                }
+                                @Override
+                                public void onNext(String text) {
+                                    Log.e("AAAAAAAAAA", uploadCheck);
+                                    new AsyncTask<Void, Void, Void>() {
+                                        @Override
+                                        protected Void doInBackground(Void... params) {
+                                            client.radioIdPostsPost("tradicaoAM", post);
+                                            return null;
+                                        }
+
+                                        @Override
+                                        protected void onPostExecute(Void result) {
+                                            super.onPostExecute(result);
+                                            AlertDialog.Builder customBuilder  = new AlertDialog.Builder(getActivity());
+                                            customBuilder.setTitle("Rádio Controle");
+                                            customBuilder.setMessage("Postagem realizada com sucesso, aguarde a aprovação da moderação.");
+                                            customBuilder.setNeutralButton("OK", new DialogInterface.OnClickListener() {
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    dialog.dismiss();
+                                                    dismiss();
+                                                }
+                                            });
+
+                                            AlertDialog dialog = customBuilder.create();
+
+                                            dialog.show();
+                                            Button btnPositive = dialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+                                            btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
+
+                                        }
+                                    }.execute();
+                                }
+                            };
+                        }
+
+                    }else {
+                        Toast.makeText(getApplicationContext(), "Grave um áudio para enviar.", Toast.LENGTH_SHORT) .show();
+                    }
                 }
 
                 /*new AsyncTask<Void, Void, Void>() {
@@ -684,6 +788,7 @@ public class MuralDialogFragment extends DialogFragment {
 
                         uploadCheck = "uploaded";
                         myObservable.subscribe(myObserver);
+                        closeWaitDialog();
                     }
                 }.execute();
             }
@@ -691,8 +796,6 @@ public class MuralDialogFragment extends DialogFragment {
     }
 
     private String beginUpload(String filePath) {
-
-        //showWaitDialog("Enviando foto...");
 
         Long timestampLong = System.currentTimeMillis()/1000;
         String timestamp = timestampLong.toString();
@@ -754,6 +857,17 @@ public class MuralDialogFragment extends DialogFragment {
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         permissions.add(CAMERA);
         permissionsToRequest = findUnAskedPermissions(permissions);
+        CacheData cacheData = new CacheData(getApplicationContext());
+        if (Build.VERSION.SDK_INT > 23) {
+            float[] hsv = new float[3];
+            int color = Color.parseColor(cacheData.getString("color"));
+            Color.colorToHSV(color, hsv);
+            hsv[2] *= 0.8f;
+            color = Color.HSVToColor(hsv);
+
+            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            dialog.getWindow().setStatusBarColor(color);
+        }
         return dialog;
     }
 
@@ -872,7 +986,7 @@ public class MuralDialogFragment extends DialogFragment {
 
     private void showWaitDialog(String message) {
         closeWaitDialog();
-        waitDialog = new ProgressDialog(getApplicationContext());
+        waitDialog = new ProgressDialog(this.getActivity());
         waitDialog.setMessage(message);
         waitDialog.show();
     }

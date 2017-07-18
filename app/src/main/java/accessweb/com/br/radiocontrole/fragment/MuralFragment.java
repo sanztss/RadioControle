@@ -6,7 +6,9 @@ import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,6 +28,7 @@ import java.util.List;
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.EscolherDialogFragment;
 import accessweb.com.br.radiocontrole.adapter.MuralListAdapter;
+import accessweb.com.br.radiocontrole.dialog.SuaContaDialogFragment;
 import accessweb.com.br.radiocontrole.model.Mural;
 import accessweb.com.br.radiocontrole.model.Post;
 import accessweb.com.br.radiocontrole.model.Posts;
@@ -34,6 +37,8 @@ import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.EndlessRecyclerViewScrollListener;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 import accessweb.com.br.radiocontrole.util.RecyclerItemClickListener;
+
+import static accessweb.com.br.radiocontrole.R.drawable.ge;
 
 
 public class MuralFragment extends Fragment {
@@ -143,6 +148,7 @@ public class MuralFragment extends Fragment {
                         mural.setNomeUsuario(post.getAuthorName());
                         mural.setTempoPublicacao(dataPostagem);
                         mural.setTextoPublicacao(post.getContent());
+                        mural.setImagemPublicacao(post.getAttachment());
                         mural.setModeloPublicacao("imagem");
                         items.add(mural);
                     } else if (post.getType().equals("audio")){
@@ -151,7 +157,7 @@ public class MuralFragment extends Fragment {
                         mural.setTempoPublicacao(dataPostagem);
                         mural.setTextoPublicacao("");
                         mural.setModeloPublicacao("audio");
-                        mural.setAudioPublicacao("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/wall/" + post.getAttachment());
+                        mural.setAudioPublicacao(post.getAttachment());
                         items.add(mural);
                     }
 
@@ -207,8 +213,25 @@ public class MuralFragment extends Fragment {
 
         btnAdicionarPostagem.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o tipo da postagem:", "mural", null);
-                dialogListCanais.show(getActivity().getSupportFragmentManager(), "dialog");
+                CacheData cacheData = new CacheData(getContext());
+                System.out.println("sashauisha" + cacheData.getString("userId"));
+                if (cacheData.getString("userId").equals("")){
+                    System.out.println("Usuário deslogado!!!");
+                    SuaContaDialogFragment dialog = new SuaContaDialogFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("tela", "mural");
+                    dialog.setArguments(bundle);
+
+                    dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
+                    FragmentTransaction ft = getActivity().getSupportFragmentManager().beginTransaction();
+                    //dialog.show(this.getSupportFragmentManager(), "dialog");
+                    ft.add(dialog,"fragment_dialog");
+                    ft.commit();
+                }else {
+                    System.out.println("Usuário logado!!!");
+                    final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o tipo da postagem:", "mural", null);
+                    dialogListCanais.show(getActivity().getSupportFragmentManager(), "dialog");
+                }
             }
         });
         btnAdicionarPostagem.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(cacheData.getString("color"))));
@@ -267,6 +290,7 @@ public class MuralFragment extends Fragment {
                         mural.setNomeUsuario(post.getAuthorName());
                         mural.setTempoPublicacao(dataPostagem);
                         mural.setTextoPublicacao("");
+                        mural.setAudioPublicacao(post.getAttachment());
                         mural.setModeloPublicacao("audio");
                         items.add(mural);
                     }
@@ -315,6 +339,7 @@ public class MuralFragment extends Fragment {
                         mural.setNomeUsuario(post.getAuthorName());
                         mural.setTempoPublicacao(dataPostagem);
                         mural.setTextoPublicacao(post.getContent());
+                        mural.setImagemPublicacao(post.getAttachment());
                         mural.setModeloPublicacao("imagem");
                         listaAnterires.add(mural);
                     } else if (post.getType().equals("audio")){
@@ -322,6 +347,7 @@ public class MuralFragment extends Fragment {
                         mural.setNomeUsuario(post.getAuthorName());
                         mural.setTempoPublicacao(dataPostagem);
                         mural.setTextoPublicacao("");
+                        mural.setAudioPublicacao(post.getAttachment());
                         mural.setModeloPublicacao("audio");
                         listaAnterires.add(mural);
                     }
@@ -337,4 +363,6 @@ public class MuralFragment extends Fragment {
             }
         }.execute();
     }
+
+
 }

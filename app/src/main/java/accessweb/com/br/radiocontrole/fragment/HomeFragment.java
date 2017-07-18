@@ -87,6 +87,13 @@ public class HomeFragment extends Fragment {
         txtContato = (TextView) rootView.findViewById(R.id.txtContato);
         txtContato.setTextColor(ColorStateList.valueOf(Color.parseColor(cacheData.getString("color"))));
 
+        contatoIconIds.clear();
+        contatoLinks.clear();
+        contatoTipo.clear();
+
+        socialIconIds.clear();
+        socialLinks.clear();
+
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {

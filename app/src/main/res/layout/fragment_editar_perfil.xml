@@ -47,7 +47,7 @@
                 android:hint="Nome"/>
         </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
+        <!--<android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -72,7 +72,7 @@
                 android:ems="10"
                 android:hint="Senha"
                 android:inputType="textPassword"/>
-        </android.support.design.widget.TextInputLayout>
+        </android.support.design.widget.TextInputLayout>-->
 
         <Button android:id="@+id/btnSalvarInformacoes"
             android:layout_width="fill_parent"

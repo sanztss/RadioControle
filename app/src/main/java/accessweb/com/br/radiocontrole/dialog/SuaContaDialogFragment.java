@@ -8,6 +8,7 @@ import accessweb.com.br.radiocontrole.util.CacheData;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.os.*;
 import android.support.design.widget.TabLayout;
@@ -31,6 +32,8 @@ public class SuaContaDialogFragment extends DialogFragment {
     private static String TAG = SuaContaDialogFragment.class.getSimpleName();
     private TabLayout tabLayout;
     private ViewPager viewPager;
+
+    private String telaDesejada = null;
 
     public SuaContaDialogFragment(){
 
@@ -74,7 +77,25 @@ public class SuaContaDialogFragment extends DialogFragment {
         tabLayout.setTabTextColors(Color.parseColor("#8d939b"), Color.parseColor(cacheData.getString("color")));
         tabLayout.setSelectedTabIndicatorColor(Color.parseColor(cacheData.getString("color")));
 
+        telaDesejada = getArguments().getString("tela");
+
         return rootView;
+    }
+    public void test(){
+        CacheData cacheData = new CacheData(getContext());
+        System.out.println("Fechando Tela e indo para tela desejada.");
+        if (telaDesejada.equals("mural") && !cacheData.getString("userId").equals("")){
+            dismiss();
+            final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o tipo da postagem:", "mural", null);
+            dialogListCanais.show(getActivity().getSupportFragmentManager(), "dialog");
+        }else if (telaDesejada.equals("perfil") && !cacheData.getString("userId").equals("")) {
+            dismiss();
+            ((MainActivity)getActivity()).abrirPerfil();
+        }
+    }
+    @Override
+    public void onDismiss(DialogInterface dialog) {
+
     }
 
     @Override
@@ -89,7 +110,7 @@ public class SuaContaDialogFragment extends DialogFragment {
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
         return dialog;
     }
-    
+
     private void setupViewPager(ViewPager viewPager) {
         ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
 

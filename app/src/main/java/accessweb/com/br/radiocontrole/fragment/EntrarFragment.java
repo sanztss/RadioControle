@@ -4,6 +4,7 @@ import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.activity.ForgotPasswordActivity;
 import accessweb.com.br.radiocontrole.activity.MainActivity;
 import accessweb.com.br.radiocontrole.activity.SignUpConfirm;
+import accessweb.com.br.radiocontrole.dialog.SuaContaDialogFragment;
 import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 import accessweb.com.br.radiocontrole.util.AppHelper;
@@ -80,11 +81,13 @@ import static accessweb.com.br.radiocontrole.R.drawable.ge;
 import static accessweb.com.br.radiocontrole.R.drawable.sy;
 import static accessweb.com.br.radiocontrole.R.id.inputNome;
 import static accessweb.com.br.radiocontrole.R.id.textoPublicacao;
+import static android.R.attr.fragment;
 import static android.R.attr.password;
 import static android.R.attr.phoneNumber;
 import static android.R.id.input;
 import static android.app.Activity.RESULT_OK;
 import static com.facebook.FacebookSdk.getApplicationContext;
+import static rx.schedulers.Schedulers.test;
 
 /**
  * Created by Des. Android on 27/06/2017.
@@ -506,8 +509,9 @@ public class EntrarFragment extends Fragment {
                         closeWaitDialog();
                         if (prev != null) {
                             DialogFragment df = (DialogFragment) prev;
-                            df.dismiss();
-                            ((MainActivity)getActivity()).abrirPerfil();
+                            SuaContaDialogFragment suaContaDialogFragment = (SuaContaDialogFragment) getParentFragment();
+                            suaContaDialogFragment.test();
+                            //df.dismiss();
                         }
                     }
 

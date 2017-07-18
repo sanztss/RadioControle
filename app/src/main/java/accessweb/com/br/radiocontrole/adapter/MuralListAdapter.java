@@ -146,7 +146,7 @@ public class MuralListAdapter extends RecyclerView.Adapter<MuralListAdapter.MyVi
                             holder.loadingIcon.setVisibility(View.VISIBLE);
                             mp = new MediaPlayer();
                             //mp.setDataSource(String.valueOf(Uri.parse(current.getAudioPublicacao())));
-                            mp.setDataSource(String.valueOf(Uri.parse("https://dt2xfopac85w8.cloudfront.net/2017/ricardo_vargas_2017_06_23_gohorse_pt.mp3")));
+                            mp.setDataSource(String.valueOf(Uri.parse(current.getAudioPublicacao())));
                             mp.prepareAsync();
                             mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
@@ -161,6 +161,19 @@ public class MuralListAdapter extends RecyclerView.Adapter<MuralListAdapter.MyVi
                                     firstTime = false;
                                 }
 
+                            });
+                            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                public void onCompletion(MediaPlayer mp) {
+                                    // PARAR RUNNABLE
+                                    handler.removeCallbacks(notification);
+
+                                    // RESETAR ITENS DO PODCAST ANTERIOR
+                                    ImageButton btnItemAnterior = (ImageButton) mRecyclerView.getChildAt(lastAudio).findViewById(R.id.btnPlayPauseAudio);
+                                    btnItemAnterior.setImageResource(R.drawable.ic_play_white);
+                                    TextView tempoItemAnterior = (TextView) mRecyclerView.getChildAt(lastAudio).findViewById(R.id.tempoAudio);
+                                    tempoItemAnterior.setText("00:00");
+                                    holder.progressBarAudio.setProgress(0);
+                                }
                             });
 
                             // SE FOR A SEGUNDA OU MAIS VEZES QUE APERTA PLAY
@@ -192,7 +205,7 @@ public class MuralListAdapter extends RecyclerView.Adapter<MuralListAdapter.MyVi
                                 holder.loadingIcon.setVisibility(View.VISIBLE);
                                 mp = new MediaPlayer();
                                 //mp.setDataSource(String.valueOf(Uri.parse(current.getAudioPublicacao())));
-                                mp.setDataSource(String.valueOf(Uri.parse("https://dt2xfopac85w8.cloudfront.net/2017/ricardo_vargas_2017_06_23_gohorse_pt.mp3")));
+                                mp.setDataSource(String.valueOf(Uri.parse(current.getAudioPublicacao())));
                                 mp.prepareAsync();
                                 mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
@@ -207,6 +220,19 @@ public class MuralListAdapter extends RecyclerView.Adapter<MuralListAdapter.MyVi
                                         firstTime = false;
                                     }
 
+                                });
+                                mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                    public void onCompletion(MediaPlayer mp) {
+                                        // PARAR RUNNABLE
+                                        handler.removeCallbacks(notification);
+
+                                        // RESETAR ITENS DO PODCAST ANTERIOR
+                                        ImageButton btnItemAnterior = (ImageButton) mRecyclerView.getChildAt(lastAudio).findViewById(R.id.btnPlayPauseAudio);
+                                        btnItemAnterior.setImageResource(R.drawable.ic_play_white);
+                                        TextView tempoItemAnterior = (TextView) mRecyclerView.getChildAt(lastAudio).findViewById(R.id.tempoAudio);
+                                        tempoItemAnterior.setText("00:00");
+                                        holder.progressBarAudio.setProgress(0);
+                                    }
                                 });
                             }
 
@@ -244,7 +270,7 @@ public class MuralListAdapter extends RecyclerView.Adapter<MuralListAdapter.MyVi
                             holder.loadingIcon.setVisibility(View.VISIBLE);
                             mp = new MediaPlayer();
                             //mp.setDataSource(String.valueOf(Uri.parse(current.getAudioPublicacao())));
-                            mp.setDataSource(String.valueOf(Uri.parse("https://dt2xfopac85w8.cloudfront.net/2017/ricardo_vargas_2017_06_23_gohorse_pt.mp3")));
+                            mp.setDataSource(String.valueOf(Uri.parse(current.getAudioPublicacao())));
                             mp.prepareAsync();
                             mp.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
 
@@ -259,6 +285,19 @@ public class MuralListAdapter extends RecyclerView.Adapter<MuralListAdapter.MyVi
                                     firstTime = false;
                                 }
 
+                            });
+                            mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                                public void onCompletion(MediaPlayer mp) {
+                                    // PARAR RUNNABLE
+                                    handler.removeCallbacks(notification);
+
+                                    // RESETAR ITENS DO PODCAST ANTERIOR
+                                    ImageButton btnItemAnterior = (ImageButton) mRecyclerView.getChildAt(lastAudio).findViewById(R.id.btnPlayPauseAudio);
+                                    btnItemAnterior.setImageResource(R.drawable.ic_play_white);
+                                    TextView tempoItemAnterior = (TextView) mRecyclerView.getChildAt(lastAudio).findViewById(R.id.tempoAudio);
+                                    tempoItemAnterior.setText("00:00");
+                                    holder.progressBarAudio.setProgress(0);
+                                }
                             });
                         }catch (IOException e){
                             Log.v("Exception: ", e.getMessage());
