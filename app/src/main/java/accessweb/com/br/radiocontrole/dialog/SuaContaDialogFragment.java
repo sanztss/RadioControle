@@ -108,6 +108,17 @@ public class SuaContaDialogFragment extends DialogFragment {
         Dialog dialog = super.onCreateDialog(savedInstanceState);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+        CacheData cacheData = new CacheData(getContext());
+        if (Build.VERSION.SDK_INT > 23) {
+            float[] hsv = new float[3];
+            int color = Color.parseColor(cacheData.getString("color"));
+            Color.colorToHSV(color, hsv);
+            hsv[2] *= 0.8f;
+            color = Color.HSVToColor(hsv);
+
+            dialog.getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            dialog.getWindow().setStatusBarColor(color);
+        }
         return dialog;
     }
 

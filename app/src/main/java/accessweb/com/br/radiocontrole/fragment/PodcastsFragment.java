@@ -23,6 +23,7 @@ import accessweb.com.br.radiocontrole.adapter.PodcastsListAdapter;
 import accessweb.com.br.radiocontrole.model.Podcast;
 import accessweb.com.br.radiocontrole.model.PodcastApp;
 import accessweb.com.br.radiocontrole.model.Podcasts;
+import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 
@@ -75,7 +76,8 @@ public class PodcastsFragment extends Fragment {
                 factory.credentialsProvider(CognitoClientManager.getCredentials());
                 factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
                 final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
-                Podcasts podcasts = client.radioIdPodcastsGet("tradicaoAM");
+                CacheData cacheData = new CacheData(getContext());
+                Podcasts podcasts = client.radioIdPodcastsGet(cacheData.getString("idRadio"));
 
                 for (Podcast podcast : podcasts){
                     PodcastApp podcastApp = new PodcastApp();
@@ -83,7 +85,7 @@ public class PodcastsFragment extends Fragment {
                     Date dataPostagem = new Date(timestamp.getTime());
 
                     podcastApp.setTituloPodcast(podcast.getName());
-                    podcastApp.setLinkPodcast("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/podcasts/" + podcast.getFile());
+                    podcastApp.setLinkPodcast("https://s3.amazonaws.com/radiocontrole/radios/" + cacheData.getString("idRadio") + "/podcasts/" + podcast.getFile());
                     podcastApp.setDataPublicacaoPodcast(dataPostagem);
                     podcastApps.add(podcastApp);
                 }
@@ -94,9 +96,9 @@ public class PodcastsFragment extends Fragment {
             protected void onPostExecute(Void result) {
                 super.onPostExecute(result);
 
-                adapter = new PodcastsListAdapter(getContext(), podcastApps);
-                recyclerView.setAdapter(adapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+                    adapter = new PodcastsListAdapter(getContext(), podcastApps);
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
             }
         }.execute();

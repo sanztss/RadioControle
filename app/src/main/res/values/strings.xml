@@ -13,6 +13,7 @@
     <string name="nav_item_perfil">Perfil</string>
     <string name="nav_item_podcasts">Podcasts</string>
     <string name="nav_item_promocoes">Promoções</string>
+    <string name="nav_item_estacoes">Estações</string>
     <string name="nav_item_sobre">Sobre o aplicativo</string>
 
     <string name="nav_item_icon_home">Início</string>
@@ -29,6 +30,7 @@
         <item>@string/nav_item_perfil</item>
         <item>@string/nav_item_podcasts</item>
         <item>@string/nav_item_promocoes</item>
+        <item>@string/nav_item_estacoes</item>
         <item>@string/nav_item_sobre</item>
     </string-array>
 
@@ -40,6 +42,7 @@
         <item>@drawable/ic_account_gray</item>
         <item>@drawable/ic_radio_tower_gray</item>
         <item>@drawable/ic_trophy_gray</item>
+        <item>@drawable/ic_radio_gray</item>
         <item>@drawable/ic_information_gray</item>
     </integer-array>
 

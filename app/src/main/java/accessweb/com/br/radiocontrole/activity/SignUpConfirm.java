@@ -4,10 +4,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,6 +23,7 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.Verificat
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.util.AppHelper;
+import accessweb.com.br.radiocontrole.util.CacheData;
 
 import static java.security.AccessController.getContext;
 
@@ -42,9 +46,10 @@ public class SignUpConfirm extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up_confirm);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        CacheData cacheData = new CacheData(getApplicationContext());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Confirmação");
+        toolbar.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
@@ -55,7 +60,16 @@ public class SignUpConfirm extends AppCompatActivity {
                 onBackPressed();
             }
         });
+        if (Build.VERSION.SDK_INT > 23) {
+            float[] hsv = new float[3];
+            int color = Color.parseColor(cacheData.getString("color"));
+            Color.colorToHSV(color, hsv);
+            hsv[2] *= 0.8f;
+            color = Color.HSVToColor(hsv);
 
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(color);
+        }
         init();
     }
 

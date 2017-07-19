@@ -23,19 +23,20 @@ android {
 dependencies {
     repositories {
         mavenCentral()
-        maven {
-            url "http://dl.bintray.com/ghedeon/maven"
-        }
+        maven { url 'https://maven.google.com' }
+        // Ampiri SDK repository
+        maven { url "http://ampiri.bintray.com/maven" }
     }
     compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 
-    compile 'com.android.support:appcompat-v7:25.3.1'
-    compile 'com.android.support:cardview-v7:25.3.1'
-    compile 'com.android.support:recyclerview-v7:25.3.1'
-    compile 'com.android.support:design:25.3.1'
+    compile 'com.android.support:appcompat-v7:25.4.0'
+    compile 'com.android.support:cardview-v7:25.4.0'
+    compile 'com.android.support:recyclerview-v7:25.4.0'
+    compile 'com.android.support:design:25.4.0'
+
     compile 'com.sothree.slidinguppanel:library:3.3.1'
 
     compile 'com.squareup.retrofit2:retrofit:2.0.0'
@@ -62,6 +63,19 @@ dependencies {
     compile 'com.amazonaws:aws-android-sdk-cognito:2.4.5'
     compile 'com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.4.5'
     compile "com.amazonaws:aws-android-sdk-apigateway-core:2.4.5"
+
+    compile 'com.ampiri.sdk:ampiri-sdk:4.2.2'
+    compile 'com.ampiri.sdk:ampiri-sdk-mediation-admob:4.2.2'
+    compile 'com.ampiri.sdk:ampiri-sdk-mediation-unityads:4.2.2'
+    compile 'com.ampiri.sdk:ampiri-sdk-mediation-applovin:4.2.2'
+    compile 'com.ampiri.sdk:ampiri-sdk-mediation-chartboost:4.2.2'
+    compile 'com.ampiri.sdk:ampiri-sdk-mediation-facebook:4.2.2'
+    compile 'com.ampiri.sdk:ampiri-sdk-mediation-inlocomedia:4.2.2'
+    compile 'com.ampiri.sdk:ampiri-sdk-mediation-mopub:4.2.2'
+    compile 'com.ampiri.sdk:ampiri-sdk-mediation-nativex:4.2.2'
+    compile 'com.ampiri.sdk:ampiri-sdk-mediation-vungle:4.2.2'
+
+    compile 'com.android.support:multidex:1.0.1'
 
     testCompile 'junit:junit:4.12'
 }

@@ -3,6 +3,8 @@
     package="accessweb.com.br.radiocontrole"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.CAMERA" />
@@ -34,21 +36,19 @@
             </intent-filter>
         </activity>
 
+        <!-- RadioGroupActivity -->
+        <activity android:name=".activity.RadioGroupActivity"/>
+
         <!-- MainActivity -->
-        <activity android:name=".activity.MainActivity">
-           <!-- <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+        <activity android:name=".activity.MainActivity"/>
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>-->
-        </activity>
+        <!-- SignUpConfirm -->
+        <activity android:name=".activity.SignUpConfirm"/>
 
-        <activity
-        android:name=".activity.SignUpConfirm"/>
+        <!-- ForgotPasswordActivity -->
+        <activity android:name=".activity.ForgotPasswordActivity"/>
 
-        <activity
-            android:name=".activity.ForgotPasswordActivity"/>
-
+        <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
@@ -70,7 +70,11 @@
                 <data android:scheme="@string/fb_login_protocol_scheme" />
             </intent-filter>
         </activity>
+
+        <!-- AlarmReceiver -->
         <receiver android:name=".util.AlarmReceiver" />
+
+        <!-- S3 Service -->
         <service android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService" android:enabled="true" />
     </application>
 

@@ -4,17 +4,21 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.util.CacheData;
 
 import static accessweb.com.br.radiocontrole.R.id.inputSenha;
 
@@ -33,9 +37,10 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forgot_password);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-
+        CacheData cacheData = new CacheData(getApplicationContext());
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Resetar Senha");
+        toolbar.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -47,6 +52,17 @@ public class ForgotPasswordActivity extends AppCompatActivity {
                 exit(null, null);
             }
         });
+
+        if (Build.VERSION.SDK_INT > 23) {
+            float[] hsv = new float[3];
+            int color = Color.parseColor(cacheData.getString("color"));
+            Color.colorToHSV(color, hsv);
+            hsv[2] *= 0.8f;
+            color = Color.HSVToColor(hsv);
+
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            getWindow().setStatusBarColor(color);
+        }
 
         init();
     }

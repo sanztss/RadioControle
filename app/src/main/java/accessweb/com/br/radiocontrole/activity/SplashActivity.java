@@ -202,6 +202,7 @@ public class SplashActivity extends Activity {
                                 break;
                         }
                     }
+                    modulos.add("estações");
                     cacheData.putListString("modulos", modulos);
 
                     Log.v("aaaaaaaaaaaaaaaaaaaa", "Nome:" + settings.getChannels().get(0).getName() + ", Rds:" + settings.getChannels().get(0).getRds() + ", Principal:" + settings.getChannels().get(0).getMain() + ", LowStreams:" + settings.getChannels().get(0).getLowStreams() + ", HighStreams:" + settings.getChannels().get(0).getHighStreams());
@@ -211,7 +212,7 @@ public class SplashActivity extends Activity {
                 @Override
                 protected void onPostExecute(Void result) {
                     super.onPostExecute(result);
-                    CacheData cacheData = new CacheData(mContext);
+                    final CacheData cacheData = new CacheData(mContext);
                     Picasso.with(mContext)
                             .load(cacheData.getString("splash"))
                             .into(splash);
@@ -219,10 +220,17 @@ public class SplashActivity extends Activity {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                            intent.putExtra("canais", (Serializable) canais);
-                            startActivity(intent);
-                            finish();
+                            if (cacheData.getString("idRadio").equals("")){
+                                Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                startActivity(intent);
+                                finish();
+                            }else {
+                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                startActivity(intent);
+                                finish();
+                            }
                         }
                     }, SPLASH_TIME_OUT);
                 }
@@ -290,6 +298,7 @@ public class SplashActivity extends Activity {
                                 break;
                         }
                     }
+                    modulos.add("estações");
                     cacheData.putListString("modulos", modulos);
 
                     Log.v("aaaaaaaaaaaaaaaaaaaa", "Nome:" + settings.getChannels().get(0).getName() + ", Rds:" + settings.getChannels().get(0).getRds() + ", Principal:" + settings.getChannels().get(0).getMain() + ", LowStreams:" + settings.getChannels().get(0).getLowStreams() + ", HighStreams:" + settings.getChannels().get(0).getHighStreams());
@@ -300,7 +309,7 @@ public class SplashActivity extends Activity {
                 protected void onPostExecute(Void result) {
                     super.onPostExecute(result);
 
-                    CacheData cacheData = new CacheData(mContext);
+                    final CacheData cacheData = new CacheData(mContext);
                     Picasso.with(mContext)
                             .load(cacheData.getString("splash"))
                             .into(splash);
@@ -308,10 +317,18 @@ public class SplashActivity extends Activity {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                            intent.putExtra("canais", (Serializable) canais);
-                            startActivity(intent);
-                            finish();
+                            if (cacheData.getString("idRadio").equals("")){
+                                Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                startActivity(intent);
+                                finish();
+                            }else {
+                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                startActivity(intent);
+                                finish();
+                            }
+
                         }
                     }, SPLASH_TIME_OUT);
 

@@ -16,6 +16,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import accessweb.com.br.radiocontrole.R;
@@ -51,7 +52,7 @@ public class NoticiasListAdapter extends RecyclerView.Adapter<NoticiasListAdapte
     public void onBindViewHolder(MyViewHolder holder, int position) {
         Noticia current = data.get(position);
         // CORREÇÃO DATA
-        DateFormat formatter =  new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
+        DateFormat formatter =  new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.US);
         Date now = new Date();
         try {
             Date past = formatter.parse(current.getTempoNoticia());

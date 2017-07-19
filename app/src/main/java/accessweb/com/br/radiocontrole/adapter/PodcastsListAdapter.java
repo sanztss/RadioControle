@@ -1,6 +1,7 @@
 package accessweb.com.br.radiocontrole.adapter;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Handler;
@@ -11,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
@@ -22,6 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.model.PodcastApp;
+import accessweb.com.br.radiocontrole.util.CacheData;
 
 /**
  * Created by Des. Android on 29/06/2017.
@@ -38,7 +41,6 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
     private Boolean firstTime = true;
     private int lastPodcast;
     private String timeAgo;
-
     RecyclerView mRecyclerView;
 
     Runnable notification;
@@ -61,7 +63,7 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
     @Override
     public void onBindViewHolder(final MyViewHolder holder, final int position) {
         final PodcastApp current = data.get(position);
-
+        CacheData cacheData = new CacheData(context);
         holder.tituloPodcast.setText(current.getTituloPodcast());
         holder.linkPodcast.setText(current.getLinkPodcast());
         Date now = new Date();
@@ -76,7 +78,7 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
             timeAgo = "agora";
         }
         holder.dataPublicacaoPodcast.setText(timeAgo);
-
+        holder.podcast_control.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         holder.btnPlayPausePodcast.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
@@ -252,6 +254,7 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
         ImageButton btnPlayPausePodcast;
         SeekBar progressBarPodcast;
         ProgressBar loadingIcon;
+        RelativeLayout podcast_control;
 
         public MyViewHolder(View itemView) {
             super(itemView);
@@ -263,6 +266,7 @@ public class PodcastsListAdapter extends RecyclerView.Adapter<PodcastsListAdapte
             btnPlayPausePodcast = (ImageButton) itemView.findViewById(R.id.btnPlayPausePodcast);
             progressBarPodcast = (SeekBar) itemView.findViewById(R.id.progressBarPodcast);
             loadingIcon = (ProgressBar) itemView.findViewById(R.id.loadingIcon);
+            podcast_control = (RelativeLayout) itemView.findViewById(R.id.podcast_control);
         }
     }
 

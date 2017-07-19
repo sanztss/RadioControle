@@ -88,9 +88,9 @@ public class ProgramacaoFragment extends Fragment {
                 factory.credentialsProvider(CognitoClientManager.getCredentials());
                 factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
                 final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
-
-                programs = client.radioIdProgramsGet("tradicaoAM");
-                hosts = client.radioIdHostsGet("tradicaoAM");
+                CacheData cacheData = new CacheData(getContext());
+                programs = client.radioIdProgramsGet(cacheData.getString("idRadio"));
+                hosts = client.radioIdHostsGet(cacheData.getString("idRadio"));
                 return null;
             }
 

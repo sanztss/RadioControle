@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.activity.MainActivity;
 import accessweb.com.br.radiocontrole.adapter.GridIconAdapter;
 import accessweb.com.br.radiocontrole.model.Settings;
 import accessweb.com.br.radiocontrole.model.Social;
@@ -102,7 +103,7 @@ public class HomeFragment extends Fragment {
                 factory.credentialsProvider(CognitoClientManager.getCredentials());
                 factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
                 final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
-                Settings settings = client.radioIdGet("tradicaoAM");
+                Settings settings = client.radioIdGet(cacheData.getString("idRadio"));
 
                 // RECUPERANDO AS REDES SOCIAIS
                 for (Social social : settings.getSocial()){
@@ -303,6 +304,12 @@ public class HomeFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((MainActivity)getActivity()).trocarTituloToolbar();
     }
 
     public void changeIcon(String acao) {

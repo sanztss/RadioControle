@@ -339,7 +339,7 @@ public class MuralDialogFragment extends DialogFragment {
                     new AsyncTask<Void, Void, Void>() {
                         @Override
                         protected Void doInBackground(Void... params) {
-                            client.radioIdPostsPost("tradicaoAM", post);
+                            client.radioIdPostsPost(cacheData.getString("idRadio"), post);
                             return null;
                         }
 
@@ -390,7 +390,7 @@ public class MuralDialogFragment extends DialogFragment {
                                 new AsyncTask<Void, Void, Void>() {
                                     @Override
                                     protected Void doInBackground(Void... params) {
-                                        client.radioIdPostsPost("tradicaoAM", post);
+                                        client.radioIdPostsPost(cacheData.getString("idRadio"), post);
                                         return null;
                                     }
 
@@ -443,7 +443,7 @@ public class MuralDialogFragment extends DialogFragment {
                                     new AsyncTask<Void, Void, Void>() {
                                         @Override
                                         protected Void doInBackground(Void... params) {
-                                            client.radioIdPostsPost("tradicaoAM", post);
+                                            client.radioIdPostsPost(cacheData.getString("idRadio"), post);
                                             return null;
                                         }
 
@@ -497,7 +497,7 @@ public class MuralDialogFragment extends DialogFragment {
                                     new AsyncTask<Void, Void, Void>() {
                                         @Override
                                         protected Void doInBackground(Void... params) {
-                                            client.radioIdPostsPost("tradicaoAM", post);
+                                            client.radioIdPostsPost(cacheData.getString("idRadio"), post);
                                             return null;
                                         }
 
@@ -535,7 +535,7 @@ public class MuralDialogFragment extends DialogFragment {
                 /*new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
-                        client.radioIdPostsPost("tradicaoAM", post);
+                        client.radioIdPostsPost(cacheData.getString("idRadio"), post);
                         return null;
                     }
 
@@ -778,7 +778,8 @@ public class MuralDialogFragment extends DialogFragment {
                 new AsyncTask<Void, Void, Void>() {
                     @Override
                     protected Void doInBackground(Void... params) {
-                        S3Util.getS3Client(getApplicationContext()).setObjectAcl("radiocontrole/radios/tradicaoAM/wall", s3FileKey , CannedAccessControlList.PublicRead);
+                        CacheData cacheData = new CacheData(getApplicationContext());
+                        S3Util.getS3Client(getApplicationContext()).setObjectAcl("radiocontrole/radios/"+ cacheData.getString("idRadio") + "/wall", s3FileKey , CannedAccessControlList.PublicRead);
                         return null;
                     }
 
@@ -800,6 +801,7 @@ public class MuralDialogFragment extends DialogFragment {
         Long timestampLong = System.currentTimeMillis()/1000;
         String timestamp = timestampLong.toString();
 
+        CacheData cacheData = new CacheData(getApplicationContext());
 
         if (filePath == null) {
             Toast.makeText(getActivity(), "Could not find the filepath of the selected file",
@@ -811,10 +813,10 @@ public class MuralDialogFragment extends DialogFragment {
         String extension = file.getName().substring(file.getName().lastIndexOf("."));
         Log.e("AAAAAAAA","radiocontrole/users/" + timestamp + extension);
         s3FileKey = timestamp + extension;
-        TransferObserver observer = transferUtility.upload("radiocontrole/radios/tradicaoAM/wall", timestamp + extension,
+        TransferObserver observer = transferUtility.upload("radiocontrole/radios/" + cacheData.getString("idRadio") + "/wall", timestamp + extension,
                 file);
         observer.setTransferListener(new UploadListener());
-        return "http://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/wall/" + timestamp + extension;
+        return "http://s3.amazonaws.com/radiocontrole/radios/" + cacheData.getString("idRadio") + "/wall/" + timestamp + extension;
     }
 
     public Bitmap getResizedBitmap(Bitmap image, int maxSize) {

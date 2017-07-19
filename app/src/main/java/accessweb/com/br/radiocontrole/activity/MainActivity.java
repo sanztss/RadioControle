@@ -111,8 +111,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     ProgressDialog progressDialog;
 
-    private Stack<Fragment> fragmentStack;
-
+    private static ArrayList<String> modulos = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         drawerFragment = (FragmentDrawer)getSupportFragmentManager().findFragmentById(R.id.fragment_navigation_drawer);
         drawerFragment.setUp(R.id.fragment_navigation_drawer, drawerLayout, mToolbar);
         drawerFragment.setDrawerListener(this);
-        displayView(0);
+        displayView("inicio");
 
 
         ////////////////////////////////////
@@ -417,38 +416,38 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     ////////////////////////////////////
     @Override
     public void onDrawerItemSelected(View view, int position) {
-
-        displayView(position);
+        System.out.println(view.getTag().toString());
+        displayView(view.getTag().toString());
 
     }
 
-    private void displayView(int position) {
+    private void displayView(String tela) {
         Fragment fragment = null;
         String title = getString(R.string.app_name);
         String tag = null;
-        switch (position) {
-            case 0:
+        final CacheData cacheData = new CacheData(mContext);
+        switch (tela) {
+            case "inicio":
                 fragment = new HomeFragment();
                 title = "Início";
                 tag = "inicio";
                 break;
-            case 1:
+            case "noticias":
                 fragment = new NoticiasFragment();
                 title = "Notícias";
                 tag = "noticias";
                 break;
-            case 2:
+            case "mural":
                 fragment = new MuralFragment();
                 title = "Mural";
                 tag = "mural";
                 break;
-            case 3:
+            case "programas":
                 fragment = new ProgramacaoFragment();
                 title = "Programação";
                 tag = "programacao";
                 break;
-            case 4:
-                CacheData cacheData = new CacheData(mContext);
+            case "perfil":
                 System.out.println("sashauisha" + cacheData.getString("userId"));
                 if (cacheData.getString("userId").equals("")){
                     System.out.println("Usuário deslogado!!!");
@@ -468,17 +467,24 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                     tag = "perfil";
                 }
                 break;
-            case 5:
+            case "podcasts":
                 fragment = new PodcastsFragment();
                 title = "Podcasts";
                 tag = "podcasts";
                 break;
-            case 6:
+            case "promocoes":
                 fragment = new PromocoesFragment();
                 title = "Promoções";
                 tag = "promocoes";
                 break;
-            case 7:
+            case "estacoes":
+                Intent intent = new Intent(MainActivity.this, RadioGroupActivity.class);
+                intent.putExtra("canais", (Serializable) canais);
+                cacheData.putString("idRadio", "");
+                startActivity(intent);
+                finish();
+                break;
+            case "sobre o aplicativo":
                 SobreDialogFragment dialog = new SobreDialogFragment();
                 dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
                 FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
@@ -494,12 +500,12 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
             fragmentTransaction.replace(R.id.container_body, fragment, tag);
 
-            if (position != 0){
+            if (!tela.equals("inicio")){
                 fragmentTransaction.addToBackStack(tag);
             }
             fragmentTransaction.commit();
             fragmentManager.executePendingTransactions();
-            if (position == 0 && audioTocando) {
+            if (tela.equals("inicio") && audioTocando) {
                 changeIcon("pause", indexCanal);
             }
             Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -732,4 +738,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         toolbar.setTitle("Perfil");
     }
 
+    public void trocarTituloToolbar(){
+        mToolbar.setTitle("Início");
+    }
 }

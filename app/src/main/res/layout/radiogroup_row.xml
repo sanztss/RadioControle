@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/card_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    card_view:cardCornerRadius="2dp"
+    android:layout_margin="6dp"
+    card_view:cardElevation="4dp"
+    card_view:contentPadding="10dp"
+    card_view:cardMaxElevation="6dp"
+    card_view:cardBackgroundColor="#fff">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/urlImagemRadio"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentTop="true"
+                    android:src="@drawable/radio" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:layout_marginLeft="60dp"
+                    android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/nomeRadio"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Nome da rádio"
+                            android:textColor="#262626"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/localizacaoRadio"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="5dp"
+                            android:text="Localização da rádio"
+                            android:textColor="#7f7f7f"
+                            android:textSize="16sp" />
+
+
+                </LinearLayout>
+
+        </RelativeLayout>
+</android.support.v7.widget.CardView>

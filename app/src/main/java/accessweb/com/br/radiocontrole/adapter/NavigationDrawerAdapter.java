@@ -6,8 +6,10 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.Normalizer;
 import java.util.Collections;
 import java.util.List;
 
@@ -42,6 +44,9 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
         NavDrawerItem current = data.get(position);
         holder.title.setText(current.getTitle());
         holder.icon.setImageResource(current.getIcon());
+        String normalized = Normalizer.normalize(current.getTitle().toLowerCase(), Normalizer.Form.NFD);
+        String accentRemoved = normalized.replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+        holder.itemDrawer.setTag(accentRemoved);
     }
 
     @Override
@@ -52,11 +57,13 @@ public class NavigationDrawerAdapter extends RecyclerView.Adapter<NavigationDraw
     class MyViewHolder extends RecyclerView.ViewHolder {
         TextView title;
         ImageView icon;
+        RelativeLayout itemDrawer;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             title = (TextView) itemView.findViewById(R.id.title);
             icon = (ImageView) itemView.findViewById(R.id.icon);
+            itemDrawer = (RelativeLayout) itemView.findViewById(R.id.itemDrawer);
         }
     }
 }

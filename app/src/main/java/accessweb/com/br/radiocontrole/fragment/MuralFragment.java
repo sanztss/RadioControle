@@ -121,7 +121,7 @@ public class MuralFragment extends Fragment {
                 factory.credentialsProvider(CognitoClientManager.getCredentials());
                 factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
                 final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
-                Posts posts = client.radioIdPostsGet("tradicaoAM", lastKey);
+                Posts posts = client.radioIdPostsGet(cacheData.getString("idRadio"), lastKey);
                 for (Post post : posts.getPosts()){
                     /*Log.e("AAAAAAAAAAA", "getAuthorId:" + post.getAuthorId());
                     Log.e("AAAAAAAAAAA", "getAuthorPicture:" + post.getAuthorPicture());
@@ -261,7 +261,7 @@ public class MuralFragment extends Fragment {
                 factory.credentialsProvider(CognitoClientManager.getCredentials());
                 factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
                 final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
-                Posts posts = client.radioIdPostsGet("tradicaoAM", "");
+                Posts posts = client.radioIdPostsGet(cacheData.getString("idRadio"), "");
                 items.clear();
                 items = new ArrayList<Mural>();
                 for (Post post : posts.getPosts()){
@@ -319,7 +319,7 @@ public class MuralFragment extends Fragment {
                 factory.credentialsProvider(CognitoClientManager.getCredentials());
                 factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
                 final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
-                Posts posts = client.radioIdPostsGet("tradicaoAM", lastKey);
+                Posts posts = client.radioIdPostsGet(cacheData.getString("idRadio"), lastKey);
                 for (Post post : posts.getPosts()){
                     Timestamp timestamp = new Timestamp(post.getTimestamp());
                     Date dataPostagem = new Date(timestamp.getTime());

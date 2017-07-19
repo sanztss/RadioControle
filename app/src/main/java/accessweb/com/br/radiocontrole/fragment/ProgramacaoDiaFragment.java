@@ -109,7 +109,7 @@ public class ProgramacaoDiaFragment extends Fragment{
                         programa.setNomePrograma(program.getName());
                         for (Host host : hosts){
                             if (host.getId().equals(program.getHostId())){
-                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/" + cacheData.getString("idRadio") + "/" + host.getPicture());
                                 programa.setNomeLocutorPrograma(host.getName());
                                 break;
                             }
@@ -145,7 +145,7 @@ public class ProgramacaoDiaFragment extends Fragment{
                         programa.setNomePrograma(program.getName());
                         for (Host host : hosts){
                             if (host.getId().equals(program.getHostId())){
-                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/" + cacheData.getString("idRadio") + "/" + host.getPicture());
                                 programa.setNomeLocutorPrograma(host.getName());
                                 break;
                             }
@@ -180,7 +180,7 @@ public class ProgramacaoDiaFragment extends Fragment{
                         programa.setNomePrograma(program.getName());
                         for (Host host : hosts){
                             if (host.getId().equals(program.getHostId())){
-                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/" + cacheData.getString("idRadio") + "/" + host.getPicture());
                                 programa.setNomeLocutorPrograma(host.getName());
                                 break;
                             }
@@ -215,7 +215,7 @@ public class ProgramacaoDiaFragment extends Fragment{
                         programa.setNomePrograma(program.getName());
                         for (Host host : hosts){
                             if (host.getId().equals(program.getHostId())){
-                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/" + cacheData.getString("idRadio") + "/" + host.getPicture());
                                 programa.setNomeLocutorPrograma(host.getName());
                                 break;
                             }
@@ -250,7 +250,7 @@ public class ProgramacaoDiaFragment extends Fragment{
                         programa.setNomePrograma(program.getName());
                         for (Host host : hosts){
                             if (host.getId().equals(program.getHostId())){
-                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/" + cacheData.getString("idRadio") + "/" + host.getPicture());
                                 programa.setNomeLocutorPrograma(host.getName());
                                 break;
                             }
@@ -285,7 +285,7 @@ public class ProgramacaoDiaFragment extends Fragment{
                         programa.setNomePrograma(program.getName());
                         for (Host host : hosts){
                             if (host.getId().equals(program.getHostId())){
-                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/" + cacheData.getString("idRadio") + "/" + host.getPicture());
                                 programa.setNomeLocutorPrograma(host.getName());
                                 break;
                             }
@@ -320,7 +320,7 @@ public class ProgramacaoDiaFragment extends Fragment{
                         programa.setNomePrograma(program.getName());
                         for (Host host : hosts){
                             if (host.getId().equals(program.getHostId())){
-                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/tradicaoAM/" + host.getPicture());
+                                programa.setFotoLocutorPrograma("https://s3.amazonaws.com/radiocontrole/radios/" + cacheData.getString("idRadio") + "/" + host.getPicture());
                                 programa.setNomeLocutorPrograma(host.getName());
                                 break;
                             }
