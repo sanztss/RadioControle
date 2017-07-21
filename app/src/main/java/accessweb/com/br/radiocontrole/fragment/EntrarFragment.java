@@ -305,6 +305,9 @@ public class EntrarFragment extends Fragment {
                 });
                 confirmDialog = builder.create();
                 confirmDialog.show();
+                CacheData cacheData = new CacheData(getApplicationContext());
+                Button btnPositive = confirmDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+                btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
 
             } else if (AppHelper.formatException(e).equals("User does not exist. ")){
                 showDialogMessage("Rádio Controle", "Falha ao fazer login, o usuário não existe.");
@@ -350,6 +353,9 @@ public class EntrarFragment extends Fragment {
         });
         userDialog = builder.create();
         userDialog.show();
+        CacheData cacheData = new CacheData(getApplicationContext());
+        Button btnPositive = userDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+        btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
     }
 
     private void mfaAuth(MultiFactorAuthenticationContinuation continuation) {

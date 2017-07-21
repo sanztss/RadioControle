@@ -11,6 +11,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.telephony.PhoneNumberUtils;
@@ -20,11 +21,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+import com.ampiri.sdk.banner.BannerAd;
+import com.ampiri.sdk.banner.BannerAdPool;
+import com.ampiri.sdk.listeners.BannerAdCallback;
+import com.ampiri.sdk.mediation.BannerSize;
+import com.ampiri.sdk.mediation.ResponseStatus;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -38,7 +46,6 @@ import accessweb.com.br.radiocontrole.model.Social;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 import accessweb.com.br.radiocontrole.util.CacheData;
-
 
 public class HomeFragment extends Fragment {
 
@@ -55,6 +62,8 @@ public class HomeFragment extends Fragment {
     List<Integer> contatoIconIds = new ArrayList<Integer>();
     List<String> contatoLinks = new ArrayList<String>();
     List<String> contatoTipo = new ArrayList<String>();
+
+    private BannerAd bannerAd;
 
     public HomeFragment() {
         // Required empty public constructor
@@ -292,6 +301,35 @@ public class HomeFragment extends Fragment {
             }
         }.execute();
 
+        BannerAdCallback bannerAdListener = new BannerAdCallback() {
+            @Override
+            public void onAdLoaded(@NonNull BannerAd ad) {
+
+            }
+
+            @Override
+            public void onAdFailed(@NonNull BannerAd AD, @NonNull ResponseStatus responseStatus) {
+
+            }
+
+            @Override
+            public void onAdOpened(@NonNull BannerAd ad) {
+
+            }
+
+            @Override
+            public void onAdClicked(@NonNull BannerAd ad) {
+
+            }
+
+            @Override
+            public void onAdClosed(@NonNull BannerAd ad) {
+
+            }
+        };
+
+        FrameLayout adView = (FrameLayout) rootView.findViewById(R.id.anuncio);
+        bannerAd = BannerAdPool.load(getActivity(),"3dfbb889-3bcd-4c34-82ae-8fcb539c3b25",  adView, BannerSize.BANNER_SIZE_320x50);
         // Inflate the layout for this fragment
         return rootView;
     }
@@ -320,5 +358,4 @@ public class HomeFragment extends Fragment {
         }
 
     }
-
 }

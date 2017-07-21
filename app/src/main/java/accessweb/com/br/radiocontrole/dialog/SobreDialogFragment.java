@@ -56,7 +56,7 @@ public class SobreDialogFragment extends DialogFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        CacheData cacheData = new CacheData(getContext());
+        final CacheData cacheData = new CacheData(getContext());
         View rootView = inflater.inflate(R.layout.fragment_sobre, null, false);
         toolbar = (Toolbar) rootView.findViewById(R.id.editarPerfilToolbar);
         toolbar.setTitle("Sobre o aplicativo");
@@ -143,10 +143,10 @@ public class SobreDialogFragment extends DialogFragment {
 
                 dialogLigar.show();
                 Button btnNegative = dialogLigar.getButton(DialogInterface.BUTTON_NEGATIVE);
-                btnNegative.setTextColor(getResources().getColor(R.color.colorPrimary));
+                btnNegative.setTextColor(Color.parseColor(cacheData.getString("color")));
 
                 Button btnPositive = dialogLigar.getButton(DialogInterface.BUTTON_POSITIVE);
-                btnPositive.setTextColor(getResources().getColor(R.color.colorPrimary));
+                btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
             }
         });
         return rootView;

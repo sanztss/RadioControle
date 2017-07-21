@@ -16,6 +16,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -32,10 +33,12 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
@@ -45,6 +48,12 @@ import com.amazonaws.mobileconnectors.cognito.SyncConflict;
 import com.amazonaws.mobileconnectors.cognito.exceptions.DataStorageException;
 import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
 import com.amazonaws.regions.Regions;
+import com.ampiri.sdk.Ampiri;
+import com.ampiri.sdk.banner.BannerAd;
+import com.ampiri.sdk.banner.BannerAdPool;
+import com.ampiri.sdk.listeners.BannerAdCallback;
+import com.ampiri.sdk.mediation.BannerSize;
+import com.ampiri.sdk.mediation.ResponseStatus;
 import com.facebook.FacebookSdk;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -96,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private TextView txtNomeMusica;
     private TextView nomeArtista;
     private TextView txtNomeCantor;
-
+    private BannerAd bannerAd;
     private List<Channel> canais = new ArrayList<Channel>();
     private int indexCanal = 0;
 
@@ -118,6 +127,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
+
+        Ampiri.setDebugMode(true);
+        Ampiri.setTestMode(true);
 
         mContext = getApplicationContext();
         mActivity = MainActivity.this;
@@ -217,10 +229,45 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         txtNomeCantor = (TextView) findViewById(R.id.txtNomeCantor);
 
         painel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+
+        BannerAdCallback bannerAdListener = new BannerAdCallback() {
+            @Override
+            public void onAdLoaded(@NonNull BannerAd ad) {
+
+            }
+
+            @Override
+            public void onAdFailed(@NonNull BannerAd AD, @NonNull ResponseStatus responseStatus) {
+
+            }
+
+            @Override
+            public void onAdOpened(@NonNull BannerAd ad) {
+
+            }
+
+            @Override
+            public void onAdClicked(@NonNull BannerAd ad) {
+
+            }
+
+            @Override
+            public void onAdClosed(@NonNull BannerAd ad) {
+
+            }
+        };
+        FrameLayout adView = (FrameLayout) findViewById(R.id.ad_view);
+        bannerAd = BannerAdPool.load(this, "264b7779-e1c7-4a85-9ffa-55e0ef532cee", adView, BannerSize.BANNER_SIZE_320x50, bannerAdListener);
     }
 
     private void initCognito() {
         CognitoClientManager.init(this);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        bannerAd.onActivityResumed();
     }
 
     @Override
@@ -734,8 +781,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         fragmentTransaction.addToBackStack("perfil");
         fragmentTransaction.commit();
         fragmentManager.executePendingTransactions();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Perfil");
+        mToolbar.setTitle("Perfil");
     }
 
     public void trocarTituloToolbar(){

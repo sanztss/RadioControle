@@ -320,7 +320,7 @@
             android:padding="5dp"
             android:scaleType="fitCenter"/>
 
-        <ImageView
+        <!--<ImageView
             android:id="@+id/anuncioPlayer"
             android:layout_marginTop="0dp"
             android:layout_width="fill_parent"
@@ -328,7 +328,16 @@
             android:gravity="center_horizontal"
             android:src="@drawable/anuncio"
             android:scaleType="fitXY"
-            android:layout_alignParentBottom="true"/>
+            android:layout_alignParentBottom="true"/>-->
+        <FrameLayout
+            android:id="@+id/ad_view"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="20dp"
+            android:layout_width="320dp"
+            android:layout_height="50dp"
+            android:background="@android:color/transparent" />
 
     </RelativeLayout>
 </com.sothree.slidinguppanel.SlidingUpPanelLayout>

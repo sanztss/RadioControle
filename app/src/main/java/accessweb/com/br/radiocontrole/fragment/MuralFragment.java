@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+import com.ampiri.sdk.listeners.NativeAdCallback;
+import com.ampiri.sdk.listeners.StreamNativeAdCallback;
+import com.ampiri.sdk.mediation.ResponseStatus;
+import com.ampiri.sdk.nativead.FeedNativeAdView;
+import com.ampiri.sdk.nativead.NativeAd;
+import com.ampiri.sdk.nativead.recyclerview.StreamAdRecyclerAdapter;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -172,8 +179,51 @@ public class MuralFragment extends Fragment {
                 super.onPostExecute(result);
 
                 adapter = new MuralListAdapter(getContext(), items);
-                recyclerView.setAdapter(adapter);
 
+                StreamNativeAdCallback streamNativeAdListener = new StreamNativeAdCallback() {
+                    @Override
+                    public void onStreamAdLoadFailed() {
+
+                    }
+
+                    @Override
+                    public void onAdLoaded(@NonNull NativeAd nativeAd) {
+
+                    }
+
+                    @Override
+                    public void onAdFailed(@NonNull NativeAd nativeAd, @NonNull ResponseStatus responseStatus) {
+
+                    }
+
+                    @Override
+                    public void onAdOpened(@NonNull NativeAd nativeAd) {
+
+                    }
+
+                    @Override
+                    public void onAdClicked(@NonNull NativeAd nativeAd) {
+
+                    }
+
+                    @Override
+                    public void onAdClosed(@NonNull NativeAd nativeAd) {
+
+                    }
+
+                    @Override
+                    public void onAdCompleted(@NonNull NativeAd nativeAd) {
+
+                    }
+                };
+                StreamAdRecyclerAdapter adAdapter = new StreamAdRecyclerAdapter.Builder()
+                        .setAdapter(adapter)
+                        .setAdUnitId("2f3caac7-7573-4e6b-bf1a-d8b58b06e9d9")
+                        .setViewBuilder(FeedNativeAdView.BUILDER)
+                        .setEventCallback(streamNativeAdListener)
+                        .build(getContext());
+                recyclerView.setAdapter(adAdapter);
+                adAdapter.loadAd();
                 recyclerView.setLayoutManager(linearLayoutManager);
 
             }

@@ -48,6 +48,11 @@
         <!-- ForgotPasswordActivity -->
         <activity android:name=".activity.ForgotPasswordActivity"/>
 
+        <activity
+            android:name="com.ampiri.sdk.mraid.MraidActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+
         <!-- Facebook -->
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
@@ -76,6 +81,7 @@
 
         <!-- S3 Service -->
         <service android:name="com.amazonaws.mobileconnectors.s3.transferutility.TransferService" android:enabled="true" />
+        <service android:name="com.ampiri.sdk.CallbackService" android:exported="false" />
     </application>
 
 </manifest>

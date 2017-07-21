@@ -6,6 +6,7 @@ import accessweb.com.br.radiocontrole.adapter.PaisAdapter;
 import accessweb.com.br.radiocontrole.model.Pais;
 import accessweb.com.br.radiocontrole.util.AppHelper;
 import accessweb.com.br.radiocontrole.util.BrPhoneNumberFormatter;
+import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
 
@@ -13,6 +14,7 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -262,6 +264,9 @@ public class CadastroFragment extends Fragment {
         });
         userDialog = builder.create();
         userDialog.show();
+        CacheData cacheData = new CacheData(getApplicationContext());
+        Button btnPositive = userDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+        btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
     }
 
     private void showWaitDialog(String message) {

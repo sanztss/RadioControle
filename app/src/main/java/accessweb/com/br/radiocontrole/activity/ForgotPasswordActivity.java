@@ -140,6 +140,9 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         });
         userDialog = builder.create();
         userDialog.show();
+        CacheData cacheData = new CacheData(getApplicationContext());
+        Button btnPositive = userDialog.getButton(DialogInterface.BUTTON_NEUTRAL);
+        btnPositive.setTextColor(Color.parseColor(cacheData.getString("color")));
     }
 
     private void exit(String newPass, String code) {

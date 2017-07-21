@@ -487,6 +487,7 @@ public class PerfilFragment extends Fragment {
                             @Override
                             public void onFailure(DataStorageException dse) {
                                 //Log.e(TAG, "Sync fails", dse);
+                                Toast.makeText(getActivity(), "Erro ao enviar foto, tente novamente mais tarde.", Toast.LENGTH_LONG).show();
                             }
                         });
                     }

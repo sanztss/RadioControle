@@ -1,13 +1,12 @@
 package accessweb.com.br.radiocontrole.activity;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.widget.ImageView;
 
@@ -25,6 +24,10 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Chal
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
+import com.ampiri.sdk.interstitial.InterstitialAd;
+import com.ampiri.sdk.interstitial.InterstitialAdPool;
+import com.ampiri.sdk.listeners.InterstitialAdCallback;
+import com.ampiri.sdk.mediation.ResponseStatus;
 import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
@@ -34,15 +37,11 @@ import java.util.List;
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.model.Channel;
 import accessweb.com.br.radiocontrole.model.Settings;
-import accessweb.com.br.radiocontrole.util.AppHelper;
 import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
-
-import static accessweb.com.br.radiocontrole.R.id.inputEmail;
 import static com.facebook.login.widget.ProfilePictureView.TAG;
-import static java.security.AccessController.getContext;
 
 /**
  * Created by Des. Android on 05/07/2017.
@@ -53,7 +52,8 @@ public class SplashActivity extends Activity {
     private Context mContext;
     private Activity mActivity;
 
-    private Boolean usuarioLogado = false;
+    private InterstitialAd interstitialAd;
+    private Boolean ampireSuccess = false;
 
     // Splash screen timer
     private static int SPLASH_TIME_OUT = 3000;
@@ -71,14 +71,69 @@ public class SplashActivity extends Activity {
         mContext = getApplicationContext();
         mActivity = SplashActivity.this;
 
+        final CacheData cacheData = new CacheData(mContext);
+        InterstitialAdCallback interstitialAdListener = new InterstitialAdCallback() {
+            @Override
+            public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                System.out.println("onAdLoaded");
+                ampireSuccess =  true;
+                ClientConfiguration clientConfiguration = new ClientConfiguration();
+                CognitoUserPool userPool = new CognitoUserPool(mContext, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+                userPool.getCurrentUser().getSession(authenticationHandler);
+            }
+
+            @Override
+            public void onAdFailed(@NonNull InterstitialAd interstitialAd, ResponseStatus responseStatus) {
+                System.out.println("onAdFailed: " + responseStatus.name());
+                ampireSuccess = false;
+                ClientConfiguration clientConfiguration = new ClientConfiguration();
+                CognitoUserPool userPool = new CognitoUserPool(mContext, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+                userPool.getCurrentUser().getSession(authenticationHandler);
+            }
+
+            @Override
+            public void onAdOpened(@NonNull InterstitialAd interstitialAd) {
+
+            }
+
+            @Override
+            public void onAdClicked(@NonNull InterstitialAd interstitialAd) {
+                if (cacheData.getString("idRadio").equals("")){
+                    Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                    intent.putExtra("canais", (Serializable) canais);
+                    startActivity(intent);
+                    finish();
+                }else {
+                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    intent.putExtra("canais", (Serializable) canais);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onAdClosed(@NonNull InterstitialAd interstitialAd) {
+                if (cacheData.getString("idRadio").equals("")){
+                    Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                    intent.putExtra("canais", (Serializable) canais);
+                    startActivity(intent);
+                    finish();
+                }else {
+                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                    intent.putExtra("canais", (Serializable) canais);
+                    startActivity(intent);
+                    finish();
+                }
+            }
+        };
+        interstitialAd = InterstitialAdPool.load( SplashActivity.this, "b43b17fe-2e32-45a5-93fe-8d1086a5611b", interstitialAdListener);
+
         CognitoClientManager.init(mActivity);
         CognitoSyncClientManager.init(this);
 
         splash = (ImageView) findViewById(R.id.splash);
 
-        ClientConfiguration clientConfiguration = new ClientConfiguration();
-        CognitoUserPool userPool = new CognitoUserPool(mContext, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
-        userPool.getCurrentUser().getSession(authenticationHandler);
+
     }
 
     // CONVERSOR RGB PARA HEXADECIMAL
@@ -220,17 +275,22 @@ public class SplashActivity extends Activity {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (cacheData.getString("idRadio").equals("")){
-                                Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
-                                intent.putExtra("canais", (Serializable) canais);
-                                startActivity(intent);
-                                finish();
+                            if (ampireSuccess){
+                                interstitialAd.showAd();
                             }else {
-                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                intent.putExtra("canais", (Serializable) canais);
-                                startActivity(intent);
-                                finish();
+                                if (cacheData.getString("idRadio").equals("")){
+                                    Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                    intent.putExtra("canais", (Serializable) canais);
+                                    startActivity(intent);
+                                    finish();
+                                }else {
+                                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                    intent.putExtra("canais", (Serializable) canais);
+                                    startActivity(intent);
+                                    finish();
+                                }
                             }
+
                         }
                     }, SPLASH_TIME_OUT);
                 }
@@ -317,16 +377,20 @@ public class SplashActivity extends Activity {
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
-                            if (cacheData.getString("idRadio").equals("")){
-                                Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
-                                intent.putExtra("canais", (Serializable) canais);
-                                startActivity(intent);
-                                finish();
+                            if (ampireSuccess){
+                                interstitialAd.showAd();
                             }else {
-                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                intent.putExtra("canais", (Serializable) canais);
-                                startActivity(intent);
-                                finish();
+                                if (cacheData.getString("idRadio").equals("")){
+                                    Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                    intent.putExtra("canais", (Serializable) canais);
+                                    startActivity(intent);
+                                    finish();
+                                }else {
+                                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                    intent.putExtra("canais", (Serializable) canais);
+                                    startActivity(intent);
+                                    finish();
+                                }
                             }
 
                         }
