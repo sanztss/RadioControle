@@ -44,7 +44,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:hint="Nome"/>
+                android:hint="Nome"
+                android:imeOptions="actionDone"/>
         </android.support.design.widget.TextInputLayout>
 
         <!--<android.support.design.widget.TextInputLayout
@@ -57,14 +58,16 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="16"
-                android:hint="E-mail"/>
+                android:hint="E-mail"
+                android:inputType="textEmailAddress"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="5dp">
+            android:layout_marginTop="5dp"
+            app:passwordToggleEnabled="true">
             <EditText
                 android:id="@+id/inputSenha"
                 android:layout_width="match_parent"

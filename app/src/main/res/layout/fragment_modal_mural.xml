@@ -135,7 +135,7 @@
                     android:layout_height="wrap_content"
                     android:elevation="4dp"
                     android:layout_centerHorizontal="true"
-                    android:src="@drawable/ic_microphone_white"
+                    app:srcCompat="@drawable/ic_microphone_white"
                     app:backgroundTint="#e8070d"
                     app:useCompatPadding="true"/>
 

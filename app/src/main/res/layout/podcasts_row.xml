@@ -2,6 +2,7 @@
 <android.support.v7.widget.CardView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/card_view"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -57,7 +58,7 @@
                 android:background="@null"
                 android:padding="0dp"
                 android:scaleType="fitXY"
-                android:src="@drawable/ic_play_white" />
+                app:srcCompat="@drawable/ic_play_white" />
 
             <ProgressBar
                 android:id="@+id/loadingIcon"

@@ -15,12 +15,15 @@ import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.ProgramacaoAdapter;
 import accessweb.com.br.radiocontrole.model.Host;
+import accessweb.com.br.radiocontrole.model.Pais;
 import accessweb.com.br.radiocontrole.model.Program;
 import accessweb.com.br.radiocontrole.model.Programa;
 import accessweb.com.br.radiocontrole.model.Programs;
@@ -351,6 +354,14 @@ public class ProgramacaoDiaFragment extends Fragment{
                 default:
                     break;
             }
+        }
+        if (data.size() > 0) {
+            Collections.sort(data, new Comparator<Programa>() {
+                @Override
+                public int compare(final Programa object1, final Programa object2) {
+                    return object1.getDataPrograma().compareTo(object2.getDataPrograma());
+                }
+            });
         }
         return data;
     }

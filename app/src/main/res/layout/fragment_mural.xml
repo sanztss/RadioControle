@@ -27,7 +27,7 @@
         android:elevation="4dp"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
-        android:src="@drawable/ic_comment_plus_outline_white"
+        app:srcCompat="@drawable/ic_comment_plus_outline_white"
         app:backgroundTint="@color/colorPrimary"
         app:useCompatPadding="true"/>
 

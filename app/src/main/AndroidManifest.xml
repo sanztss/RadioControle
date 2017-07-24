@@ -21,7 +21,8 @@
         android:screenOrientation="portrait"
         android:supportsRtl="true"
         android:theme="@style/MyMaterialTheme"
-        tools:node="replace">
+        tools:node="replace"
+        android:name="android.support.multidex.MultiDexApplication">
 
         <!-- SplashActivity -->
         <activity
