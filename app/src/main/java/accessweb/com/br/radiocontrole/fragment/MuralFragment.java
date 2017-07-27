@@ -218,7 +218,8 @@ public class MuralFragment extends Fragment {
                 };
                 StreamAdRecyclerAdapter adAdapter = new StreamAdRecyclerAdapter.Builder()
                         .setAdapter(adapter)
-                        .setAdUnitId("2f3caac7-7573-4e6b-bf1a-d8b58b06e9d9")
+                        //.setAdUnitId("2f3caac7-7573-4e6b-bf1a-d8b58b06e9d9")
+                        .setAdUnitId("e5cc8e6d-d674-402a-aeca-eda7856bd7af")
                         .setViewBuilder(FeedNativeAdView.BUILDER)
                         .setEventCallback(streamNativeAdListener)
                         .build(getContext());

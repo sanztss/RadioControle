@@ -24,10 +24,13 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.Chal
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.MultiFactorAuthenticationContinuation;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
+import com.ampiri.sdk.Ampiri;
 import com.ampiri.sdk.interstitial.InterstitialAd;
 import com.ampiri.sdk.interstitial.InterstitialAdPool;
 import com.ampiri.sdk.listeners.InterstitialAdCallback;
 import com.ampiri.sdk.mediation.ResponseStatus;
+import com.ampiri.sdk.mediation.admob.AdMobMediation;
+import com.avocarrot.sdk.Avocarrot;
 import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
@@ -130,7 +133,13 @@ public class SplashActivity extends Activity {
                 }
             }
         };
-        interstitialAd = InterstitialAdPool.load( SplashActivity.this, "b43b17fe-2e32-45a5-93fe-8d1086a5611b", interstitialAdListener);
+        //interstitialAd = InterstitialAdPool.load( SplashActivity.this, "b43b17fe-2e32-45a5-93fe-8d1086a5611b", interstitialAdListener);
+        interstitialAd = InterstitialAdPool.load( SplashActivity.this, "6b34bf0e-04c4-47f9-b4d3-caeddeab0b13", interstitialAdListener);
+
+        Ampiri.addMediationAdapter(new AdMobMediation.Builder()
+                //.addTestDevice("ca-app-pub-4694313893492524~8880658070")
+                .addTestDevice("ca-app-pub-4694313893492524/4709656385")
+                .build());
 
         /*ClientConfiguration clientConfiguration = new ClientConfiguration();
         CognitoUserPool userPool = new CognitoUserPool(mContext, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);

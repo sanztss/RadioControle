@@ -16,16 +16,11 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,15 +30,11 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.amazonaws.ClientConfiguration;
-import com.amazonaws.auth.CognitoCachingCredentialsProvider;
-import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
 import com.amazonaws.mobileconnectors.cognito.Dataset;
 import com.amazonaws.mobileconnectors.cognito.Record;
 import com.amazonaws.mobileconnectors.cognito.SyncConflict;
 import com.amazonaws.mobileconnectors.cognito.exceptions.DataStorageException;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoDevice;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserAttributes;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserDetails;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserSession;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.AuthenticationContinuation;
@@ -55,8 +46,6 @@ import com.amazonaws.mobileconnectors.cognitoidentityprovider.continuations.NewP
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.AuthenticationHandler;
 import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.ForgotPasswordHandler;
 import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
-import com.amazonaws.mobileconnectors.cognitoidentityprovider.handlers.GetDetailsHandler;
-import com.amazonaws.regions.Regions;
 import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -67,27 +56,13 @@ import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.squareup.otto.Subscribe;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
 
-import static accessweb.com.br.radiocontrole.R.drawable.ao;
-import static accessweb.com.br.radiocontrole.R.drawable.ca;
-import static accessweb.com.br.radiocontrole.R.drawable.ge;
-import static accessweb.com.br.radiocontrole.R.drawable.sy;
-import static accessweb.com.br.radiocontrole.R.id.inputNome;
-import static accessweb.com.br.radiocontrole.R.id.textoPublicacao;
-import static android.R.attr.fragment;
-import static android.R.attr.password;
-import static android.R.attr.phoneNumber;
-import static android.R.id.input;
 import static android.app.Activity.RESULT_OK;
 import static com.facebook.FacebookSdk.getApplicationContext;
-import static rx.schedulers.Schedulers.test;
 
 /**
  * Created by Des. Android on 27/06/2017.
@@ -201,11 +176,9 @@ public class EntrarFragment extends Fragment {
             @Override
             public void onSuccess(LoginResult loginResult) {
                 Log.v("Resultado: ", "sucesso!");
-                getUserDetails(loginResult);
-
+                showWaitDialog("Entrando...");
                 CognitoClientManager.addLogins("graph.facebook.com", AccessToken.getCurrentAccessToken().getToken());
-
-                new InsertUserTask().execute();
+                getUserDetails(loginResult);
             }
 
             @Override
@@ -257,6 +230,7 @@ public class EntrarFragment extends Fragment {
             @Override
         public void onSuccess(CognitoUserSession cognitoUserSession, CognitoDevice device) {
             Log.e(TAG, "Auth Success");
+
             CognitoClientManager.addLogins("cognito-idp.us-east-1.amazonaws.com/us-east-1_uEcyGgDBj", cognitoUserSession.getIdToken().getJWTToken());
             //og.i(TAG, "userID = " + CognitoClientManager.getCredentials().getIdentityId());
             new InsertUserTask().execute();
@@ -405,20 +379,79 @@ public class EntrarFragment extends Fragment {
                             profile_pic_data = new JSONObject(resposta.get("picture").toString());
                             profile_pic_url = new JSONObject(profile_pic_data.getString("data"));
                             Log.v("Url foto facebook: ", profile_pic_url.getString("url"));
+                            new AsyncTask<Void, Void, Void>() {
+                                @Override
+                                protected Void doInBackground(Void... params) {
+                                    CognitoClientManager.getCredentials().refresh();
+                                    Log.i(TAG, "userID = " + CognitoClientManager.getCredentials().getIdentityId());
+                                    Dataset profileData = CognitoSyncClientManager.openOrCreateDataset("profileData");
+                                    try {
+                                        profileData.put("name", resposta.get("name").toString());
+                                        profileData.put("email", resposta.get("email").toString());
+                                        profileData.put("phone", "");
+                                        profileData.put("picture", profile_pic_url.getString("url"));
+                                    } catch (JSONException e) {
+                                        e.printStackTrace();
+                                    }
+
+                                    profileData.synchronize(new SyncCallback() {
+
+                                        @Override
+                                        public void onSuccess(Dataset dataset, List<Record> updatedRecords) {
+                                            Log.d(TAG, "Sync success" + dataset);
+                                            System.out.println(dataset.get("name"));
+                                            System.out.println(dataset.get("email"));
+                                            System.out.println(dataset.get("phone"));
+                                            CacheData cacheData = new CacheData(getContext());
+                                            cacheData.putString("userId", dataset.get("email"));
+                                            cacheData.putString("userEmail", dataset.get("email"));
+                                            cacheData.putString("userNome", dataset.get("name"));
+                                            cacheData.putString("userTelefone", dataset.get("phone"));
+                                            cacheData.putString("userUrlFoto", dataset.get("picture"));
+                                            Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
+                                            closeWaitDialog();
+                                            if (prev != null) {
+                                                DialogFragment df = (DialogFragment) prev;
+                                                SuaContaDialogFragment suaContaDialogFragment = (SuaContaDialogFragment) getParentFragment();
+                                                suaContaDialogFragment.abrirTelaDesejada();
+                                                //df.dismiss();
+                                            }
+                                        }
+
+                                        @Override
+                                        public boolean onConflict(Dataset dataset, List<SyncConflict> conflicts) {
+                                            //Log.d(TAG, "Conflict");
+                                            return false;
+                                        }
+
+                                        @Override
+                                        public boolean onDatasetDeleted(Dataset dataset, String datasetName) {
+                                            //Log.d(TAG, "Dataset deleted");
+                                            return false;
+                                        }
+
+                                        @Override
+                                        public boolean onDatasetsMerged(Dataset dataset, List<String> datasetNames) {
+                                            //Log.d(TAG, "Datasets merged");
+                                            return false;
+                                        }
+
+                                        @Override
+                                        public void onFailure(DataStorageException dse) {
+                                            //Log.e(TAG, "Sync fails", dse);
+                                        }
+                                    });
+                                    return null;
+                                }
+
+                                @Override
+                                protected void onPostExecute(Void result) {
+                                    super.onPostExecute(result);
 
 
-                            CacheData cacheData = new CacheData(getContext());
-                            cacheData.putString("userId", resposta.get("id").toString());
-                            cacheData.putString("userEmail", resposta.get("email").toString());
-                            cacheData.putString("userNome", resposta.get("name").toString());
-                            cacheData.putString("userTelefone", "");
-                            cacheData.putString("userUrlFoto", profile_pic_url.getString("url"));
-                            Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
-                            if (prev != null) {
-                                DialogFragment df = (DialogFragment) prev;
-                                ((MainActivity)getActivity()).abrirPerfil();
-                                df.dismiss();
-                            }
+                                }
+                            }.execute();
+
                         } catch(Exception e){
                             e.printStackTrace();
                         }
@@ -510,13 +543,13 @@ public class EntrarFragment extends Fragment {
                         cacheData.putString("userEmail", dataset.get("email"));
                         cacheData.putString("userNome", dataset.get("name"));
                         cacheData.putString("userTelefone", dataset.get("phone"));
-                        cacheData.putString("userUrlFoto", "");
+                        cacheData.putString("userUrlFoto", dataset.get("picture"));
                         Fragment prev = getActivity().getSupportFragmentManager().findFragmentByTag("fragment_dialog");
                         closeWaitDialog();
                         if (prev != null) {
                             DialogFragment df = (DialogFragment) prev;
                             SuaContaDialogFragment suaContaDialogFragment = (SuaContaDialogFragment) getParentFragment();
-                            suaContaDialogFragment.test();
+                            suaContaDialogFragment.abrirTelaDesejada();
                             //df.dismiss();
                         }
                     }

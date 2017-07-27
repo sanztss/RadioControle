@@ -19,6 +19,7 @@ import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
@@ -30,6 +31,8 @@ import accessweb.com.br.radiocontrole.model.Programs;
 import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
+
+import static com.ampiri.sdk.c.b.a.S;
 
 /**
  * Created by Des. Android on 26/06/2017.
@@ -70,6 +73,9 @@ public class ProgramacaoFragment extends Fragment {
         tabLayout.setTabTextColors(Color.parseColor("#8d939b"), Color.parseColor(cacheData.getString("color")));
         tabLayout.setSelectedTabIndicatorColor(Color.parseColor(cacheData.getString("color")));
         tabLayout.setupWithViewPager(viewPager);
+
+
+
 
         return rootView;
     }
@@ -162,6 +168,13 @@ public class ProgramacaoFragment extends Fragment {
                 adapter.addFragment(domingo, "DOM");
 
                 viewPager.setAdapter(adapter);
+
+                Calendar calendar = Calendar.getInstance();
+                calendar.setFirstDayOfWeek(Calendar.MONDAY);
+                int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK) - 2;
+
+                tabLayout.setScrollPosition(dayOfWeek,0f,true);
+                viewPager.setCurrentItem(dayOfWeek);
             }
         }.execute();
 

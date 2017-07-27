@@ -173,6 +173,7 @@ public class CadastroFragment extends Fragment {
             profileData.put("name", inputNome.getText().toString());
             profileData.put("email", inputEmail.getText().toString().toLowerCase());
             profileData.put("phone", inputTelefone.getText().toString().toLowerCase());
+            profileData.put("picture", "");
             profileData.synchronize(new SyncCallback() {
 
                 @Override

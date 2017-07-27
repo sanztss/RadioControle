@@ -81,7 +81,7 @@ public class SuaContaDialogFragment extends DialogFragment {
 
         return rootView;
     }
-    public void test(){
+    public void abrirTelaDesejada(){
         CacheData cacheData = new CacheData(getContext());
         System.out.println("Fechando Tela e indo para tela desejada.");
         if (telaDesejada.equals("mural") && !cacheData.getString("userId").equals("")){

@@ -28,6 +28,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+import com.ampiri.sdk.Ampiri;
 import com.ampiri.sdk.banner.BannerAd;
 import com.ampiri.sdk.banner.BannerAdPool;
 import com.ampiri.sdk.listeners.BannerAdCallback;
@@ -329,7 +330,8 @@ public class HomeFragment extends Fragment {
         };
 
         FrameLayout adView = (FrameLayout) rootView.findViewById(R.id.anuncio);
-        bannerAd = BannerAdPool.load(getActivity(),"3dfbb889-3bcd-4c34-82ae-8fcb539c3b25",  adView, BannerSize.BANNER_SIZE_320x50);
+        //bannerAd = BannerAdPool.load(getActivity(),"3dfbb889-3bcd-4c34-82ae-8fcb539c3b25",  adView, BannerSize.BANNER_SIZE_320x50);
+        bannerAd = BannerAdPool.load(getActivity(),"8160598b-936c-4886-b3a0-12c75b3a145f",  adView, BannerSize.BANNER_SIZE_320x50);
         // Inflate the layout for this fragment
         return rootView;
     }

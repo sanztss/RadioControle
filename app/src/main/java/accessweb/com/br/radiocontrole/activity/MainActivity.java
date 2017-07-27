@@ -7,6 +7,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -26,6 +29,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -58,6 +62,8 @@ import com.facebook.FacebookSdk;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 import java.io.Serializable;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -127,9 +133,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_main);
-
-        Ampiri.setDebugMode(true);
-        Ampiri.setTestMode(true);
 
         mContext = getApplicationContext();
         mActivity = MainActivity.this;
@@ -230,6 +233,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         painel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
 
+        Ampiri.setDebugMode(true);
+        Ampiri.setTestMode(true);
         BannerAdCallback bannerAdListener = new BannerAdCallback() {
             @Override
             public void onAdLoaded(@NonNull BannerAd ad) {
@@ -257,7 +262,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
         };
         FrameLayout adView = (FrameLayout) findViewById(R.id.ad_view);
-        bannerAd = BannerAdPool.load(this, "264b7779-e1c7-4a85-9ffa-55e0ef532cee", adView, BannerSize.BANNER_SIZE_320x50, bannerAdListener);
+        //bannerAd = BannerAdPool.load(this, "264b7779-e1c7-4a85-9ffa-55e0ef532cee", adView, BannerSize.BANNER_SIZE_320x50, bannerAdListener);
+        bannerAd = BannerAdPool.load(this, "34e3be38-adb1-493b-8eec-5c20a60d0f56", adView, BannerSize.BANNER_SIZE_320x50, bannerAdListener);
     }
 
     private void initCognito() {
@@ -268,6 +274,18 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     protected void onResume() {
         super.onResume();
         bannerAd.onActivityResumed();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        bannerAd.onActivityPaused();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        bannerAd.onActivityDestroyed();
     }
 
     @Override
@@ -334,11 +352,11 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
                 if(item.getItemId() == R.id.action_canais){
                     final EscolherDialogFragment dialogListCanais = new EscolherDialogFragment("Selecione o canal desejado:", "canais", canais);
-                    dialogListCanais.show(getSupportFragmentManager(), "test");
+                    dialogListCanais.show(getSupportFragmentManager(), "abrirTelaDesejada");
 
                 }else if (item.getItemId() == R.id.action_dormir){
                     final EscolherDialogFragment dialogListDormir = new EscolherDialogFragment("Selecione o tempo para desligar automaticamente:", "dormir", null);
-                    dialogListDormir.show(getSupportFragmentManager(), "test");
+                    dialogListDormir.show(getSupportFragmentManager(), "abrirTelaDesejada");
                 }
 
                 return false;
@@ -419,7 +437,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 public void onShow(DialogInterface dialog) {
                     // TODO Auto-generated method stub
                     ListView listView = alertDialog.getListView();
-                    //Log.i("test");
+                    //Log.i("abrirTelaDesejada");
                     *//*listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
 
                         @Override
@@ -715,12 +733,6 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private void stop() {
         if (myMediaPlayer != null)
             myMediaPlayer.stop();
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        //stop();
     }
 
     public void onCompletion(MediaPlayer mp) {
