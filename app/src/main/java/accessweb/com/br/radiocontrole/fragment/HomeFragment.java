@@ -1,19 +1,31 @@
 package accessweb.com.br.radiocontrole.fragment;
 
 
+import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
+import android.content.ComponentName;
+import android.content.ContentProviderOperation;
+import android.content.ContentProviderResult;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.telephony.PhoneNumberUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +47,7 @@ import com.ampiri.sdk.listeners.BannerAdCallback;
 import com.ampiri.sdk.mediation.BannerSize;
 import com.ampiri.sdk.mediation.ResponseStatus;
 import com.squareup.picasso.Picasso;
+import android.provider.ContactsContract.Data;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,6 +60,9 @@ import accessweb.com.br.radiocontrole.model.Social;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 import accessweb.com.br.radiocontrole.util.CacheData;
+
+import static android.R.id.message;
+import static com.ampiri.sdk.c.b.a.P;
 
 public class HomeFragment extends Fragment {
 
@@ -63,6 +79,8 @@ public class HomeFragment extends Fragment {
     List<Integer> contatoIconIds = new ArrayList<Integer>();
     List<String> contatoLinks = new ArrayList<String>();
     List<String> contatoTipo = new ArrayList<String>();
+
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
 
     private BannerAd bannerAd;
 
@@ -247,7 +265,10 @@ public class HomeFragment extends Fragment {
                                 final String numeroWhatsapp = contatoLinks.get(position).replaceAll("[^\\d.]", "");
 
                                 Log.e("whats", "" + numeroWhatsapp);
-                                try {
+                                checkAndRequestPermissions(numeroWhatsapp);
+
+
+                                /*try {
                                     Intent intentWhatsapp = new Intent("android.intent.action.MAIN");
                                     //intentWhatsapp.setComponent(new ComponentName("com.whatsapp","com.whatsapp.Conversation"));
                                     intentWhatsapp.setAction(Intent.ACTION_SEND);
@@ -274,7 +295,7 @@ public class HomeFragment extends Fragment {
 
                                     Button btnPositiveWhatsapp = dialogWhatsapp.getButton(DialogInterface.BUTTON_NEUTRAL);
                                     btnPositiveWhatsapp.setTextColor(Color.parseColor(cacheData.getString("color")));
-                                }
+                                }*/
 
                                 break;
                             case "site":
@@ -359,5 +380,148 @@ public class HomeFragment extends Fragment {
             btnHomePlayPause.setImageResource(R.drawable.ic_stop_white);
         }
 
+    }
+
+    public boolean contactExists(Context context, String number) {
+        Uri lookupUri = Uri.withAppendedPath(
+                ContactsContract.PhoneLookup.CONTENT_FILTER_URI,
+                Uri.encode(number));
+        String[] mPhoneNumberProjection = { ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.NUMBER, ContactsContract.PhoneLookup.DISPLAY_NAME };
+        Cursor cur = context.getContentResolver().query(lookupUri,mPhoneNumberProjection, null, null, null);
+        try {
+            if (cur.moveToFirst()) {
+                return true;
+            }
+        }
+        finally {
+            if (cur != null)
+                cur.close();
+        }
+        return false;
+    }
+
+    private void addContact(String number) {
+        CacheData cacheData = new CacheData(getContext());
+        if (contactExists(getContext(), number)){
+            System.out.println("Contato existe!");
+            try {
+                Intent sendIntent = new Intent("android.intent.action.MAIN");
+                sendIntent.putExtra(Intent.EXTRA_TEXT, " ");
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.setPackage("com.whatsapp");
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+            } catch (ActivityNotFoundException e) {
+                e.printStackTrace();
+
+                AlertDialog.Builder customBuilderWhatstapp  = new AlertDialog.Builder(getActivity());
+                customBuilderWhatstapp .setTitle("Whatsapp");
+                customBuilderWhatstapp .setMessage("Você não possui o aplicativo instalado em seu dispositivo.");
+                customBuilderWhatstapp .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                });
+
+                AlertDialog dialogWhatsapp = customBuilderWhatstapp.create();
+
+                dialogWhatsapp.show();
+
+                Button btnPositiveWhatsapp = dialogWhatsapp.getButton(DialogInterface.BUTTON_NEUTRAL);
+                btnPositiveWhatsapp.setTextColor(Color.parseColor(cacheData.getString("color")));
+            }
+        }else {
+            System.out.println("Contato ainda não existe!");
+            ArrayList<ContentProviderOperation> operationList = new ArrayList<ContentProviderOperation>();
+            operationList.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME, null)
+                    .build());
+
+            // first and last names
+            operationList.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                    .withValueBackReference(Data.RAW_CONTACT_ID, 0)
+                    .withValue(Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, cacheData.getString("nomeRadio"))
+                    .withValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, "- Rádio")
+                    .build());
+
+            operationList.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
+                    .withValueBackReference(Data.RAW_CONTACT_ID, 0)
+                    .withValue(Data.MIMETYPE,ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, number)
+                    .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                    .build());
+
+            try{
+                ContentProviderResult[] results = getActivity().getContentResolver().applyBatch(ContactsContract.AUTHORITY, operationList);
+                System.out.println(results.toString());
+                try {
+                    Intent sendIntent = new Intent("android.intent.action.MAIN");
+                    sendIntent.putExtra(Intent.EXTRA_TEXT, " ");
+                    sendIntent.setAction(Intent.ACTION_SEND);
+                    sendIntent.setPackage("com.whatsapp");
+                    sendIntent.setType("text/plain");
+                    startActivity(sendIntent);
+                } catch (ActivityNotFoundException e) {
+                    e.printStackTrace();
+
+                    AlertDialog.Builder customBuilderWhatstapp  = new AlertDialog.Builder(getActivity());
+                    customBuilderWhatstapp .setTitle("Whatsapp");
+                    customBuilderWhatstapp .setMessage("Você não possui o aplicativo instalado em seu dispositivo.");
+                    customBuilderWhatstapp .setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    });
+
+                    AlertDialog dialogWhatsapp = customBuilderWhatstapp.create();
+
+                    dialogWhatsapp.show();
+
+                    Button btnPositiveWhatsapp = dialogWhatsapp.getButton(DialogInterface.BUTTON_NEUTRAL);
+                    btnPositiveWhatsapp.setTextColor(Color.parseColor(cacheData.getString("color")));
+                }
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    private  boolean checkAndRequestPermissions(String numero) {
+        int lerContato = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.READ_CONTACTS);
+        int escreverContato = ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.WRITE_CONTACTS);
+        List<String> listPermissionsNeeded = new ArrayList<>();
+
+        if (lerContato != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.READ_CONTACTS);
+        }
+        if (escreverContato != PackageManager.PERMISSION_GRANTED) {
+            listPermissionsNeeded.add(Manifest.permission.WRITE_CONTACTS);
+        }
+        if (!listPermissionsNeeded.isEmpty()) {
+            ActivityCompat.requestPermissions(getActivity(),listPermissionsNeeded.toArray(new String[listPermissionsNeeded.size()]),REQUEST_ID_MULTIPLE_PERMISSIONS);
+            return false;
+        }else {
+            addContact(numero);
+        }
+        return true;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+        System.out.println("AAAAAAAAAA" + requestCode);
+        switch (requestCode) {
+            case REQUEST_ID_MULTIPLE_PERMISSIONS:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Snackbar.make(getView(),"Permição Garantida, Clique novamente no ícone do Whatsapp.",Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(getView(),"Permição Negada, Para conversar via Whatsapp precisamos de sua permissão.",Snackbar.LENGTH_LONG).show();
+                }
+                break;
+        }
     }
 }

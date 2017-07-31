@@ -319,6 +319,19 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 new ActivityResultEvent(requestCode, resultCode, data));
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        System.out.println("BBBBBBB" + requestCode);
+        List<Fragment> fragments = getSupportFragmentManager().getFragments();
+        if (fragments != null) {
+            for (Fragment fragment : fragments) {
+                fragment.onRequestPermissionsResult(requestCode, permissions, grantResults);
+            }
+        }
+    }
+
 
     ////////////////////////////
     ///     Menu Toolbar     ///

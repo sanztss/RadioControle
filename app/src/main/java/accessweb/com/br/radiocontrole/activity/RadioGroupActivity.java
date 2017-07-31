@@ -75,6 +75,7 @@ public class RadioGroupActivity extends Activity {
                     System.out.println(itemPosition);
                     //CacheData cacheData = new CacheData(getApplicationContext());
                     cacheData.putString("idRadio", radios.get(itemPosition).getIdRadio());
+                    cacheData.putString("nomeRadio", radios.get(itemPosition).getNomeRadio());
                     Intent intent = new Intent(RadioGroupActivity.this, MainActivity.class);
                     intent.putExtra("canais", (Serializable) canais);
                     startActivity(intent);
