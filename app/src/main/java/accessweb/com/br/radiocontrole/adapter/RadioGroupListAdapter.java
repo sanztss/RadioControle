@@ -14,19 +14,19 @@ import java.util.Collections;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
-import accessweb.com.br.radiocontrole.model.Radio;
+import accessweb.com.br.radiocontrole.model.RadioApp;
 
 /**
  * Created by Des. Android on 19/07/2017.
  */
 
 public class RadioGroupListAdapter extends RecyclerView.Adapter<RadioGroupListAdapter.MyViewHolder> {
-    List<Radio> data = Collections.emptyList();
+    List<RadioApp> data = Collections.emptyList();
     private LayoutInflater inflater;
     private Context context;
 
 
-    public RadioGroupListAdapter(Context context, List<Radio> data) {
+    public RadioGroupListAdapter(Context context, List<RadioApp> data) {
         this.context = context;
         inflater = LayoutInflater.from(context);
         this.data = data;
@@ -46,7 +46,7 @@ public class RadioGroupListAdapter extends RecyclerView.Adapter<RadioGroupListAd
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-        Radio current = data.get(position);
+        RadioApp current = data.get(position);
 
         Picasso.with(context)
                 .load(current.getUrlImagemRadio())
@@ -68,7 +68,7 @@ public class RadioGroupListAdapter extends RecyclerView.Adapter<RadioGroupListAd
         }
     }
 
-    public void addAll(List<Radio> list) {
+    public void addAll(List<RadioApp> list) {
         this.data.addAll(list);
         notifyDataSetChanged();
     }

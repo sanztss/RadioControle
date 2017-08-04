@@ -1,7 +1,7 @@
 package accessweb.com.br.radiocontrole.fragment;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -10,16 +10,29 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.io.Serializable;
+import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.PromocoesAdapter;
-import accessweb.com.br.radiocontrole.dialog.PromocaoDialogFragment;
 import accessweb.com.br.radiocontrole.model.Premio;
 import accessweb.com.br.radiocontrole.model.Promocao;
-import accessweb.com.br.radiocontrole.util.RecyclerItemClickListener;
+import accessweb.com.br.radiocontrole.model.Promotion;
+import accessweb.com.br.radiocontrole.model.PromotionPrizesItem;
+import accessweb.com.br.radiocontrole.model.Promotions;
+import accessweb.com.br.radiocontrole.util.CacheData;
+import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
+
+import static android.R.attr.format;
+import static com.ampiri.sdk.c.b.a.D;
 
 /**
  * Created by Des. Android on 29/06/2017.
@@ -46,6 +59,10 @@ public class PromocoesStatusFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        final CacheData cacheData = new CacheData(getContext());
+
+
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_promocoes_status, container, false);
 
@@ -53,9 +70,108 @@ public class PromocoesStatusFragment extends Fragment{
         status = (String) args.get("status");
 
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);
-        adapter = new PromocoesAdapter(getContext(), getData());
-        recyclerView.setAdapter(adapter);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        data = new ArrayList<>();
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                ApiClientFactory factory = new ApiClientFactory();
+                factory.credentialsProvider(CognitoClientManager.getCredentials());
+                factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
+                final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
+                Promotions promotions = client.radioIdPromotionsGet(cacheData.getString("idRadio"));
+
+                DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+                String stringToday = dateFormat.format(new Date());
+
+                Date dateToday = null;
+
+                for (Promotion promotion : promotions){
+
+                    switch (status){
+                        case "vigentes":
+                            Date dateVigente = null;
+                            try {
+                                dateVigente = dateFormat.parse(promotion.getEndingDate());
+                                dateToday = dateFormat.parse(stringToday);
+
+                                if (dateToday.before(dateVigente) || dateToday.equals(dateVigente)){
+                                    Promocao promocao = new Promocao();
+                                    List<Premio> listaPremioVigentes = new ArrayList<>();
+                                    promocao.setVigente(true);
+                                    promocao.setTituloPromocao(promotion.getName());
+                                    promocao.setImagemPromocao(promotion.getImage());
+                                    promocao.setDataEncerramentoPromocao(promotion.getEndingDate());
+                                    promocao.setDataSorteioPromocao(promotion.getDrawDate());
+                                    promocao.setLinkRegulamentoPromocao(promotion.getLinkRegulation());
+                                    promocao.setLinkVideoPromocao(promotion.getLinkYoutube());
+                                   /* if (i%2 == 0){
+                                        promocao.setParticipando(true);
+                                    }else {
+                                        promocao.setParticipando(false);
+                                    }*/
+                                    for (PromotionPrizesItem prize : promotion.getPrizes()){
+                                        Premio premioVigentes = new Premio();
+                                        premioVigentes.setImagemPremio(prize.getPrizeImage());
+                                        premioVigentes.setTituloPremio(prize.getPrizeName());
+                                        listaPremioVigentes.add(premioVigentes);
+                                    }
+
+                                    promocao.setPremio(listaPremioVigentes);
+                                    data.add(promocao);
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            break;
+                        case "encerradas":
+                            Date dateEncerrada = null;
+                            try {
+                                dateEncerrada = dateFormat.parse(promotion.getEndingDate());
+                                dateToday = dateFormat.parse(stringToday);
+
+                                if (dateToday.after(dateEncerrada)){
+                                    Promocao promocao = new Promocao();
+                                    List<Premio> listaPremioEncerradas = new ArrayList<>();
+                                    promocao.setVigente(false);
+                                    promocao.setTituloPromocao(promotion.getName());
+                                    promocao.setImagemPromocao(promotion.getImage());
+                                    promocao.setDataEncerramentoPromocao(promotion.getEndingDate());
+                                    promocao.setDataSorteioPromocao(promotion.getDrawDate());
+                                    promocao.setLinkRegulamentoPromocao(promotion.getLinkRegulation());
+                                    promocao.setLinkVideoPromocao(promotion.getLinkYoutube());
+                                    promocao.setParticipando(false);
+                                    for (PromotionPrizesItem prize : promotion.getPrizes()){
+                                        Premio premioEncerradas = new Premio();
+                                        premioEncerradas.setImagemPremio(prize.getPrizeImage());
+                                        premioEncerradas.setTituloPremio(prize.getPrizeName());
+                                        listaPremioEncerradas.add(premioEncerradas);
+                                    }
+                                    promocao.setPremio(listaPremioEncerradas);
+                                    data.add(promocao);
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+
+                adapter = new PromocoesAdapter(getContext(), data);
+                recyclerView.setAdapter(adapter);
+                recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+            }
+        }.execute();
+
 
         return rootView;
     }

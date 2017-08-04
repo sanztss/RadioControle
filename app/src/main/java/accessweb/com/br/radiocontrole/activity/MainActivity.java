@@ -81,6 +81,7 @@ import accessweb.com.br.radiocontrole.fragment.PodcastsFragment;
 import accessweb.com.br.radiocontrole.fragment.ProgramacaoFragment;
 import accessweb.com.br.radiocontrole.fragment.PromocoesFragment;
 import accessweb.com.br.radiocontrole.model.Channel;
+import accessweb.com.br.radiocontrole.model.Radio;
 import accessweb.com.br.radiocontrole.util.ActivityResultBus;
 import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
@@ -115,6 +116,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private List<Channel> canais = new ArrayList<Channel>();
     private int indexCanal = 0;
 
+    private List<Radio> radios = new ArrayList<Radio>();
+
     private ConnectivityManager connManager;
     private NetworkInfo mWifi;
     private NetworkInfo mMobile;
@@ -146,6 +149,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         // RECUPERANDO LISTA DE CANAIS DA SPLASH ACTIVITY
         Bundle extras = getIntent().getExtras();
         canais = (List<Channel>) extras.getSerializable("canais");
+        radios = (List<Radio>) extras.getSerializable("radios");
 
         // INICIANDO COGNITO
         initCognito();
@@ -558,6 +562,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             case "estacoes":
                 Intent intent = new Intent(MainActivity.this, RadioGroupActivity.class);
                 intent.putExtra("canais", (Serializable) canais);
+                intent.putExtra("radios", (Serializable) radios);
                 cacheData.putString("idRadio", "");
                 startActivity(intent);
                 finish();

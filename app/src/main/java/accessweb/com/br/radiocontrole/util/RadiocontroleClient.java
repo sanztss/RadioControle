@@ -17,7 +17,7 @@ package accessweb.com.br.radiocontrole.util;
 
 import java.util.*;
 
-import accessweb.com.br.radiocontrole.model.Empty;
+import accessweb.com.br.radiocontrole.model.Group;
 import accessweb.com.br.radiocontrole.model.Error;
 import accessweb.com.br.radiocontrole.model.Settings;
 import accessweb.com.br.radiocontrole.model.Hosts;
@@ -26,7 +26,9 @@ import accessweb.com.br.radiocontrole.model.Posts;
 import accessweb.com.br.radiocontrole.model.Post;
 import accessweb.com.br.radiocontrole.model.Comments;
 import accessweb.com.br.radiocontrole.model.Comment;
+import accessweb.com.br.radiocontrole.model.Empty;
 import accessweb.com.br.radiocontrole.model.Programs;
+import accessweb.com.br.radiocontrole.model.Promotions;
 
 
 @com.amazonaws.mobileconnectors.apigateway.annotation.Service(endpoint = "https://wt0vuyzu4c.execute-api.us-east-1.amazonaws.com/alpha")
@@ -39,121 +41,131 @@ public interface RadiocontroleClient {
      * @return ApiResponse
      */
     com.amazonaws.mobileconnectors.apigateway.ApiResponse execute(com.amazonaws.mobileconnectors.apigateway.ApiRequest request);
-    
+
     /**
-     * 
-     * 
-     * @param group 
-     * @return Empty
+     *
+     *
+     * @param radioGroupId
+     * @return Group
      */
-    @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/radiogroup", method = "GET")
-    Empty radiogroupGet(
-            @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "group", location = "query")
-            String group);
-    
+    @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/radiogroup/{radioGroupId}", method = "GET")
+    Group radiogroupRadioGroupIdGet(
+            @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioGroupId", location = "path")
+                    String radioGroupId);
+
     /**
-     * 
-     * 
-     * @param radioId 
+     *
+     *
+     * @param radioId
      * @return Settings
      */
     @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}", method = "GET")
     Settings radioIdGet(
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
-            String radioId);
-    
+                    String radioId);
+
     /**
-     * 
-     * 
-     * @param radioId 
+     *
+     *
+     * @param radioId
      * @return Hosts
      */
     @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/hosts", method = "GET")
     Hosts radioIdHostsGet(
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
-            String radioId);
-    
+                    String radioId);
+
     /**
-     * 
-     * 
-     * @param radioId 
+     *
+     *
+     * @param radioId
      * @return Podcasts
      */
     @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/podcasts", method = "GET")
     Podcasts radioIdPodcastsGet(
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
-            String radioId);
-    
+                    String radioId);
+
     /**
-     * 
-     * 
-     * @param radioId 
-     * @param lastKey 
+     *
+     *
+     * @param radioId
+     * @param lastKey
      * @return Posts
      */
     @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/posts", method = "GET")
     Posts radioIdPostsGet(
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
-            String radioId,
+                    String radioId,
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "lastKey", location = "query")
-            String lastKey);
-    
+                    String lastKey);
+
     /**
-     * 
-     * 
-     * @param radioId 
-     * @param body 
+     *
+     *
+     * @param radioId
+     * @param body
      * @return Post
      */
     @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/posts", method = "POST")
     Post radioIdPostsPost(
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
-            String radioId,
+                    String radioId,
             Post body);
-    
+
     /**
-     * 
-     * 
-     * @param postId 
-     * @param radioId 
-     * @param lastKey 
+     *
+     *
+     * @param postId
+     * @param radioId
+     * @param lastKey
      * @return Comments
      */
     @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/posts/{postId}/comments", method = "GET")
     Comments radioIdPostsPostIdCommentsGet(
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "postId", location = "path")
-            String postId,
+                    String postId,
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
-            String radioId,
+                    String radioId,
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "lastKey", location = "query")
-            String lastKey);
-    
+                    String lastKey);
+
     /**
-     * 
-     * 
-     * @param postId 
-     * @param radioId 
-     * @param body 
+     *
+     *
+     * @param postId
+     * @param radioId
+     * @param body
      * @return Empty
      */
     @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/posts/{postId}/comments", method = "POST")
     Empty radioIdPostsPostIdCommentsPost(
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "postId", location = "path")
-            String postId,
+                    String postId,
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
-            String radioId,
+                    String radioId,
             Comment body);
-    
+
     /**
-     * 
-     * 
-     * @param radioId 
+     *
+     *
+     * @param radioId
      * @return Programs
      */
     @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/programs", method = "GET")
     Programs radioIdProgramsGet(
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
-            String radioId);
-    
+                    String radioId);
+
+    /**
+     *
+     *
+     * @param radioId
+     * @return Promotions
+     */
+    @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/promotions", method = "GET")
+    Promotions radioIdPromotionsGet(
+            @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
+                    String radioId);
 }
 

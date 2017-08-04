@@ -405,12 +405,18 @@ public class HomeFragment extends Fragment {
         if (contactExists(getContext(), number)){
             System.out.println("Contato existe!");
             try {
-                Intent sendIntent = new Intent("android.intent.action.MAIN");
+                /*Intent sendIntent = new Intent("android.intent.action.MAIN");
                 sendIntent.putExtra(Intent.EXTRA_TEXT, " ");
                 sendIntent.setAction(Intent.ACTION_SEND);
                 sendIntent.setPackage("com.whatsapp");
                 sendIntent.setType("text/plain");
-                startActivity(sendIntent);
+                startActivity(sendIntent);*/
+
+                Uri mUri = Uri.parse("smsto:" + number);
+                Intent mIntent = new Intent(Intent.ACTION_SENDTO, mUri);
+                mIntent.setPackage("com.whatsapp");
+                mIntent.putExtra("chat",true);
+                startActivity(Intent.createChooser(mIntent, "Conversar via:"));
             } catch (ActivityNotFoundException e) {
                 e.printStackTrace();
 
@@ -458,12 +464,17 @@ public class HomeFragment extends Fragment {
                 ContentProviderResult[] results = getActivity().getContentResolver().applyBatch(ContactsContract.AUTHORITY, operationList);
                 System.out.println(results.toString());
                 try {
-                    Intent sendIntent = new Intent("android.intent.action.MAIN");
+                    /*Intent sendIntent = new Intent("android.intent.action.MAIN");
                     sendIntent.putExtra(Intent.EXTRA_TEXT, " ");
                     sendIntent.setAction(Intent.ACTION_SEND);
                     sendIntent.setPackage("com.whatsapp");
                     sendIntent.setType("text/plain");
-                    startActivity(sendIntent);
+                    startActivity(sendIntent);*/
+                    Uri mUri = Uri.parse("smsto:" + number);
+                    Intent mIntent = new Intent(Intent.ACTION_SENDTO, mUri);
+                    mIntent.setPackage("com.whatsapp");
+                    mIntent.putExtra("chat",true);
+                    startActivity(Intent.createChooser(mIntent, "Share with"));
                 } catch (ActivityNotFoundException e) {
                     e.printStackTrace();
 

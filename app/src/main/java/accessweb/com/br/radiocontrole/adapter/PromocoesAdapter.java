@@ -19,8 +19,13 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.dialog.PromocaoDialogFragment;
@@ -60,13 +65,22 @@ public class PromocoesAdapter extends RecyclerView.Adapter<PromocoesAdapter.MyVi
                 .error(R.drawable.picture)
                 .into(holder.imagemPromocao);
         holder.tituloPromocao.setText(current.getTituloPromocao());
+        String string = "04/08/2017";
+        /*DateFormat format = new SimpleDateFormat("dd/MM/yyy", Locale.ENGLISH);
+        Date date = null;
+        try {
+            date = format.parse(string);
+            System.out.println(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }*/
         holder.dataEncerramentoPromocao.setText(current.getDataEncerramentoPromocao());
         holder.dataSorteioPromocao.setText(current.getDataSorteioPromocao());
-        if (current.getParticipando()){
+        /*if (current.getParticipando()){
             holder.participando.setVisibility(View.VISIBLE);
         }else {
             holder.participando.setVisibility(View.GONE);
-        }
+        }*/
 
         holder.btnCompartilhar.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {

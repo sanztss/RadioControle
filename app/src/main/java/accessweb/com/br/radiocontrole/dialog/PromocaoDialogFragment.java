@@ -50,14 +50,15 @@ public class PromocaoDialogFragment extends DialogFragment {
 
     private ImageView imagemPromocao;
     private ImageButton btnCompartilhar;
-    private ImageButton btnAudioPromocao;
     private ImageButton btnVideoPromocao;
     private TextView tituloPromocao;
     private TextView dataEncerramentoPromocao;
     private TextView dataSorteioPromocao;
     private TextView participando;
     private Button btnRegulamento;
+    private View spacerButton;
     private Button btnParticipar;
+    private TextView txtPremios;
     private RecyclerView recyclerView;
     private PremiosAdapter adapter;
 
@@ -102,7 +103,6 @@ public class PromocaoDialogFragment extends DialogFragment {
 
         imagemPromocao = (ImageView) rootView.findViewById(R.id.imagemPromocao);
         btnCompartilhar = (ImageButton) rootView.findViewById(R.id.btnCompartilhar);
-        btnAudioPromocao = (ImageButton) rootView.findViewById(R.id.btnAudioPromocao);
         btnVideoPromocao = (ImageButton) rootView.findViewById(R.id.btnVideoPromocao);
         tituloPromocao = (TextView) rootView.findViewById(R.id.tituloPromocao);
         dataEncerramentoPromocao = (TextView) rootView.findViewById(R.id.dataEncerramentoPromocao);
@@ -110,6 +110,8 @@ public class PromocaoDialogFragment extends DialogFragment {
         participando = (TextView) rootView.findViewById(R.id.participando);
         btnRegulamento = (Button) rootView.findViewById(R.id.btnRegulamento);
         btnParticipar = (Button) rootView.findViewById(R.id.btnParticipar);
+        spacerButton = rootView.findViewById(R.id.spacerButton);
+        txtPremios = (TextView) rootView.findViewById(R.id.txtPremios);
         recyclerView = (RecyclerView) rootView.findViewById(R.id.recyclerView);
 
         Picasso.with(getContext())
@@ -128,11 +130,6 @@ public class PromocaoDialogFragment extends DialogFragment {
                 getContext().startActivity(Intent.createChooser(sendIntent,"Compartilhar no:" ));
             }
         });
-        btnAudioPromocao.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                Log.v("Click", "Botão ouvir áudio.");
-            }
-        });
         btnVideoPromocao.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Botão ver vídeo.");
@@ -141,18 +138,20 @@ public class PromocaoDialogFragment extends DialogFragment {
         tituloPromocao.setText(promocao.get(itemPosicao).getTituloPromocao());
         dataEncerramentoPromocao.setText(promocao.get(itemPosicao).getDataEncerramentoPromocao());
         dataSorteioPromocao.setText(promocao.get(itemPosicao).getDataSorteioPromocao());
-        if (promocao.get(itemPosicao).getParticipando()){
+        /*if (promocao.get(itemPosicao).getParticipando()){
             participando.setVisibility(View.VISIBLE);
             btnParticipar.setVisibility(View.GONE);
         }else {
             participando.setVisibility(View.GONE);
             btnParticipar.setVisibility(View.VISIBLE);
-        }
+        }*/
         if (!promocao.get(itemPosicao).getVigente()){
             btnParticipar.setVisibility(View.GONE);
+            spacerButton.setVisibility(View.GONE);
         }
         Log.e("participando", " " + promocao.get(itemPosicao).getParticipando());
         Log.e("vigente", " " + promocao.get(itemPosicao).getVigente());
+        btnRegulamento.setTextColor(Color.parseColor(cacheData.getString("color")));
         btnRegulamento.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Botão Regulamento.");
@@ -163,6 +162,7 @@ public class PromocaoDialogFragment extends DialogFragment {
                 Log.v("Click", "Botão Participar.");
             }
         });
+        txtPremios.setTextColor(Color.parseColor(cacheData.getString("color")));
         adapter = new PremiosAdapter(getContext(), promocao.get(itemPosicao).getPremio());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

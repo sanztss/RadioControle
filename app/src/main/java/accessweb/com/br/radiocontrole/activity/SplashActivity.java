@@ -39,11 +39,16 @@ import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.model.Channel;
+import accessweb.com.br.radiocontrole.model.Empty;
+import accessweb.com.br.radiocontrole.model.Group;
+import accessweb.com.br.radiocontrole.model.Radio;
 import accessweb.com.br.radiocontrole.model.Settings;
 import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
+
+import static android.R.id.empty;
 import static com.facebook.login.widget.ProfilePictureView.TAG;
 
 /**
@@ -63,6 +68,7 @@ public class SplashActivity extends Activity {
 
     private ArrayList<String> modulos = new ArrayList<String>();
     private List<Channel> canais = new ArrayList<Channel>();
+    private List<Radio> radios = new ArrayList<Radio>();
 
     private ImageView splash;
 
@@ -108,11 +114,13 @@ public class SplashActivity extends Activity {
                 if (cacheData.getString("idRadio").equals("")){
                     Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
                     intent.putExtra("canais", (Serializable) canais);
+                    intent.putExtra("radios", (Serializable) radios);
                     startActivity(intent);
                     finish();
                 }else {
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                     intent.putExtra("canais", (Serializable) canais);
+                    intent.putExtra("radios", (Serializable) radios);
                     startActivity(intent);
                     finish();
                 }
@@ -123,11 +131,13 @@ public class SplashActivity extends Activity {
                 if (cacheData.getString("idRadio").equals("")){
                     Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
                     intent.putExtra("canais", (Serializable) canais);
+                    intent.putExtra("radios", (Serializable) radios);
                     startActivity(intent);
                     finish();
                 }else {
                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                     intent.putExtra("canais", (Serializable) canais);
+                    intent.putExtra("radios", (Serializable) radios);
                     startActivity(intent);
                     finish();
                 }
@@ -221,7 +231,14 @@ public class SplashActivity extends Activity {
                     factory.credentialsProvider(CognitoClientManager.getCredentials());
                     factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
                     final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
-                    Settings settings = client.radioIdGet("tradicaoAM");
+
+                    Group group = client.radiogroupRadioGroupIdGet("tradicaoAM");
+                    //Log.e("AAAAAAAAAAAAAAAAAAAAA", "" + group.get(0).getName());
+                    for (Radio radio: group){
+                        radios.add(radio);
+                    }
+
+                    Settings settings = client.radioIdGet(radios.get(0).getId());
 
                     // COR PRINCIPAL
                     String [] parts = settings.getColor().toString().split(",");
@@ -295,11 +312,13 @@ public class SplashActivity extends Activity {
                                 if (cacheData.getString("idRadio").equals("")){
                                     Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
                                     intent.putExtra("canais", (Serializable) canais);
+                                    intent.putExtra("radios", (Serializable) radios);
                                     startActivity(intent);
                                     finish();
                                 }else {
                                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                                     intent.putExtra("canais", (Serializable) canais);
+                                    intent.putExtra("radios", (Serializable) radios);
                                     startActivity(intent);
                                     finish();
                                 }
@@ -322,7 +341,12 @@ public class SplashActivity extends Activity {
                     factory.credentialsProvider(CognitoClientManager.getCredentials());
                     factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
                     final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
-                    Settings settings = client.radioIdGet("tradicaoAM");
+
+                    Group group = client.radiogroupRadioGroupIdGet("tradicaoAM");
+                    for (Radio radio: group){
+                        radios.add(radio);
+                    }
+                    Settings settings = client.radioIdGet(radios.get(0).getId());
 
                     // COR PRINCIPAL
                     String [] parts = settings.getColor().toString().split(",");
@@ -397,11 +421,13 @@ public class SplashActivity extends Activity {
                                 if (cacheData.getString("idRadio").equals("")){
                                     Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
                                     intent.putExtra("canais", (Serializable) canais);
+                                    intent.putExtra("radios", (Serializable) radios);
                                     startActivity(intent);
                                     finish();
                                 }else {
                                     Intent intent = new Intent(SplashActivity.this, MainActivity.class);
                                     intent.putExtra("canais", (Serializable) canais);
+                                    intent.putExtra("radios", (Serializable) radios);
                                     startActivity(intent);
                                     finish();
                                 }
