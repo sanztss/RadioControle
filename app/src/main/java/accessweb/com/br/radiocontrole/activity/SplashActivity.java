@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import accessweb.com.br.radiocontrole.R;
+import accessweb.com.br.radiocontrole.model.Advert;
 import accessweb.com.br.radiocontrole.model.Channel;
 import accessweb.com.br.radiocontrole.model.Empty;
 import accessweb.com.br.radiocontrole.model.Group;
@@ -48,6 +49,7 @@ import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 
+import static accessweb.com.br.radiocontrole.R.drawable.ca;
 import static android.R.id.empty;
 import static com.facebook.login.widget.ProfilePictureView.TAG;
 
@@ -240,6 +242,8 @@ public class SplashActivity extends Activity {
 
                     Settings settings = client.radioIdGet(radios.get(0).getId());
 
+                    Log.e("AAAAAAAAAAAAAAAAAAAAA", "" + settings.getAdverts().size());
+
                     // COR PRINCIPAL
                     String [] parts = settings.getColor().toString().split(",");
                     String hex = toHex(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));
@@ -255,6 +259,65 @@ public class SplashActivity extends Activity {
 
                     for (Channel channel: settings.getChannels()){
                         canais.add(channel);
+                    }
+
+                    for (Advert advert : settings.getAdverts()){
+                        switch (advert.getLocal()){
+                            case "player":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsPlayerContent", "off");
+                                } else if (advert.getType().equals("ampiri")) {
+                                    cacheData.putString("adsPlayerContent", "ampiri");
+                                    cacheData.putString("adsPlayerValue", advert.getValue());
+                                } else if (advert.getType().equals("image")) {
+                                    cacheData.putString("adsPlayerContent", "image");
+                                    cacheData.putString("adsPlayerValue", advert.getValue());
+                                    cacheData.putString("adsPlayerLink", advert.getLink());
+                                }
+                                break;
+                            case "home":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsHomeContent", "off");
+                                } else if (advert.getType().equals("ampiri")) {
+                                    cacheData.putString("adsHomeContent", "ampiri");
+                                    cacheData.putString("adsHomeValue", advert.getValue());
+                                } else if (advert.getType().equals("image")) {
+                                    cacheData.putString("adsHomeContent", "image");
+                                    cacheData.putString("adsHomeValue", advert.getValue());
+                                    cacheData.putString("adsHomeLink", advert.getLink());
+                                }
+                                break;
+                            case "play":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsPlayContent", "off");
+                                } else if (advert.getType().equals("audio")) {
+                                    cacheData.putString("adsPlayContent", "audio");
+                                    cacheData.putString("adsPlayValue", advert.getValue());
+                                }
+                                break;
+                            case "wall":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsWallContent", "off");
+                                } else if (advert.getType().equals("ampiri")) {
+                                    cacheData.putString("adsWallContent", "ampiri");
+                                    cacheData.putString("adsWallValue", advert.getValue());
+                                }
+                                break;
+                            case "interstitial":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsInterstitialContent", "off");
+                                } else if (advert.getType().equals("ampiri")) {
+                                    cacheData.putString("adsInterstitialContent", "ampiri");
+                                    cacheData.putString("adsInterstitialValue", advert.getValue());
+                                } else if (advert.getType().equals("image")) {
+                                    cacheData.putString("adsInterstitialContent", "image");
+                                    cacheData.putString("adsInterstitialValue", advert.getValue());
+                                    cacheData.putString("adsInterstitialLink", advert.getLink());
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
 
                     modulos.add("início");
@@ -363,6 +426,65 @@ public class SplashActivity extends Activity {
 
                     for (Channel channel: settings.getChannels()){
                         canais.add(channel);
+                    }
+
+                    for (Advert advert : settings.getAdverts()){
+                        switch (advert.getLocal()){
+                            case "player":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsPlayerContent", "off");
+                                } else if (advert.getType().equals("ampiri")) {
+                                    cacheData.putString("adsPlayerContent", "ampiri");
+                                    cacheData.putString("adsPlayerValue", advert.getValue());
+                                } else if (advert.getType().equals("image")) {
+                                    cacheData.putString("adsPlayerContent", "image");
+                                    cacheData.putString("adsPlayerValue", advert.getValue());
+                                    cacheData.putString("adsPlayerLink", advert.getLink());
+                                }
+                                break;
+                            case "home":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsHomeContent", "off");
+                                } else if (advert.getType().equals("ampiri")) {
+                                    cacheData.putString("adsHomeContent", "ampiri");
+                                    cacheData.putString("adsHomeValue", advert.getValue());
+                                } else if (advert.getType().equals("image")) {
+                                    cacheData.putString("adsHomeContent", "image");
+                                    cacheData.putString("adsHomeValue", advert.getValue());
+                                    cacheData.putString("adsHomeLink", advert.getLink());
+                                }
+                                break;
+                            case "play":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsPlayContent", "off");
+                                } else if (advert.getType().equals("audio")) {
+                                    cacheData.putString("adsPlayContent", "audio");
+                                    cacheData.putString("adsPlayValue", advert.getValue());
+                                }
+                                break;
+                            case "wall":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsWallContent", "off");
+                                } else if (advert.getType().equals("ampiri")) {
+                                    cacheData.putString("adsWallContent", "ampiri");
+                                    cacheData.putString("adsWallValue", advert.getValue());
+                                }
+                                break;
+                            case "intersticial":
+                                if (advert.getType().equals("off")){
+                                    cacheData.putString("adsIntersticialContent", "off");
+                                } else if (advert.getType().equals("ampiri")) {
+                                    cacheData.putString("adsIntersticialContent", "ampiri");
+                                    cacheData.putString("adsIntersticialValue", advert.getValue());
+                                } else if (advert.getType().equals("image")) {
+                                    cacheData.putString("adsIntersticialContent", "image");
+                                    cacheData.putString("adsIntersticialValue", advert.getValue());
+                                    cacheData.putString("adsIntersticialLink", advert.getLink());
+                                }
+                                break;
+                            default:
+                                break;
+                        }
                     }
 
                     modulos.add("início");

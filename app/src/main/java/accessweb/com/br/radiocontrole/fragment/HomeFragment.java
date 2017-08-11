@@ -21,6 +21,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
@@ -36,6 +37,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -61,6 +63,7 @@ import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 import accessweb.com.br.radiocontrole.util.CacheData;
 
+import static accessweb.com.br.radiocontrole.R.id.btnRegulamento;
 import static android.R.id.message;
 import static com.ampiri.sdk.c.b.a.P;
 
@@ -70,6 +73,11 @@ public class HomeFragment extends Fragment {
     private FloatingActionButton btnHomePlayPause;
     private TextView txtRedesSociais;
     private TextView txtContato;
+
+    private RelativeLayout relativeLogo;
+    private LinearLayout areaAnuncio;
+    private FrameLayout ampiri;
+    private ImageView imagemAnuncio;
 
     private GridView gridViewSocial;
     List<Integer> socialIconIds = new ArrayList<Integer>();
@@ -98,6 +106,10 @@ public class HomeFragment extends Fragment {
         final View rootView = inflater.inflate(R.layout.fragment_home, container, false);
 
         final CacheData cacheData = new CacheData(getContext());
+        relativeLogo = (RelativeLayout) rootView.findViewById(R.id.relativeLogo);
+        areaAnuncio = (LinearLayout) rootView.findViewById(R.id.areaAnuncio);
+        ampiri = (FrameLayout) rootView.findViewById(R.id.ampiri);
+        imagemAnuncio = (ImageView) rootView.findViewById(R.id.imagemAnuncio);
 
         // INSTANCIANDO A LOGO INSERINDO NA TELA
         logo = (ImageView) rootView.findViewById(R.id.logo);
@@ -323,36 +335,63 @@ public class HomeFragment extends Fragment {
             }
         }.execute();
 
-        BannerAdCallback bannerAdListener = new BannerAdCallback() {
-            @Override
-            public void onAdLoaded(@NonNull BannerAd ad) {
 
-            }
 
-            @Override
-            public void onAdFailed(@NonNull BannerAd AD, @NonNull ResponseStatus responseStatus) {
+        if (cacheData.getString("adsHomeContent").equals("off")){
+            areaAnuncio.setVisibility(View.GONE);
+            final float scale = getContext().getResources().getDisplayMetrics().density;
+            int px = (int) (313 * scale + 0.5f);  // replace 100 with your dimensions
+            relativeLogo.getLayoutParams().height = px;
+        }else if (cacheData.getString("adsHomeContent").equals("ampiri")) {
+            ampiri.setVisibility(View.VISIBLE);
+            BannerAdCallback bannerAdListener = new BannerAdCallback() {
+                @Override
+                public void onAdLoaded(@NonNull BannerAd ad) {
 
-            }
+                }
 
-            @Override
-            public void onAdOpened(@NonNull BannerAd ad) {
+                @Override
+                public void onAdFailed(@NonNull BannerAd AD, @NonNull ResponseStatus responseStatus) {
 
-            }
+                }
 
-            @Override
-            public void onAdClicked(@NonNull BannerAd ad) {
+                @Override
+                public void onAdOpened(@NonNull BannerAd ad) {
 
-            }
+                }
 
-            @Override
-            public void onAdClosed(@NonNull BannerAd ad) {
+                @Override
+                public void onAdClicked(@NonNull BannerAd ad) {
 
-            }
-        };
+                }
 
-        FrameLayout adView = (FrameLayout) rootView.findViewById(R.id.anuncio);
-        //bannerAd = BannerAdPool.load(getActivity(),"3dfbb889-3bcd-4c34-82ae-8fcb539c3b25",  adView, BannerSize.BANNER_SIZE_320x50);
-        bannerAd = BannerAdPool.load(getActivity(),"8160598b-936c-4886-b3a0-12c75b3a145f",  adView, BannerSize.BANNER_SIZE_320x50);
+                @Override
+                public void onAdClosed(@NonNull BannerAd ad) {
+
+                }
+            };
+
+            //FrameLayout adView = (FrameLayout) rootView.findViewById(R.id.anuncio);
+
+            //bannerAd = BannerAdPool.load(getActivity(),"8160598b-936c-4886-b3a0-12c75b3a145f",  adView, BannerSize.BANNER_SIZE_320x50);
+            bannerAd = BannerAdPool.load(getActivity(),cacheData.getString("adsHomeValue"),  ampiri, BannerSize.BANNER_SIZE_320x50);
+        } else if (cacheData.getString("adsHomeContent").equals("image")) {
+            ampiri.setVisibility(View.GONE);
+            imagemAnuncio.setVisibility(View.VISIBLE);
+            Picasso.with(getContext()).load(cacheData.getString("adsHomeValue")).into(imagemAnuncio);
+            imagemAnuncio.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    try {
+                        Intent intentContato = new Intent(Intent.ACTION_VIEW, Uri.parse(cacheData.getString("adsHomeLink")));
+                        startActivity(intentContato);
+                    } catch (ActivityNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+
+        }
+
         // Inflate the layout for this fragment
         return rootView;
     }
