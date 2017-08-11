@@ -68,7 +68,7 @@ public class PromocoesFragment extends Fragment {
     }
 
     private void setupViewPager(ViewPager viewPager) {
-        ViewPagerAdapter adapter = new ViewPagerAdapter(getFragmentManager());
+        ViewPagerAdapter adapter = new ViewPagerAdapter(getChildFragmentManager());
 
         PromocoesStatusFragment vigentes = new PromocoesStatusFragment();
         Bundle argsVigentes = new Bundle();

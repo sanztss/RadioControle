@@ -91,6 +91,8 @@ public class SuaContaDialogFragment extends DialogFragment {
         }else if (telaDesejada.equals("perfil") && !cacheData.getString("userId").equals("")) {
             dismiss();
             ((MainActivity)getActivity()).abrirPerfil();
+        }else if (telaDesejada.equals("promocao") && !cacheData.getString("userId").equals("")) {
+            dismiss();
         }
     }
     @Override

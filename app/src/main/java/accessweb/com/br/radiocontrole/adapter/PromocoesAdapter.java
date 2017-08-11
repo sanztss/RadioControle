@@ -28,8 +28,11 @@ import java.util.List;
 import java.util.Locale;
 
 import accessweb.com.br.radiocontrole.R;
-import accessweb.com.br.radiocontrole.dialog.PromocaoDialogFragment;
+import accessweb.com.br.radiocontrole.activity.ForgotPasswordActivity;
+import accessweb.com.br.radiocontrole.activity.PromocaoActivity;
 import accessweb.com.br.radiocontrole.model.Promocao;
+
+import static java.security.AccessController.getContext;
 
 /**
  * Created by Des. Android on 29/06/2017.
@@ -96,15 +99,10 @@ public class PromocoesAdapter extends RecyclerView.Adapter<PromocoesAdapter.MyVi
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 Log.v("Click", "Click Item");
-
-                PromocaoDialogFragment dialog = new PromocaoDialogFragment();
-                Bundle args = new Bundle();
-                args.putInt("posicao", position);
-                args.putSerializable("lista", (Serializable)data);
-                dialog.setStyle(DialogFragment.STYLE_NORMAL, R.style.DialogFragmentTheme);
-                dialog.setArguments(args);
-                dialog.show(((AppCompatActivity) context).getSupportFragmentManager(), "dialog");
-
+                Intent intent = new Intent(context, PromocaoActivity.class);
+                intent.putExtra("posicao", position);
+                intent.putExtra("lista", (Serializable) data);
+                context.startActivity(intent);
             }
         });
     }

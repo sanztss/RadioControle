@@ -11,6 +11,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
+import com.amazonaws.mobileconnectors.cognito.Dataset;
+import com.amazonaws.mobileconnectors.cognito.Record;
+import com.amazonaws.mobileconnectors.cognito.SyncConflict;
+import com.amazonaws.mobileconnectors.cognito.exceptions.DataStorageException;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -22,6 +26,8 @@ import java.util.Locale;
 
 import accessweb.com.br.radiocontrole.R;
 import accessweb.com.br.radiocontrole.adapter.PromocoesAdapter;
+import accessweb.com.br.radiocontrole.model.Participant;
+import accessweb.com.br.radiocontrole.model.Participants;
 import accessweb.com.br.radiocontrole.model.Premio;
 import accessweb.com.br.radiocontrole.model.Promocao;
 import accessweb.com.br.radiocontrole.model.Promotion;
@@ -29,8 +35,9 @@ import accessweb.com.br.radiocontrole.model.PromotionPrizesItem;
 import accessweb.com.br.radiocontrole.model.Promotions;
 import accessweb.com.br.radiocontrole.util.CacheData;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
+import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
-
+import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
 import static android.R.attr.format;
 import static com.ampiri.sdk.c.b.a.D;
 
@@ -46,6 +53,9 @@ public class PromocoesStatusFragment extends Fragment{
     private List<Promocao> data;
     private static String TAG = PromocoesStatusFragment.class.getSimpleName();
     private String status;
+
+
+    private ArrayList<String> promocoesParticipantes = new ArrayList<String>();
 
     public PromocoesStatusFragment() {
         // Required empty public constructor
@@ -71,6 +81,7 @@ public class PromocoesStatusFragment extends Fragment{
 
         recyclerView = (RecyclerView)rootView.findViewById(R.id.recycler_view);
         data = new ArrayList<>();
+        System.out.println(cacheData.getString("idRadio"));
         new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... params) {
@@ -78,7 +89,53 @@ public class PromocoesStatusFragment extends Fragment{
                 factory.credentialsProvider(CognitoClientManager.getCredentials());
                 factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
                 final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
+
                 Promotions promotions = client.radioIdPromotionsGet(cacheData.getString("idRadio"));
+
+                /*if (!cacheData.getString("userEmail").equals("") && status.equals("vigentes")){
+                    Participants participants = client.radioIdParticipantsGet(cacheData.getString("idRadio"));
+                    for (Participant participant : participants){
+                        if (participant.getEmail().equals(cacheData.getString("userEmail"))){
+                            promocoesParticipantes.add(participant.getPromotionId()+"");
+                        }
+                    }
+                    cacheData.putListString("promocoesParticipantes", promocoesParticipantes);
+                }*/
+
+                Dataset profileData = CognitoSyncClientManager.openOrCreateDataset("profileData");
+                profileData.synchronize(new SyncCallback() {
+                    @Override
+                    public void onSuccess(Dataset dataset, List<Record> updatedRecords) {
+                        Log.d(TAG, "Sync success AAAAAAA" + dataset.get("promos"));
+                        String promocoesUser = dataset.get("promos");
+                        String [] promocoesSplit = promocoesUser.split("-");
+                        for (String promocaoString : promocoesSplit){
+                            promocoesParticipantes.add(promocaoString);
+                        }
+                        cacheData.putListString("promocoesParticipantes", promocoesParticipantes);
+                        cacheData.putString("promocoesDataset", promocoesUser);
+                    }
+
+                    @Override
+                    public boolean onConflict(Dataset dataset, List<SyncConflict> conflicts) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onDatasetDeleted(Dataset dataset, String datasetName) {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean onDatasetsMerged(Dataset dataset, List<String> datasetNames) {
+                        return false;
+                    }
+
+                    @Override
+                    public void onFailure(DataStorageException dse) {
+
+                    }
+                });
 
                 DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
                 String stringToday = dateFormat.format(new Date());
@@ -104,6 +161,7 @@ public class PromocoesStatusFragment extends Fragment{
                                     promocao.setDataSorteioPromocao(promotion.getDrawDate());
                                     promocao.setLinkRegulamentoPromocao(promotion.getLinkRegulation());
                                     promocao.setLinkVideoPromocao(promotion.getLinkYoutube());
+                                    promocao.setTimestamp(promotion.getTimestamp());
                                    /* if (i%2 == 0){
                                         promocao.setParticipando(true);
                                     }else {

@@ -19,6 +19,8 @@ import java.util.*;
 
 import accessweb.com.br.radiocontrole.model.Group;
 import accessweb.com.br.radiocontrole.model.Error;
+import accessweb.com.br.radiocontrole.model.Participant;
+import accessweb.com.br.radiocontrole.model.Participants;
 import accessweb.com.br.radiocontrole.model.Settings;
 import accessweb.com.br.radiocontrole.model.Hosts;
 import accessweb.com.br.radiocontrole.model.Podcasts;
@@ -74,6 +76,30 @@ public interface RadiocontroleClient {
     Hosts radioIdHostsGet(
             @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
                     String radioId);
+
+    /**
+     *
+     *
+     * @param radioId
+     * @return Participants
+     */
+    @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/participants", method = "GET")
+    Participants radioIdParticipantsGet(
+            @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
+                    String radioId);
+
+    /**
+     *
+     *
+     * @param radioId
+     * @param body
+     * @return Participant
+     */
+    @com.amazonaws.mobileconnectors.apigateway.annotation.Operation(path = "/{radioId}/participants", method = "POST")
+    Participant radioIdParticipantsPost(
+            @com.amazonaws.mobileconnectors.apigateway.annotation.Parameter(name = "radioId", location = "path")
+                    String radioId,
+            Participant body);
 
     /**
      *

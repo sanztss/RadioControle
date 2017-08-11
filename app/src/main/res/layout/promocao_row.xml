@@ -30,10 +30,10 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentRight="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginRight="5dp"
-            android:layout_marginTop="5dp"
-            android:background="#80ffffff"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="0dp"
+            android:layout_marginBottom="5dp"
+            android:background="#80cccccc"
             app:srcCompat="@drawable/ic_share_gray" />
 
         <TextView

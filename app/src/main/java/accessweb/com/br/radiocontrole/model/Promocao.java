@@ -19,10 +19,12 @@ public class Promocao implements Serializable {
     private Boolean vigente;
     private static List<Premio> premio;
 
+    private long timestamp;
+
     public Promocao() {
     }
 
-    public Promocao(String imagemPromocao, String tituloPromocao, String dataEncerramentoPromocao, String dataSorteioPromocao, String linkRegulamentoPromocao, String linkAudioPromocao, String linkVideoPromocao, Boolean participando, Boolean vigente, List<Premio> premio) {
+    public Promocao(String imagemPromocao, String tituloPromocao, String dataEncerramentoPromocao, String dataSorteioPromocao, String linkRegulamentoPromocao, String linkAudioPromocao, String linkVideoPromocao, Boolean participando, Boolean vigente, List<Premio> premio, Long timestamp) {
         this.imagemPromocao = imagemPromocao;
         this.tituloPromocao = tituloPromocao;
         this.dataEncerramentoPromocao = dataEncerramentoPromocao;
@@ -33,6 +35,7 @@ public class Promocao implements Serializable {
         this.participando = participando;
         this.vigente = vigente;
         this.premio = premio;
+        this.timestamp = timestamp;
     }
 
     public String getImagemPromocao() {
@@ -113,5 +116,13 @@ public class Promocao implements Serializable {
 
     public void setPremio(List<Premio> premio) {
         this.premio = premio;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 }

@@ -15,6 +15,7 @@
 
 package accessweb.com.br.radiocontrole.model;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 public class Promotion {
@@ -36,6 +37,8 @@ public class Promotion {
     private String drawDate = null;
     @com.google.gson.annotations.SerializedName("thumbnail")
     private String thumbnail = null;
+    @com.google.gson.annotations.SerializedName("timestamp")
+    private long timestamp;
 
     /**
      * Gets endingDate
@@ -197,6 +200,24 @@ public class Promotion {
      */
     public void setThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    /**
+     * Gets timestamp
+     *
+     * @return timestamp
+     **/
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * Sets the value of timestamp.
+     *
+     * @param timestamp the new value
+     */
+    public void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
     }
 
 }

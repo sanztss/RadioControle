@@ -102,9 +102,9 @@ public class RadioGroupActivity extends Activity {
 
                             Settings settings = client.radioIdGet(radios.get(itemPosition).getId());
 
-                            Promotions promotions = client.radioIdPromotionsGet(radios.get(itemPosition).getId());
+                            //Promotions promotions = client.radioIdPromotionsGet(radios.get(itemPosition).getId());
 
-                            Log.e("AAAAASSSSSS", "" + promotions.size());
+                            //Log.e("AAAAASSSSSS", "" + promotions.size());
                             // COR PRINCIPAL
                             String [] parts = settings.getColor().toString().split(",");
                             String hex = toHex(Integer.parseInt(parts[0]), Integer.parseInt(parts[1]), Integer.parseInt(parts[2]));

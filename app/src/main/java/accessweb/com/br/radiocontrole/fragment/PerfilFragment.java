@@ -196,6 +196,7 @@ public class PerfilFragment extends Fragment {
                 cacheData.putString("userNome", "");
                 cacheData.putString("userTelefone", "");
                 cacheData.putString("userUrlFoto", "");
+                cacheData.putListString("promocoesParticipantes", new ArrayList<String>());
 
                 ClientConfiguration clientConfiguration = new ClientConfiguration();
                 CognitoUserPool userPool = new CognitoUserPool(getContext(), "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);

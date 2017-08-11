@@ -51,6 +51,9 @@
         <!-- ForgotPasswordActivity -->
         <activity android:name=".activity.ForgotPasswordActivity"/>
 
+        <!-- PromocaoActivity -->
+        <activity android:name=".activity.PromocaoActivity"/>
+
         <activity
             android:name="com.ampiri.sdk.mraid.MraidActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"

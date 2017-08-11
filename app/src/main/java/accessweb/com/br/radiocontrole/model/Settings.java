@@ -22,6 +22,12 @@ import accessweb.com.br.radiocontrole.model.Social;
 public class Settings {
     @com.google.gson.annotations.SerializedName("modules")
     private List<String> modules = null;
+    @com.google.gson.annotations.SerializedName("adverts")
+    private List<Advert> adverts = null;
+    @com.google.gson.annotations.SerializedName("linkAndroid")
+    private String linkAndroid = null;
+    @com.google.gson.annotations.SerializedName("linkIos")
+    private String linkIos = null;
     @com.google.gson.annotations.SerializedName("color")
     private String color = null;
     @com.google.gson.annotations.SerializedName("logo")
@@ -53,6 +59,60 @@ public class Settings {
      */
     public void setModules(List<String> modules) {
         this.modules = modules;
+    }
+
+    /**
+     * Gets adverts
+     *
+     * @return adverts
+     **/
+    public List<Advert> getAdverts() {
+        return adverts;
+    }
+
+    /**
+     * Sets the value of adverts.
+     *
+     * @param adverts the new value
+     */
+    public void setAdverts(List<Advert> adverts) {
+        this.adverts = adverts;
+    }
+
+    /**
+     * Gets linkAndroid
+     *
+     * @return linkAndroid
+     **/
+    public String getLinkAndroid() {
+        return linkAndroid;
+    }
+
+    /**
+     * Sets the value of linkAndroid.
+     *
+     * @param linkAndroid the new value
+     */
+    public void setLinkAndroid(String linkAndroid) {
+        this.linkAndroid = linkAndroid;
+    }
+
+    /**
+     * Gets linkIos
+     *
+     * @return linkIos
+     **/
+    public String getLinkIos() {
+        return linkIos;
+    }
+
+    /**
+     * Sets the value of linkIos.
+     *
+     * @param linkIos the new value
+     */
+    public void setLinkIos(String linkIos) {
+        this.linkIos = linkIos;
     }
 
     /**

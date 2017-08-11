@@ -79,6 +79,8 @@ dependencies {
 
     compile 'com.avocarrot:android-sdk:4.0.+'
 
+    compile files('libs/YouTubeAndroidPlayerApi.jar')
+
     compile 'com.android.support:multidex:1.0.1'
     testCompile 'junit:junit:4.12'
 }
