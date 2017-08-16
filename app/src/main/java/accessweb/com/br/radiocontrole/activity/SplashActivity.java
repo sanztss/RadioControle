@@ -1,13 +1,16 @@
 package accessweb.com.br.radiocontrole.activity;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.amazonaws.ClientConfiguration;
@@ -50,7 +53,9 @@ import accessweb.com.br.radiocontrole.util.CognitoSyncClientManager;
 import accessweb.com.br.radiocontrole.util.RadiocontroleClient;
 
 import static accessweb.com.br.radiocontrole.R.drawable.ca;
+import static accessweb.com.br.radiocontrole.R.id.imagemAnuncio;
 import static android.R.id.empty;
+import static com.ampiri.sdk.device.i.c;
 import static com.facebook.login.widget.ProfilePictureView.TAG;
 
 /**
@@ -64,6 +69,7 @@ public class SplashActivity extends Activity {
 
     private InterstitialAd interstitialAd;
     private Boolean ampireSuccess = false;
+    private Boolean bannerImage = false;
 
     // Splash screen timer
     private static int SPLASH_TIME_OUT = 3000;
@@ -87,7 +93,166 @@ public class SplashActivity extends Activity {
         CognitoClientManager.init(mActivity);
         CognitoSyncClientManager.init(this);
 
-        InterstitialAdCallback interstitialAdListener = new InterstitialAdCallback() {
+        new AsyncTask<Void, Void, Void>() {
+            @Override
+            protected Void doInBackground(Void... params) {
+                ApiClientFactory factory = new ApiClientFactory();
+                factory.credentialsProvider(CognitoClientManager.getCredentials());
+                factory.apiKey("QgpKgwmkrA3ilAhtFbtW4abS5l9AHNP89Pe0WlrK");
+                final RadiocontroleClient client = factory.build(RadiocontroleClient.class);
+                Group group = client.radiogroupRadioGroupIdGet("tradicaoAM");
+                for (Radio radio: group){
+                    radios.add(radio);
+                }
+                Settings settings = client.radioIdGet(radios.get(0).getId());
+                for (Advert advert : settings.getAdverts()){
+                    switch (advert.getLocal()){
+                        case "player":
+                            if (advert.getType().equals("off")){
+                                cacheData.putString("adsPlayerContent", "off");
+                            } else if (advert.getType().equals("ampiri")) {
+                                cacheData.putString("adsPlayerContent", "ampiri");
+                                cacheData.putString("adsPlayerValue", advert.getValueAndroid());
+                            } else if (advert.getType().equals("image")) {
+                                cacheData.putString("adsPlayerContent", "image");
+                                cacheData.putString("adsPlayerValue", advert.getValueAndroid());
+                                cacheData.putString("adsPlayerLink", advert.getLink());
+                            }
+                            break;
+                        case "home":
+                            if (advert.getType().equals("off")){
+                                cacheData.putString("adsHomeContent", "off");
+                            } else if (advert.getType().equals("ampiri")) {
+                                cacheData.putString("adsHomeContent", "ampiri");
+                                cacheData.putString("adsHomeValue", advert.getValueAndroid());
+                            } else if (advert.getType().equals("image")) {
+                                cacheData.putString("adsHomeContent", "image");
+                                cacheData.putString("adsHomeValue", advert.getValueAndroid());
+                                cacheData.putString("adsHomeLink", advert.getLink());
+                            }
+                            break;
+                        case "play":
+                            if (advert.getType().equals("off")){
+                                cacheData.putString("adsPlayContent", "off");
+                            } else if (advert.getType().equals("audio")) {
+                                cacheData.putString("adsPlayContent", "audio");
+                                cacheData.putString("adsPlayValue", advert.getValueAndroid());
+                            }
+                            break;
+                        case "wall":
+                            if (advert.getType().equals("off")){
+                                cacheData.putString("adsWallContent", "off");
+                            } else if (advert.getType().equals("ampiri")) {
+                                cacheData.putString("adsWallContent", "ampiri");
+                                cacheData.putString("adsWallValue", advert.getValueAndroid());
+                            }
+                            break;
+                        case "interstitial":
+                            Log.e("AAAAAAAAAAAsasas", "ASASASASAS");
+                            Log.e("AAAAAAAAAAAsasas", "ASASASASAS");
+                            Log.e("AAAAAAAAAAAsasas", "ASASASASAS");
+                            if (advert.getType().equals("off")){
+                                cacheData.putString("adsInterstitialContent", "off");
+                            } else if (advert.getType().equals("ampiri")) {
+                                cacheData.putString("adsInterstitialContent", "ampiri");
+                                cacheData.putString("adsInterstitialValue", advert.getValueAndroid());
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                return null;
+            }
+
+            @Override
+            protected void onPostExecute(Void result) {
+                super.onPostExecute(result);
+                Log.e("AAAAAAAAAAAsasas", cacheData.getString("adsInterstitialContent"));
+                if (cacheData.getString("adsInterstitialContent").equals("off")){
+                    ampireSuccess = false;
+                    ClientConfiguration clientConfiguration = new ClientConfiguration();
+                    CognitoUserPool userPool = new CognitoUserPool(mContext, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+                    userPool.getCurrentUser().getSession(authenticationHandler);
+                }else if (cacheData.getString("adsInterstitialContent").equals("ampiri")) {
+                    InterstitialAdCallback interstitialAdListener = new InterstitialAdCallback() {
+                        @Override
+                        public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
+                            System.out.println("onAdLoaded");
+                            ampireSuccess = true;
+                            ClientConfiguration clientConfiguration = new ClientConfiguration();
+                            CognitoUserPool userPool = new CognitoUserPool(mContext, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+                            userPool.getCurrentUser().getSession(authenticationHandler);
+                        }
+
+                        @Override
+                        public void onAdFailed(@NonNull InterstitialAd interstitialAd, ResponseStatus responseStatus) {
+                            System.out.println("onAdFailed: " + responseStatus.name());
+                            ampireSuccess = false;
+                            ClientConfiguration clientConfiguration = new ClientConfiguration();
+                            CognitoUserPool userPool = new CognitoUserPool(mContext, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+                            userPool.getCurrentUser().getSession(authenticationHandler);
+                        }
+
+                        @Override
+                        public void onAdOpened(@NonNull InterstitialAd interstitialAd) {
+
+                        }
+
+                        @Override
+                        public void onAdClicked(@NonNull InterstitialAd interstitialAd) {
+                            if (cacheData.getString("idRadio").equals("")){
+                                Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                intent.putExtra("radios", (Serializable) radios);
+                                startActivity(intent);
+                                finish();
+                            }else {
+                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                intent.putExtra("radios", (Serializable) radios);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+
+                        @Override
+                        public void onAdClosed(@NonNull InterstitialAd interstitialAd) {
+                            if (cacheData.getString("idRadio").equals("")){
+                                Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                intent.putExtra("radios", (Serializable) radios);
+                                startActivity(intent);
+                                finish();
+                            }else {
+                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                intent.putExtra("radios", (Serializable) radios);
+                                startActivity(intent);
+                                finish();
+                            }
+                        }
+                    };
+                    //interstitialAd = InterstitialAdPool.load( SplashActivity.this, "6b34bf0e-04c4-47f9-b4d3-caeddeab0b13", interstitialAdListener);
+                    interstitialAd = InterstitialAdPool.load( SplashActivity.this, cacheData.getString("adsInterstitialValue"), interstitialAdListener);
+
+                    Ampiri.addMediationAdapter(new AdMobMediation.Builder()
+                            //.addTestDevice("ca-app-pub-4694313893492524~8880658070")
+                            .addTestDevice("ca-app-pub-4694313893492524/4709656385")
+                            .build());
+                } else if (cacheData.getString("adsInterstitialContent").equals("image")) {
+                    ampireSuccess = false;
+                    bannerImage = true;
+                    ClientConfiguration clientConfiguration = new ClientConfiguration();
+                    CognitoUserPool userPool = new CognitoUserPool(mContext, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
+                    userPool.getCurrentUser().getSession(authenticationHandler);
+                }
+
+            }
+        }.execute();
+
+        /*InterstitialAdCallback interstitialAdListener = new InterstitialAdCallback() {
             @Override
             public void onAdLoaded(@NonNull InterstitialAd interstitialAd) {
                 System.out.println("onAdLoaded");
@@ -151,7 +316,7 @@ public class SplashActivity extends Activity {
         Ampiri.addMediationAdapter(new AdMobMediation.Builder()
                 //.addTestDevice("ca-app-pub-4694313893492524~8880658070")
                 .addTestDevice("ca-app-pub-4694313893492524/4709656385")
-                .build());
+                .build());*/
 
         /*ClientConfiguration clientConfiguration = new ClientConfiguration();
         CognitoUserPool userPool = new CognitoUserPool(mContext, "us-east-1_uEcyGgDBj", "h4q14gu4a1le3juib4sosncb1", "1dpl7kohsao2g9nrvbm8i8rqrmvqgps9oo1f616et9u6aa3sid0d", clientConfiguration);
@@ -268,10 +433,10 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsPlayerContent", "off");
                                 } else if (advert.getType().equals("ampiri")) {
                                     cacheData.putString("adsPlayerContent", "ampiri");
-                                    cacheData.putString("adsPlayerValue", advert.getValue());
+                                    cacheData.putString("adsPlayerValue", advert.getValueAndroid());
                                 } else if (advert.getType().equals("image")) {
                                     cacheData.putString("adsPlayerContent", "image");
-                                    cacheData.putString("adsPlayerValue", advert.getValue());
+                                    cacheData.putString("adsPlayerValue", advert.getValueAndroid());
                                     cacheData.putString("adsPlayerLink", advert.getLink());
                                 }
                                 break;
@@ -280,10 +445,10 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsHomeContent", "off");
                                 } else if (advert.getType().equals("ampiri")) {
                                     cacheData.putString("adsHomeContent", "ampiri");
-                                    cacheData.putString("adsHomeValue", advert.getValue());
+                                    cacheData.putString("adsHomeValue", advert.getValueAndroid());
                                 } else if (advert.getType().equals("image")) {
                                     cacheData.putString("adsHomeContent", "image");
-                                    cacheData.putString("adsHomeValue", advert.getValue());
+                                    cacheData.putString("adsHomeValue", advert.getValueAndroid());
                                     cacheData.putString("adsHomeLink", advert.getLink());
                                 }
                                 break;
@@ -292,7 +457,7 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsPlayContent", "off");
                                 } else if (advert.getType().equals("audio")) {
                                     cacheData.putString("adsPlayContent", "audio");
-                                    cacheData.putString("adsPlayValue", advert.getValue());
+                                    cacheData.putString("adsPlayValue", advert.getValueAndroid());
                                 }
                                 break;
                             case "wall":
@@ -300,7 +465,7 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsWallContent", "off");
                                 } else if (advert.getType().equals("ampiri")) {
                                     cacheData.putString("adsWallContent", "ampiri");
-                                    cacheData.putString("adsWallValue", advert.getValue());
+                                    cacheData.putString("adsWallValue", advert.getValueAndroid());
                                 }
                                 break;
                             case "interstitial":
@@ -308,10 +473,10 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsInterstitialContent", "off");
                                 } else if (advert.getType().equals("ampiri")) {
                                     cacheData.putString("adsInterstitialContent", "ampiri");
-                                    cacheData.putString("adsInterstitialValue", advert.getValue());
+                                    cacheData.putString("adsInterstitialValue", advert.getValueAndroid());
                                 } else if (advert.getType().equals("image")) {
                                     cacheData.putString("adsInterstitialContent", "image");
-                                    cacheData.putString("adsInterstitialValue", advert.getValue());
+                                    cacheData.putString("adsInterstitialValue", advert.getValueAndroid());
                                     cacheData.putString("adsInterstitialLink", advert.getLink());
                                 }
                                 break;
@@ -362,33 +527,54 @@ public class SplashActivity extends Activity {
                 protected void onPostExecute(Void result) {
                     super.onPostExecute(result);
                     final CacheData cacheData = new CacheData(mContext);
-                    Picasso.with(mContext)
-                            .load(cacheData.getString("splash"))
-                            .into(splash);
+                    if (!cacheData.getString("splash").equals("")){
+                        Picasso.with(mContext)
+                                .load(cacheData.getString("splash"))
+                                .into(splash);
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (ampireSuccess){
-                                interstitialAd.showAd();
-                            }else {
-                                if (cacheData.getString("idRadio").equals("")){
-                                    Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
-                                    intent.putExtra("canais", (Serializable) canais);
-                                    intent.putExtra("radios", (Serializable) radios);
-                                    startActivity(intent);
-                                    finish();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (ampireSuccess){
+                                    interstitialAd.showAd();
                                 }else {
-                                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                    intent.putExtra("canais", (Serializable) canais);
-                                    intent.putExtra("radios", (Serializable) radios);
-                                    startActivity(intent);
-                                    finish();
+                                    if (cacheData.getString("idRadio").equals("")){
+                                        Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                        intent.putExtra("canais", (Serializable) canais);
+                                        intent.putExtra("radios", (Serializable) radios);
+                                        startActivity(intent);
+                                        finish();
+                                    }else {
+                                        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                        intent.putExtra("canais", (Serializable) canais);
+                                        intent.putExtra("radios", (Serializable) radios);
+                                        startActivity(intent);
+                                        finish();
+                                    }
                                 }
-                            }
 
+                            }
+                        }, SPLASH_TIME_OUT);
+                    }else {
+                        if (ampireSuccess){
+                            interstitialAd.showAd();
+                        }else {
+                            if (cacheData.getString("idRadio").equals("")){
+                                Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                intent.putExtra("radios", (Serializable) radios);
+                                startActivity(intent);
+                                finish();
+                            }else {
+                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                intent.putExtra("radios", (Serializable) radios);
+                                startActivity(intent);
+                                finish();
+                            }
                         }
-                    }, SPLASH_TIME_OUT);
+                    }
+
                 }
             }.execute();
         }
@@ -435,10 +621,10 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsPlayerContent", "off");
                                 } else if (advert.getType().equals("ampiri")) {
                                     cacheData.putString("adsPlayerContent", "ampiri");
-                                    cacheData.putString("adsPlayerValue", advert.getValue());
+                                    cacheData.putString("adsPlayerValue", advert.getValueAndroid());
                                 } else if (advert.getType().equals("image")) {
                                     cacheData.putString("adsPlayerContent", "image");
-                                    cacheData.putString("adsPlayerValue", advert.getValue());
+                                    cacheData.putString("adsPlayerValue", advert.getValueAndroid());
                                     cacheData.putString("adsPlayerLink", advert.getLink());
                                 }
                                 break;
@@ -447,10 +633,10 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsHomeContent", "off");
                                 } else if (advert.getType().equals("ampiri")) {
                                     cacheData.putString("adsHomeContent", "ampiri");
-                                    cacheData.putString("adsHomeValue", advert.getValue());
+                                    cacheData.putString("adsHomeValue", advert.getValueAndroid());
                                 } else if (advert.getType().equals("image")) {
                                     cacheData.putString("adsHomeContent", "image");
-                                    cacheData.putString("adsHomeValue", advert.getValue());
+                                    cacheData.putString("adsHomeValue", advert.getValueAndroid());
                                     cacheData.putString("adsHomeLink", advert.getLink());
                                 }
                                 break;
@@ -459,7 +645,7 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsPlayContent", "off");
                                 } else if (advert.getType().equals("audio")) {
                                     cacheData.putString("adsPlayContent", "audio");
-                                    cacheData.putString("adsPlayValue", advert.getValue());
+                                    cacheData.putString("adsPlayValue", advert.getValueAndroid());
                                 }
                                 break;
                             case "wall":
@@ -467,7 +653,7 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsWallContent", "off");
                                 } else if (advert.getType().equals("ampiri")) {
                                     cacheData.putString("adsWallContent", "ampiri");
-                                    cacheData.putString("adsWallValue", advert.getValue());
+                                    cacheData.putString("adsWallValue", advert.getValueAndroid());
                                 }
                                 break;
                             case "intersticial":
@@ -475,10 +661,10 @@ public class SplashActivity extends Activity {
                                     cacheData.putString("adsIntersticialContent", "off");
                                 } else if (advert.getType().equals("ampiri")) {
                                     cacheData.putString("adsIntersticialContent", "ampiri");
-                                    cacheData.putString("adsIntersticialValue", advert.getValue());
+                                    cacheData.putString("adsIntersticialValue", advert.getValueAndroid());
                                 } else if (advert.getType().equals("image")) {
                                     cacheData.putString("adsIntersticialContent", "image");
-                                    cacheData.putString("adsIntersticialValue", advert.getValue());
+                                    cacheData.putString("adsIntersticialValue", advert.getValueAndroid());
                                     cacheData.putString("adsIntersticialLink", advert.getLink());
                                 }
                                 break;
@@ -530,33 +716,53 @@ public class SplashActivity extends Activity {
                     super.onPostExecute(result);
 
                     final CacheData cacheData = new CacheData(mContext);
-                    Picasso.with(mContext)
-                            .load(cacheData.getString("splash"))
-                            .into(splash);
+                    if (!cacheData.getString("splash").equals("")){
+                        Picasso.with(mContext)
+                                .load(cacheData.getString("splash"))
+                                .into(splash);
 
-                    new Handler().postDelayed(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (ampireSuccess){
-                                interstitialAd.showAd();
-                            }else {
-                                if (cacheData.getString("idRadio").equals("")){
-                                    Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
-                                    intent.putExtra("canais", (Serializable) canais);
-                                    intent.putExtra("radios", (Serializable) radios);
-                                    startActivity(intent);
-                                    finish();
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (ampireSuccess){
+                                    interstitialAd.showAd();
                                 }else {
-                                    Intent intent = new Intent(SplashActivity.this, MainActivity.class);
-                                    intent.putExtra("canais", (Serializable) canais);
-                                    intent.putExtra("radios", (Serializable) radios);
-                                    startActivity(intent);
-                                    finish();
+                                    if (cacheData.getString("idRadio").equals("")){
+                                        Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                        intent.putExtra("canais", (Serializable) canais);
+                                        intent.putExtra("radios", (Serializable) radios);
+                                        startActivity(intent);
+                                        finish();
+                                    }else {
+                                        Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                        intent.putExtra("canais", (Serializable) canais);
+                                        intent.putExtra("radios", (Serializable) radios);
+                                        startActivity(intent);
+                                        finish();
+                                    }
                                 }
-                            }
 
+                            }
+                        }, SPLASH_TIME_OUT);
+                    }else {
+                        if (ampireSuccess){
+                            interstitialAd.showAd();
+                        }else {
+                            if (cacheData.getString("idRadio").equals("")){
+                                Intent intent = new Intent(SplashActivity.this, RadioGroupActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                intent.putExtra("radios", (Serializable) radios);
+                                startActivity(intent);
+                                finish();
+                            }else {
+                                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                                intent.putExtra("canais", (Serializable) canais);
+                                intent.putExtra("radios", (Serializable) radios);
+                                startActivity(intent);
+                                finish();
+                            }
                         }
-                    }, SPLASH_TIME_OUT);
+                    }
 
                 }
             }.execute();

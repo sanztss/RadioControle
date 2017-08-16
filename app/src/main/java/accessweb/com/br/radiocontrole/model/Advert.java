@@ -19,8 +19,10 @@ package accessweb.com.br.radiocontrole.model;
 public class Advert {
     @com.google.gson.annotations.SerializedName("type")
     private String type = null;
-    @com.google.gson.annotations.SerializedName("value")
-    private String value = null;
+    @com.google.gson.annotations.SerializedName("valueIos")
+    private String valueIos = null;
+    @com.google.gson.annotations.SerializedName("valueAndroid")
+    private String valueAndroid = null;
     @com.google.gson.annotations.SerializedName("local")
     private String local = null;
     @com.google.gson.annotations.SerializedName("link")
@@ -45,21 +47,39 @@ public class Advert {
     }
 
     /**
-     * Gets value
+     * Gets valueIos
      *
-     * @return value
+     * @return valueIos
      **/
-    public String getValue() {
-        return value;
+    public String getValueIos() {
+        return valueIos;
     }
 
     /**
-     * Sets the value of value.
+     * Sets the value of valueIos.
      *
-     * @param value the new value
+     * @param valueIos the new value
      */
-    public void setValue(String value) {
-        this.value = value;
+    public void setValueIos(String valueIos) {
+        this.valueIos = valueIos;
+    }
+
+    /**
+     * Gets valueAndroid
+     *
+     * @return valueAndroid
+     **/
+    public String getValueAndroid() {
+        return valueAndroid;
+    }
+
+    /**
+     * Sets the value of valueAndroid.
+     *
+     * @param valueAndroid the new value
+     */
+    public void setValueAndroid(String valueAndroid) {
+        this.valueAndroid = valueAndroid;
     }
 
     /**

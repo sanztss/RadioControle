@@ -179,54 +179,57 @@ public class MuralFragment extends Fragment {
                 super.onPostExecute(result);
 
                 adapter = new MuralListAdapter(getContext(), items);
+                if (cacheData.getString("adsWallContent").equals("off")){
+                    recyclerView.setAdapter(adapter);
+                    recyclerView.setLayoutManager(linearLayoutManager);
+                } else if (cacheData.getString("adsWallContent").equals("ampiri")){
+                    StreamNativeAdCallback streamNativeAdListener = new StreamNativeAdCallback() {
+                        @Override
+                        public void onStreamAdLoadFailed() {
 
-                StreamNativeAdCallback streamNativeAdListener = new StreamNativeAdCallback() {
-                    @Override
-                    public void onStreamAdLoadFailed() {
+                        }
 
-                    }
+                        @Override
+                        public void onAdLoaded(@NonNull NativeAd nativeAd) {
 
-                    @Override
-                    public void onAdLoaded(@NonNull NativeAd nativeAd) {
+                        }
 
-                    }
+                        @Override
+                        public void onAdFailed(@NonNull NativeAd nativeAd, @NonNull ResponseStatus responseStatus) {
 
-                    @Override
-                    public void onAdFailed(@NonNull NativeAd nativeAd, @NonNull ResponseStatus responseStatus) {
+                        }
 
-                    }
+                        @Override
+                        public void onAdOpened(@NonNull NativeAd nativeAd) {
 
-                    @Override
-                    public void onAdOpened(@NonNull NativeAd nativeAd) {
+                        }
 
-                    }
+                        @Override
+                        public void onAdClicked(@NonNull NativeAd nativeAd) {
 
-                    @Override
-                    public void onAdClicked(@NonNull NativeAd nativeAd) {
+                        }
 
-                    }
+                        @Override
+                        public void onAdClosed(@NonNull NativeAd nativeAd) {
 
-                    @Override
-                    public void onAdClosed(@NonNull NativeAd nativeAd) {
+                        }
 
-                    }
+                        @Override
+                        public void onAdCompleted(@NonNull NativeAd nativeAd) {
 
-                    @Override
-                    public void onAdCompleted(@NonNull NativeAd nativeAd) {
-
-                    }
-                };
-                StreamAdRecyclerAdapter adAdapter = new StreamAdRecyclerAdapter.Builder()
-                        .setAdapter(adapter)
-                        //.setAdUnitId("2f3caac7-7573-4e6b-bf1a-d8b58b06e9d9")
-                        .setAdUnitId("e5cc8e6d-d674-402a-aeca-eda7856bd7af")
-                        .setViewBuilder(FeedNativeAdView.BUILDER)
-                        .setEventCallback(streamNativeAdListener)
-                        .build(getContext());
-                recyclerView.setAdapter(adAdapter);
-                adAdapter.loadAd();
-                recyclerView.setLayoutManager(linearLayoutManager);
-
+                        }
+                    };
+                    StreamAdRecyclerAdapter adAdapter = new StreamAdRecyclerAdapter.Builder()
+                            .setAdapter(adapter)
+                            //.setAdUnitId("e5cc8e6d-d674-402a-aeca-eda7856bd7af")
+                            .setAdUnitId(cacheData.getString("adsWallValue"))
+                            .setViewBuilder(FeedNativeAdView.BUILDER)
+                            .setEventCallback(streamNativeAdListener)
+                            .build(getContext());
+                    recyclerView.setAdapter(adAdapter);
+                    adAdapter.loadAd();
+                    recyclerView.setLayoutManager(linearLayoutManager);
+                }
             }
         }.execute();
 

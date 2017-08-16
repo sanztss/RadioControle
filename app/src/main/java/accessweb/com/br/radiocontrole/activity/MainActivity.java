@@ -3,6 +3,7 @@ package accessweb.com.br.radiocontrole.activity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -40,6 +41,7 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -60,6 +62,7 @@ import com.ampiri.sdk.mediation.BannerSize;
 import com.ampiri.sdk.mediation.ResponseStatus;
 import com.facebook.FacebookSdk;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
+import com.squareup.picasso.Picasso;
 
 import java.io.Serializable;
 import java.security.MessageDigest;
@@ -87,6 +90,9 @@ import accessweb.com.br.radiocontrole.util.ActivityResultEvent;
 import accessweb.com.br.radiocontrole.util.CognitoClientManager;
 import accessweb.com.br.radiocontrole.util.CacheData;
 
+import static accessweb.com.br.radiocontrole.R.id.areaAnuncio;
+import static accessweb.com.br.radiocontrole.R.id.imagemAnuncio;
+import static accessweb.com.br.radiocontrole.R.id.relativeLogo;
 import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener,MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, OnBufferingUpdateListener {
@@ -113,6 +119,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private TextView nomeArtista;
     private TextView txtNomeCantor;
     private BannerAd bannerAd;
+    private LinearLayout areaAnuncio;
+    private ImageView imagemAnuncio;
     private List<Channel> canais = new ArrayList<Channel>();
     private int indexCanal = 0;
 
@@ -144,7 +152,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         mMobile = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
-        CacheData cacheData = new CacheData(getApplicationContext());
+        final CacheData cacheData = new CacheData(getApplicationContext());
 
         // RECUPERANDO LISTA DE CANAIS DA SPLASH ACTIVITY
         Bundle extras = getIntent().getExtras();
@@ -239,35 +247,57 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         Ampiri.setDebugMode(true);
         Ampiri.setTestMode(true);
-        BannerAdCallback bannerAdListener = new BannerAdCallback() {
-            @Override
-            public void onAdLoaded(@NonNull BannerAd ad) {
 
-            }
+        areaAnuncio = (LinearLayout) findViewById(R.id.areaAnuncio);
+        imagemAnuncio = (ImageView) findViewById(R.id.imagemAnuncio);
+        if (cacheData.getString("adsPlayerContent").equals("off")){
+            areaAnuncio.setVisibility(View.GONE);
+        }else if (cacheData.getString("adsPlayerContent").equals("ampiri")) {
+            BannerAdCallback bannerAdListener = new BannerAdCallback() {
+                @Override
+                public void onAdLoaded(@NonNull BannerAd ad) {
 
-            @Override
-            public void onAdFailed(@NonNull BannerAd AD, @NonNull ResponseStatus responseStatus) {
+                }
 
-            }
+                @Override
+                public void onAdFailed(@NonNull BannerAd AD, @NonNull ResponseStatus responseStatus) {
 
-            @Override
-            public void onAdOpened(@NonNull BannerAd ad) {
+                }
 
-            }
+                @Override
+                public void onAdOpened(@NonNull BannerAd ad) {
 
-            @Override
-            public void onAdClicked(@NonNull BannerAd ad) {
+                }
 
-            }
+                @Override
+                public void onAdClicked(@NonNull BannerAd ad) {
 
-            @Override
-            public void onAdClosed(@NonNull BannerAd ad) {
+                }
 
-            }
-        };
-        FrameLayout adView = (FrameLayout) findViewById(R.id.ad_view);
-        //bannerAd = BannerAdPool.load(this, "264b7779-e1c7-4a85-9ffa-55e0ef532cee", adView, BannerSize.BANNER_SIZE_320x50, bannerAdListener);
-        bannerAd = BannerAdPool.load(this, "34e3be38-adb1-493b-8eec-5c20a60d0f56", adView, BannerSize.BANNER_SIZE_320x50, bannerAdListener);
+                @Override
+                public void onAdClosed(@NonNull BannerAd ad) {
+
+                }
+            };
+            FrameLayout adView = (FrameLayout) findViewById(R.id.ad_view);
+            adView.setVisibility(View.VISIBLE);
+            //bannerAd = BannerAdPool.load(this, "34e3be38-adb1-493b-8eec-5c20a60d0f56", adView, BannerSize.BANNER_SIZE_320x50, bannerAdListener);
+            bannerAd = BannerAdPool.load(this, cacheData.getString("adsPlayerValue"), adView, BannerSize.BANNER_SIZE_320x50, bannerAdListener);
+        } else if (cacheData.getString("adsPlayerContent").equals("image")) {
+            imagemAnuncio.setVisibility(View.VISIBLE);
+            Picasso.with(mContext).load(cacheData.getString("adsPlayerValue")).into(imagemAnuncio);
+            imagemAnuncio.setOnClickListener(new View.OnClickListener() {
+                public void onClick(View v) {
+                    try {
+                        Intent intentContato = new Intent(Intent.ACTION_VIEW, Uri.parse(cacheData.getString("adsHomeLink")));
+                        startActivity(intentContato);
+                    } catch (ActivityNotFoundException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        }
+
     }
 
     private void initCognito() {
