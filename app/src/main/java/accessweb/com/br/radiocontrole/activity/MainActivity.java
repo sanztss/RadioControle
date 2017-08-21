@@ -357,6 +357,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
 
 
+        } else if(myMediaPlayer.isPlaying()){
+            moveTaskToBack(true);
         } else {
             super.onBackPressed();
         }
