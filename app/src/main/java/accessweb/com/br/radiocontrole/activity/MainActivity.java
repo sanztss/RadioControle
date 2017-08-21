@@ -46,6 +46,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
 import com.amazonaws.mobileconnectors.cognito.Dataset;
@@ -53,13 +54,18 @@ import com.amazonaws.mobileconnectors.cognito.Record;
 import com.amazonaws.mobileconnectors.cognito.SyncConflict;
 import com.amazonaws.mobileconnectors.cognito.exceptions.DataStorageException;
 import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
+import com.amazonaws.mobileconnectors.cognitoidentityprovider.CognitoUserPool;
 import com.amazonaws.regions.Regions;
 import com.ampiri.sdk.Ampiri;
 import com.ampiri.sdk.banner.BannerAd;
 import com.ampiri.sdk.banner.BannerAdPool;
+import com.ampiri.sdk.interstitial.InterstitialAd;
+import com.ampiri.sdk.interstitial.InterstitialAdPool;
 import com.ampiri.sdk.listeners.BannerAdCallback;
+import com.ampiri.sdk.listeners.InterstitialAdCallback;
 import com.ampiri.sdk.mediation.BannerSize;
 import com.ampiri.sdk.mediation.ResponseStatus;
+import com.ampiri.sdk.mediation.admob.AdMobMediation;
 import com.facebook.FacebookSdk;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 import com.squareup.picasso.Picasso;
@@ -138,6 +144,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     ProgressDialog progressDialog;
 
     private static ArrayList<String> modulos = new ArrayList<String>();
+
+    private Boolean firstTimeAds = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -250,33 +259,39 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         areaAnuncio = (LinearLayout) findViewById(R.id.areaAnuncio);
         imagemAnuncio = (ImageView) findViewById(R.id.imagemAnuncio);
+
         if (cacheData.getString("adsPlayerContent").equals("off")){
             areaAnuncio.setVisibility(View.GONE);
         }else if (cacheData.getString("adsPlayerContent").equals("ampiri")) {
             BannerAdCallback bannerAdListener = new BannerAdCallback() {
                 @Override
                 public void onAdLoaded(@NonNull BannerAd ad) {
-
+                    Log.e("BannerAdCallback", "onAdLoaded");
+                    Log.e("BannerAdCallback", "onAdLoaded");
                 }
 
                 @Override
                 public void onAdFailed(@NonNull BannerAd AD, @NonNull ResponseStatus responseStatus) {
-
+                    Log.e("BannerAdCallback", "onAdFailed");
+                    Log.e("BannerAdCallback", "onAdFailed");
                 }
 
                 @Override
                 public void onAdOpened(@NonNull BannerAd ad) {
-
+                    Log.e("BannerAdCallback", "onAdOpened");
+                    Log.e("BannerAdCallback", "onAdOpened");
                 }
 
                 @Override
                 public void onAdClicked(@NonNull BannerAd ad) {
-
+                    Log.e("BannerAdCallback", "onAdClicked");
+                    Log.e("BannerAdCallback", "onAdClicked");
                 }
 
                 @Override
                 public void onAdClosed(@NonNull BannerAd ad) {
-
+                    Log.e("BannerAdCallback", "onAdClosed");
+                    Log.e("BannerAdCallback", "onAdClosed");
                 }
             };
             FrameLayout adView = (FrameLayout) findViewById(R.id.ad_view);
@@ -307,19 +322,25 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     @Override
     protected void onResume() {
         super.onResume();
-        bannerAd.onActivityResumed();
+        if (bannerAd != null){
+            bannerAd.onActivityResumed();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        bannerAd.onActivityPaused();
+        if (bannerAd != null){
+            bannerAd.onActivityPaused();
+        }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        bannerAd.onActivityDestroyed();
+        if (bannerAd != null){
+            bannerAd.onActivityDestroyed();
+        }
     }
 
     @Override
@@ -640,11 +661,23 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     // PLAY PAUSE STREAMING
     public void playPauseStreaming(View view) {
         //Log.v("aaa", ""+ view.getId());
-        if (!audioTocando) {
-            changeIcon("play", indexCanal);
-        } else {
-            changeIcon("pause", indexCanal);
+        CacheData cacheData = new CacheData(mContext);
+        if (cacheData.getString("adsPlayContent").equals("audio")){
+            if (firstTimeAds) {
+                changeIcon("propaganda", indexCanal);
+            } else if (!audioTocando) {
+                changeIcon("play", indexCanal);
+            } else {
+                changeIcon("pause", indexCanal);
+            }
+        }else {
+            if (!audioTocando) {
+                changeIcon("play", indexCanal);
+            } else {
+                changeIcon("pause", indexCanal);
+            }
         }
+
     }
 
     // ALTERAR ÍCONE PLAY PAUSE
@@ -755,6 +788,42 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             } catch (Throwable t) {
                 Log.d(TAG, t.toString());
             }
+        }else if (acao.equals("propaganda")) {
+            firstTimeAds = false;
+            CacheData cacheData = new CacheData(mContext);
+            progressDialog = new ProgressDialog(MainActivity.this);
+            progressDialog.setMessage("Carregando Áudio");
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            progressDialog.show();
+            Uri myUri = Uri.parse(cacheData.getString("adsPlayValue"));
+            try {
+                if (myMediaPlayer == null) {
+                    this.myMediaPlayer = new MediaPlayer();
+                } else {
+                    myMediaPlayer.stop();
+                    myMediaPlayer.reset();
+                }
+                myMediaPlayer.setDataSource(this, myUri); // Go to Initialized state
+                myMediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                myMediaPlayer.setOnPreparedListener(this);
+                myMediaPlayer.setOnBufferingUpdateListener(this);
+
+                myMediaPlayer.setOnErrorListener(this);
+                myMediaPlayer.prepareAsync();
+                myMediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        Log.e("AAAA","uhsuhsuhsuh");
+                        changeIcon("play", indexCanal);
+                    }
+
+                });
+                Log.d(TAG, "LoadClip Done");
+            } catch (Throwable t) {
+                Log.d(TAG, t.toString());
+            }
+            System.out.println("AAAAAAAAAAAAAAAA");
         }
     }
 

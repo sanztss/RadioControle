@@ -346,7 +346,6 @@
                 android:layout_height="69dp"
                 android:gravity="center_horizontal"
                 android:src="@drawable/anuncio"
-                android:scaleType="fitXY"
                 android:visibility="gone"/>
             <FrameLayout
                 android:id="@+id/ad_view"
