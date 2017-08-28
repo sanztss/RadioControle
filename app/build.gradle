@@ -65,6 +65,7 @@ dependencies {
     compile 'com.amazonaws:aws-android-sdk-cognito:2.4.5'
     compile 'com.amazonaws:aws-android-sdk-cognitoidentityprovider:2.4.5'
     compile 'com.amazonaws:aws-android-sdk-apigateway-core:2.4.5'
+    compile 'com.amazonaws:aws-android-sdk-mobileanalytics:2.4.5'
 
     compile 'com.ampiri.sdk:ampiri-sdk:4.2.2'
     compile 'com.ampiri.sdk:ampiri-sdk-mediation-admob:4.2.2'

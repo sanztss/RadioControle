@@ -48,6 +48,9 @@ import android.widget.Toast;
 
 import com.amazonaws.ClientConfiguration;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.AnalyticsEvent;
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.InitializationException;
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.MobileAnalyticsManager;
 import com.amazonaws.mobileconnectors.cognito.CognitoSyncManager;
 import com.amazonaws.mobileconnectors.cognito.Dataset;
 import com.amazonaws.mobileconnectors.cognito.Record;
@@ -147,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     private Boolean firstTimeAds = true;
 
+    private static MobileAnalyticsManager analytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,6 +164,16 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         connManager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         mWifi = connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         mMobile = connManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+
+        try {
+            analytics = MobileAnalyticsManager.getOrCreateInstance(
+                    this.getApplicationContext(),
+                    "78901fb9b7ae4dc98c6b4ba0dd54e409", //Amazon Mobile Analytics App ID
+                    "us-east-1:9434eddb-ce1a-4204-bb3b-4a7f88b97b17" //Amazon Cognito Identity Pool ID
+            );
+        } catch(InitializationException ex) {
+            Log.e(this.getClass().getName(), "Failed to initialize Amazon Mobile Analytics", ex);
+        }
 
         final CacheData cacheData = new CacheData(getApplicationContext());
 
@@ -313,6 +327,17 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             });
         }
 
+        AnalyticsEvent playerEvent = analytics.getEventClient().createEvent("Player");
+        if (!cacheData.getString("userEmail").equals("")){
+            playerEvent.addAttribute("Email", cacheData.getString("userEmail"));
+            playerEvent.addAttribute("Logged", "True");
+            playerEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }else {
+            playerEvent.addAttribute("Logged", "False");
+            playerEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }
+        analytics.getEventClient().recordEvent(playerEvent);
+
     }
 
     private void initCognito() {
@@ -325,6 +350,9 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         if (bannerAd != null){
             bannerAd.onActivityResumed();
         }
+        if(analytics != null) {
+            analytics.getSessionClient().resumeSession();
+        }
     }
 
     @Override
@@ -332,6 +360,10 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         super.onPause();
         if (bannerAd != null){
             bannerAd.onActivityPaused();
+        }
+        if(analytics != null) {
+            analytics.getSessionClient().pauseSession();
+            analytics.getEventClient().submitEvents();
         }
     }
 
@@ -357,7 +389,7 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             }
 
 
-        } else if(myMediaPlayer.isPlaying()){
+        } else if(myMediaPlayer != null && myMediaPlayer.isPlaying()){
             moveTaskToBack(true);
         } else {
             super.onBackPressed();
@@ -658,6 +690,17 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     public void abrirPainel(View view) {
         //Log.v("view", "Player toolbar");
         painel.setPanelState(SlidingUpPanelLayout.PanelState.EXPANDED);
+        CacheData cacheData = new CacheData(mContext);
+        AnalyticsEvent playerEvent = analytics.getEventClient().createEvent("Player");
+        if (!cacheData.getString("userEmail").equals("")){
+            playerEvent.addAttribute("Email", cacheData.getString("userEmail"));
+            playerEvent.addAttribute("Logged", "True");
+            playerEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }else {
+            playerEvent.addAttribute("Logged", "False");
+            playerEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }
+        analytics.getEventClient().recordEvent(playerEvent);
     }
 
     // PLAY PAUSE STREAMING
@@ -669,6 +712,16 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 changeIcon("propaganda", indexCanal);
             } else if (!audioTocando) {
                 changeIcon("play", indexCanal);
+                AnalyticsEvent buttonPlayTapped = analytics.getEventClient().createEvent("ButtonPlayTapped");
+                if (!cacheData.getString("userEmail").equals("")){
+                    buttonPlayTapped.addAttribute("Email", cacheData.getString("userEmail"));
+                    buttonPlayTapped.addAttribute("Logged", "True");
+                    buttonPlayTapped.addAttribute("RadioId", cacheData.getString("idRadio"));
+                }else {
+                    buttonPlayTapped.addAttribute("Logged", "False");
+                    buttonPlayTapped.addAttribute("RadioId", cacheData.getString("idRadio"));
+                }
+                analytics.getEventClient().recordEvent(buttonPlayTapped);
             } else {
                 changeIcon("pause", indexCanal);
             }

@@ -72,6 +72,7 @@ public class ProgramacaoDiaFragment extends Fragment{
         adapter = new ProgramacaoAdapter(getContext(), getData());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
         return rootView;
     }
 

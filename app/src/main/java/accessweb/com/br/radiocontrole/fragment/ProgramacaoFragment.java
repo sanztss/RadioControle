@@ -103,7 +103,7 @@ public class ProgramacaoFragment extends Fragment {
             @Override
             protected void onPostExecute(Void result) {
                 super.onPostExecute(result);
-                Log.v("AAAAAAAAAAAAA", "Nome:" + programs.get(0).getName());
+                //Log.v("AAAAAAAAAAAAA", "Nome:" + programs.get(0).getName());
                 // SEGUNDA
                 ProgramacaoDiaFragment segunda = new ProgramacaoDiaFragment();
                 Bundle argsSegunda = new Bundle();

@@ -30,6 +30,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.AnalyticsEvent;
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.MobileAnalyticsManager;
 import com.amazonaws.mobileconnectors.cognito.Dataset;
 import com.amazonaws.mobileconnectors.cognito.Record;
 import com.amazonaws.mobileconnectors.cognito.SyncConflict;
@@ -86,6 +88,7 @@ public class EntrarFragment extends Fragment {
     private AlertDialog confirmDialog;
     private ProgressDialog waitDialog;
 
+    private static MobileAnalyticsManager analytics;
 
     public EntrarFragment() {
         // Required empty public constructor
@@ -552,6 +555,15 @@ public class EntrarFragment extends Fragment {
                             suaContaDialogFragment.abrirTelaDesejada();
                             //df.dismiss();
                         }
+                        AnalyticsEvent sessionEvent = analytics.getEventClient().createEvent("Session");
+                        if (!cacheData.getString("userEmail").equals("")){
+                            sessionEvent.addAttribute("Email", cacheData.getString("userEmail"));
+                            sessionEvent.addAttribute("Logged", "True");
+                            sessionEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+                        }else {
+                            sessionEvent.addAttribute("Logged", "False");
+                        }
+                        analytics.getEventClient().recordEvent(sessionEvent);
                     }
 
                     @Override

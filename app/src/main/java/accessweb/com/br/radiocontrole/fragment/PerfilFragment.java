@@ -35,6 +35,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amazonaws.ClientConfiguration;
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.AnalyticsEvent;
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.MobileAnalyticsManager;
 import com.amazonaws.mobileconnectors.cognito.Dataset;
 import com.amazonaws.mobileconnectors.cognito.Dataset.SyncCallback;
 import com.amazonaws.mobileconnectors.cognito.Record;
@@ -97,6 +99,8 @@ public class PerfilFragment extends Fragment {
     private ProgressDialog waitDialog;
     private String s3FileKey;
 
+    private static MobileAnalyticsManager analytics;
+
     public PerfilFragment() {
         // Required empty public constructor
     }
@@ -148,6 +152,18 @@ public class PerfilFragment extends Fragment {
         bgFotoUsuario = (View) rootView.findViewById(R.id.bgFotoUsuario);
 
         CacheData cacheData = new CacheData(getContext());
+
+        AnalyticsEvent profileEvent = analytics.getEventClient().createEvent("Profile");
+        if (!cacheData.getString("userEmail").equals("")){
+            profileEvent.addAttribute("Email", cacheData.getString("userEmail"));
+            profileEvent.addAttribute("Logged", "True");
+            profileEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }else {
+            profileEvent.addAttribute("Logged", "False");
+            profileEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }
+        analytics.getEventClient().recordEvent(profileEvent);
+
         bgFotoUsuario.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         System.out.println("AAAAAAAAAAAAAAAAA" + cacheData.getString("userUrlFoto"));
         if (!cacheData.getString("userUrlFoto").equals("")){

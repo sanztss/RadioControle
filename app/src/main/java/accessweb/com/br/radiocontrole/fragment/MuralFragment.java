@@ -18,6 +18,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.AnalyticsEvent;
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.MobileAnalyticsManager;
 import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
 import com.ampiri.sdk.listeners.NativeAdCallback;
 import com.ampiri.sdk.listeners.StreamNativeAdCallback;
@@ -64,6 +66,8 @@ public class MuralFragment extends Fragment {
 
     private CacheData cacheData;
     private String lastKey = "";
+
+    private static MobileAnalyticsManager analytics;
 
     public MuralFragment() {
         // Required empty public constructor
@@ -289,6 +293,17 @@ public class MuralFragment extends Fragment {
             }
         });
         btnAdicionarPostagem.setBackgroundTintList(ColorStateList.valueOf(Color.parseColor(cacheData.getString("color"))));
+
+        AnalyticsEvent wallEvent = analytics.getEventClient().createEvent("Wall");
+        if (!cacheData.getString("userEmail").equals("")){
+            wallEvent.addAttribute("Email", cacheData.getString("userEmail"));
+            wallEvent.addAttribute("Logged", "True");
+            wallEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }else {
+            wallEvent.addAttribute("Logged", "False");
+        }
+        analytics.getEventClient().recordEvent(wallEvent);
+
         return rootView;
     }
 
