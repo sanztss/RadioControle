@@ -41,6 +41,8 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.AnalyticsEvent;
+import com.amazonaws.mobileconnectors.amazonmobileanalytics.MobileAnalyticsManager;
 import com.amazonaws.mobileconnectors.apigateway.ApiClientFactory;
 import com.ampiri.sdk.Ampiri;
 import com.ampiri.sdk.banner.BannerAd;
@@ -91,6 +93,8 @@ public class HomeFragment extends Fragment {
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 1;
 
     private BannerAd bannerAd;
+
+    private static MobileAnalyticsManager analytics;
 
     public HomeFragment() {
         // Required empty public constructor

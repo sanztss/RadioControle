@@ -337,7 +337,16 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
             playerEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
         }
         analytics.getEventClient().recordEvent(playerEvent);
-
+        AnalyticsEvent homeEvent = analytics.getEventClient().createEvent("Home");
+        if (!cacheData.getString("userEmail").equals("")){
+            homeEvent.addAttribute("Email", cacheData.getString("userEmail"));
+            homeEvent.addAttribute("Logged", "True");
+            homeEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }else {
+            homeEvent.addAttribute("Logged", "False");
+            homeEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }
+        analytics.getEventClient().recordEvent(homeEvent);
     }
 
     private void initCognito() {
@@ -608,6 +617,15 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 fragment = new MuralFragment();
                 title = "Mural";
                 tag = "mural";
+                AnalyticsEvent wallEvent = analytics.getEventClient().createEvent("Wall");
+                if (!cacheData.getString("userEmail").equals("")){
+                    wallEvent.addAttribute("Email", cacheData.getString("userEmail"));
+                    wallEvent.addAttribute("Logged", "True");
+                    wallEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+                }else {
+                    wallEvent.addAttribute("Logged", "False");
+                }
+                analytics.getEventClient().recordEvent(wallEvent);
                 break;
             case "programas":
                 fragment = new ProgramacaoFragment();
