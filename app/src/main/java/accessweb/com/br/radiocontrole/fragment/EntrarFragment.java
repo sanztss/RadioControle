@@ -87,6 +87,7 @@ public class EntrarFragment extends Fragment {
     private AlertDialog userDialog;
     private AlertDialog confirmDialog;
     private ProgressDialog waitDialog;
+    private String[] primeiraLetraEmail;
 
     private static MobileAnalyticsManager analytics;
 
@@ -557,7 +558,8 @@ public class EntrarFragment extends Fragment {
                         }
                         AnalyticsEvent sessionEvent = analytics.getEventClient().createEvent("Session");
                         if (!cacheData.getString("userEmail").equals("")){
-                            sessionEvent.addAttribute("Email", cacheData.getString("userEmail"));
+                            primeiraLetraEmail = cacheData.getString("userEmail").split("");
+                            sessionEvent.addAttribute("Email" + primeiraLetraEmail[0].toLowerCase(), cacheData.getString("userEmail"));
                             sessionEvent.addAttribute("Logged", "True");
                             sessionEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
                         }else {

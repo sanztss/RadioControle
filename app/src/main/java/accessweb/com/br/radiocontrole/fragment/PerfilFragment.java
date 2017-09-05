@@ -153,7 +153,7 @@ public class PerfilFragment extends Fragment {
 
         CacheData cacheData = new CacheData(getContext());
 
-        AnalyticsEvent profileEvent = analytics.getEventClient().createEvent("Profile");
+        /*AnalyticsEvent profileEvent = analytics.getEventClient().createEvent("Profile");
         if (!cacheData.getString("userEmail").equals("")){
             profileEvent.addAttribute("Email", cacheData.getString("userEmail"));
             profileEvent.addAttribute("Logged", "True");
@@ -162,7 +162,7 @@ public class PerfilFragment extends Fragment {
             profileEvent.addAttribute("Logged", "False");
             profileEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
         }
-        analytics.getEventClient().recordEvent(profileEvent);
+        analytics.getEventClient().recordEvent(profileEvent);*/
 
         bgFotoUsuario.setBackgroundColor(Color.parseColor(cacheData.getString("color")));
         System.out.println("AAAAAAAAAAAAAAAAA" + cacheData.getString("userUrlFoto"));

@@ -102,6 +102,7 @@ import accessweb.com.br.radiocontrole.util.CacheData;
 import static accessweb.com.br.radiocontrole.R.id.areaAnuncio;
 import static accessweb.com.br.radiocontrole.R.id.imagemAnuncio;
 import static accessweb.com.br.radiocontrole.R.id.relativeLogo;
+import static com.ampiri.sdk.c.b.a.S;
 import static java.security.AccessController.getContext;
 
 public class MainActivity extends AppCompatActivity implements FragmentDrawer.FragmentDrawerListener,MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener, MediaPlayer.OnErrorListener, OnBufferingUpdateListener {
@@ -151,6 +152,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
     private Boolean firstTimeAds = true;
 
     private static MobileAnalyticsManager analytics;
+
+    private String[] primeiraLetraEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -329,7 +332,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
         AnalyticsEvent playerEvent = analytics.getEventClient().createEvent("Player");
         if (!cacheData.getString("userEmail").equals("")){
-            playerEvent.addAttribute("Email", cacheData.getString("userEmail"));
+            primeiraLetraEmail = cacheData.getString("userEmail").split("");
+            playerEvent.addAttribute("Email" + primeiraLetraEmail[0].toLowerCase(), cacheData.getString("userEmail"));
             playerEvent.addAttribute("Logged", "True");
             playerEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
         }else {
@@ -339,7 +343,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         analytics.getEventClient().recordEvent(playerEvent);
         AnalyticsEvent homeEvent = analytics.getEventClient().createEvent("Home");
         if (!cacheData.getString("userEmail").equals("")){
-            homeEvent.addAttribute("Email", cacheData.getString("userEmail"));
+            primeiraLetraEmail = cacheData.getString("userEmail").split("");
+            homeEvent.addAttribute("Email" + primeiraLetraEmail[0].toLowerCase(), cacheData.getString("userEmail"));
             homeEvent.addAttribute("Logged", "True");
             homeEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
         }else {
@@ -619,7 +624,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 tag = "mural";
                 AnalyticsEvent wallEvent = analytics.getEventClient().createEvent("Wall");
                 if (!cacheData.getString("userEmail").equals("")){
-                    wallEvent.addAttribute("Email", cacheData.getString("userEmail"));
+                    primeiraLetraEmail = cacheData.getString("userEmail").split("");
+                    wallEvent.addAttribute("Email" + primeiraLetraEmail[0].toLowerCase(), cacheData.getString("userEmail"));
                     wallEvent.addAttribute("Logged", "True");
                     wallEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
                 }else {
@@ -646,6 +652,17 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                     ft.add(dialog,"fragment_dialog");
                     ft.commit();
                 }else {
+                    AnalyticsEvent profileEvent = analytics.getEventClient().createEvent("Profile");
+                    if (!cacheData.getString("userEmail").equals("")){
+                        primeiraLetraEmail = cacheData.getString("userEmail").split("");
+                        profileEvent.addAttribute("Email" + primeiraLetraEmail[0].toLowerCase(), cacheData.getString("userEmail"));
+                        profileEvent.addAttribute("Logged", "True");
+                        profileEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+                    }else {
+                        profileEvent.addAttribute("Logged", "False");
+                        profileEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+                    }
+                    analytics.getEventClient().recordEvent(profileEvent);
                     System.out.println("Usuário logado!!!");
                     fragment = new PerfilFragment();
                     title = "Perfil";
@@ -711,7 +728,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
         CacheData cacheData = new CacheData(mContext);
         AnalyticsEvent playerEvent = analytics.getEventClient().createEvent("Player");
         if (!cacheData.getString("userEmail").equals("")){
-            playerEvent.addAttribute("Email", cacheData.getString("userEmail"));
+            primeiraLetraEmail = cacheData.getString("userEmail").split("");
+            playerEvent.addAttribute("Email" + primeiraLetraEmail[0].toLowerCase(), cacheData.getString("userEmail"));
             playerEvent.addAttribute("Logged", "True");
             playerEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
         }else {
@@ -732,7 +750,8 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
                 changeIcon("play", indexCanal);
                 AnalyticsEvent buttonPlayTapped = analytics.getEventClient().createEvent("ButtonPlayTapped");
                 if (!cacheData.getString("userEmail").equals("")){
-                    buttonPlayTapped.addAttribute("Email", cacheData.getString("userEmail"));
+                    primeiraLetraEmail = cacheData.getString("userEmail").split("");
+                    buttonPlayTapped.addAttribute("Email" + primeiraLetraEmail[0].toLowerCase(), cacheData.getString("userEmail"));
                     buttonPlayTapped.addAttribute("Logged", "True");
                     buttonPlayTapped.addAttribute("RadioId", cacheData.getString("idRadio"));
                 }else {
@@ -975,6 +994,18 @@ public class MainActivity extends AppCompatActivity implements FragmentDrawer.Fr
 
     // ABRIR FRAGMENTO PERFIL
     public void abrirPerfil() {
+        CacheData cacheData = new CacheData(mContext);
+        AnalyticsEvent profileEvent = analytics.getEventClient().createEvent("Profile");
+        if (!cacheData.getString("userEmail").equals("")){
+            primeiraLetraEmail = cacheData.getString("userEmail").split("");
+            profileEvent.addAttribute("Email" + primeiraLetraEmail[0].toLowerCase(), cacheData.getString("userEmail"));
+            profileEvent.addAttribute("Logged", "True");
+            profileEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }else {
+            profileEvent.addAttribute("Logged", "False");
+            profileEvent.addAttribute("RadioId", cacheData.getString("idRadio"));
+        }
+        analytics.getEventClient().recordEvent(profileEvent);
         Fragment fragment = null;
         fragment = new PerfilFragment();
         FragmentManager fragmentManager = getSupportFragmentManager();
